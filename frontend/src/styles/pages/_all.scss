@@ -2,17 +2,17 @@
 @import "theme";
 
 * {
-    font-family: "Roboto", sans-serif;
+    font-family: $font-family-base;
 }
 
 html {
     font-size: 62.5%;
-    line-height: 1.3;
+    line-height: $theme-line-height;
     scroll-behavior: smooth;
 }
 
 body {
-    background-color: white;
+    background-color: get-theme-color("background");
     margin: 0;
     display: flex;
     flex-direction: column;
@@ -26,6 +26,12 @@ body {
     overflow-y: auto;
     box-sizing: border-box;
 }
+
 a {
     text-decoration: none;
+    color: get-theme-color("primary");
+    
+    &:hover {
+        text-decoration: underline;
+    }
 }

@@ -1,0 +1,210 @@
+@import "../../../styles/pages/theme";
+
+.marketplace-page {
+    margin-top: $header-height;
+    min-height: calc(100vh - #{$header-height});
+    background-color: get-theme-color("background");
+
+    .marketplace-header {
+        background: white;
+        position: sticky;
+        top: $header-height;
+        z-index: 10;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            h1 {
+                font-size: 24px;
+                font-weight: $font-weight-bold;
+                color: get-theme-color("text-primary");
+                margin: 0;
+            }
+
+            .sell-button {
+                padding: 8px 16px;
+                border: none;
+                border-radius: 8px;
+                background: get-theme-color("primary");
+                color: white;
+                font-size: 15px;
+                font-weight: $font-weight-medium;
+                cursor: pointer;
+                transition: all 0.2s ease;
+
+                &:hover {
+                    background: darken(get-theme-color("primary"), 5%);
+                }
+            }
+        }
+
+        .categories-scroll {
+            overflow-x: auto;
+            padding: 0 24px 12px;
+
+            &::-webkit-scrollbar {
+                height: 4px;
+            }
+
+            &::-webkit-scrollbar-track {
+                background: #f1f1f1;
+            }
+
+            &::-webkit-scrollbar-thumb {
+                background: #888;
+                border-radius: 4px;
+            }
+
+            .categories {
+                display: flex;
+                gap: 12px;
+                max-width: 1200px;
+                margin: 0 auto;
+
+                .category {
+                    padding: 8px 16px;
+                    border: none;
+                    border-radius: 20px;
+                    background: get-theme-color("background");
+                    color: get-theme-color("text-secondary");
+                    font-size: 14px;
+                    font-weight: $font-weight-medium;
+                    cursor: pointer;
+                    white-space: nowrap;
+                    transition: all 0.2s ease;
+
+                    &:hover {
+                        background: darken(get-theme-color("background"), 5%);
+                    }
+
+                    &.active {
+                        background: get-theme-color("primary");
+                        color: white;
+                    }
+                }
+            }
+        }
+    }
+
+    .products-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 24px;
+        max-width: 1200px;
+        margin: 24px auto;
+        padding: 0 24px;
+
+        .product-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+            .product-image {
+                position: relative;
+                aspect-ratio: 1;
+                overflow: hidden;
+                
+                img {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                    transition: transform 0.3s ease;
+                }
+
+                .save-button {
+                    position: absolute;
+                    top: 12px;
+                    right: 12px;
+                    background: white;
+                    border: none;
+                    border-radius: 50%;
+                    width: 36px;
+                    height: 36px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    cursor: pointer;
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+                }
+
+                &:hover img {
+                    transform: scale(1.05);
+                }
+            }
+
+            .product-info {
+                padding: 16px;
+
+                h3 {
+                    margin: 0;
+                    font-size: 16px;
+                    font-weight: $font-weight-semibold;
+                    color: get-theme-color("text-primary");
+                }
+
+                .price {
+                    margin: 8px 0;
+                    font-size: 18px;
+                    font-weight: $font-weight-bold;
+                    color: get-theme-color("primary");
+                }
+
+                .location {
+                    margin: 4px 0;
+                    font-size: 14px;
+                    color: get-theme-color("text-secondary");
+                }
+
+                .seller-info {
+                    display: flex;
+                    gap: 8px;
+                    align-items: center;
+                    margin-top: 8px;
+                    font-size: 13px;
+                    color: get-theme-color("text-secondary");
+                }
+            }
+
+            .contact-button {
+                width: 100%;
+                padding: 12px;
+                border: none;
+                background: get-theme-color("background");
+                color: get-theme-color("primary");
+                font-size: 14px;
+                font-weight: $font-weight-medium;
+                cursor: pointer;
+                transition: background-color 0.2s ease;
+
+                &:hover {
+                    background: darken(get-theme-color("background"), 5%);
+                }
+            }
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .marketplace-page {
+        .marketplace-header {
+            .header-content {
+                flex-direction: column;
+                gap: 16px;
+                align-items: flex-start;
+            }
+        }
+
+        .products-grid {
+            grid-template-columns: 1fr;
+            padding: 16px;
+            gap: 16px;
+        }
+    }
+}

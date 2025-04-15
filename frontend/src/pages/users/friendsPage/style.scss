@@ -1,0 +1,141 @@
+@import "../../../styles/pages/theme";
+
+.friends-page {
+    margin-top: $header-height;
+    padding: 24px;
+    min-height: calc(100vh - #{$header-height});
+    background-color: get-theme-color("background");
+
+    .friends-header {
+        max-width: 1200px;
+        margin: 0 auto 24px;
+
+        h1 {
+            font-size: 24px;
+            font-weight: $font-weight-bold;
+            color: get-theme-color("text-primary");
+            margin-bottom: 16px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 12px;
+            border-bottom: 1px solid #dddfe2;
+            padding-bottom: 12px;
+
+            .tab {
+                padding: 8px 16px;
+                border: none;
+                border-radius: 20px;
+                background: none;
+                color: get-theme-color("text-secondary");
+                font-size: 15px;
+                font-weight: $font-weight-medium;
+                cursor: pointer;
+                transition: all 0.2s ease;
+
+                &:hover {
+                    background: rgba(0, 0, 0, 0.05);
+                }
+
+                &.active {
+                    background: get-theme-color("primary");
+                    color: white;
+                }
+            }
+        }
+    }
+
+    .friends-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 16px;
+        max-width: 1200px;
+        margin: 0 auto;
+
+        .friend-card {
+            background: white;
+            border-radius: 8px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+            .friend-photo {
+                width: 120px;
+                height: 120px;
+                border-radius: 50%;
+                overflow: hidden;
+                margin-bottom: 12px;
+
+                img {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                }
+            }
+
+            .friend-info {
+                h3 {
+                    margin: 0;
+                    font-size: 17px;
+                    font-weight: $font-weight-semibold;
+                    color: get-theme-color("text-primary");
+                }
+
+                p {
+                    margin: 4px 0 12px;
+                    font-size: 14px;
+                    color: get-theme-color("text-secondary");
+                }
+
+                .friend-actions {
+                    display: flex;
+                    gap: 8px;
+                    justify-content: center;
+
+                    button {
+                        padding: 8px 16px;
+                        border: none;
+                        border-radius: 6px;
+                        font-size: 14px;
+                        font-weight: $font-weight-medium;
+                        cursor: pointer;
+                        transition: background-color 0.2s ease;
+
+                        &.primary-button {
+                            background: get-theme-color("primary");
+                            color: white;
+
+                            &:hover {
+                                background: darken(get-theme-color("primary"), 5%);
+                            }
+                        }
+
+                        &.secondary-button {
+                            background: get-theme-color("background");
+                            color: get-theme-color("text-secondary");
+
+                            &:hover {
+                                background: darken(get-theme-color("background"), 5%);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@media (max-width: 600px) {
+    .friends-page {
+        padding: 16px;
+
+        .friends-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+}

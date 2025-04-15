@@ -9,13 +9,14 @@ const Footer = () => {
             <div className="footer-content">
                 <div className="footer-links">
                     <Link to="/about">About</Link>
-                    <Link to="/help">Help</Link>
-                    <Link to="/privacy">Privacy</Link>
-                    <Link to="/terms">Terms</Link>
+                    <Link to="/help">Help Center</Link>
+                    <Link to="/privacy">Privacy Policy</Link>
+                    <Link to="/terms">Terms of Service</Link>
                     <Link to="/careers">Careers</Link>
+                    <Link to="/contact">Contact Us</Link>
                 </div>
                 <div className="footer-copyright">
-                    Social Network © {currentYear}
+                    Capstone Social © {currentYear} | Made with ❤️ by Group 7
                 </div>
             </div>
         </footer>

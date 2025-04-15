@@ -8,10 +8,10 @@ const Header = () => {
             <div className="header-container">
                 <div className="header-left">
                     <Link to="/" className="logo">
-                        <img src="/facebook-logo.png" alt="Facebook" />
+                        <img src="/logo.png" alt="Capstone Social" />
                     </Link>
                     <div className="search">
-                        <input type="text" placeholder="Search Facebook" />
+                        <input type="text" placeholder="Search Capstone Social" />
                     </div>
                 </div>
                 <nav className="header-center">
@@ -19,10 +19,10 @@ const Header = () => {
                         <span className="nav-icon">🏠</span>
                     </Link>
                     <Link to="/watch" className="nav-item">
-                        <span className="nav-icon">📺</span>
+                        <span className="nav-icon">🎥</span>
                     </Link>
                     <Link to="/marketplace" className="nav-item">
-                        <span className="nav-icon">🏪</span>
+                        <span className="nav-icon">🛍️</span>
                     </Link>
                     <Link to="/groups" className="nav-item">
                         <span className="nav-icon">👥</span>
@@ -30,7 +30,7 @@ const Header = () => {
                 </nav>
                 <div className="header-right">
                     <button className="profile-button">
-                        <img src="/default-avatar.png" alt="Profile" />
+                        <img src="/images/default-avatar.png" alt="Profile" />
                     </button>
                 </div>
             </div>

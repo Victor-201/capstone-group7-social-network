@@ -7,7 +7,8 @@
     right: 0;
     height: $header-height;
     background-color: white;
-    border-bottom: 1px solid #dddfe2;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     z-index: 100;
 
     .header-container {
@@ -30,11 +31,12 @@
             img {
                 width: 100%;
                 height: 100%;
+                object-fit: contain;
             }
         }
 
         .search {
-            background: get-theme-color("background-gray");
+            background: get-theme-color("background");
             border-radius: 50px;
             padding: 0 16px;
             
@@ -45,6 +47,7 @@
                 background: none;
                 outline: none;
                 font-size: 15px;
+                font-family: $font-family-base;
                 
                 &::placeholder {
                     color: get-theme-color("text-secondary");
@@ -69,11 +72,11 @@
             transition: all 0.2s;
 
             &:hover {
-                background-color: get-theme-color("background-gray");
+                background-color: get-theme-color("background");
             }
 
             &.active {
-                color: get-theme-color("facebook-blue");
+                color: get-theme-color("primary");
                 position: relative;
 
                 &::after {
@@ -83,7 +86,7 @@
                     left: 0;
                     right: 0;
                     height: 3px;
-                    background-color: get-theme-color("facebook-blue");
+                    background-color: get-theme-color("primary");
                 }
             }
 
@@ -103,6 +106,7 @@
             cursor: pointer;
             overflow: hidden;
             background: none;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 
             img {
                 width: 100%;
@@ -111,7 +115,8 @@
             }
 
             &:hover {
-                opacity: 0.9;
+                transform: scale(1.05);
+                transition: transform 0.2s ease;
             }
         }
     }
