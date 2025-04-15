@@ -1,0 +1,31 @@
+@use "sass:map";
+@import "theme";
+
+* {
+    font-family: "Roboto", sans-serif;
+}
+
+html {
+    font-size: 62.5%;
+    line-height: 1.3;
+    scroll-behavior: smooth;
+}
+
+body {
+    background-color: white;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.container {
+    margin: 0 auto;
+    max-width: 1440px;
+    min-height: calc(100vh - 120px - 65.5px);
+    padding: $theme-padding;
+    overflow-y: auto;
+    box-sizing: border-box;
+}
+a {
+    text-decoration: none;
+}
