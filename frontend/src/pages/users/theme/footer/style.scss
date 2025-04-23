@@ -1,0 +1,35 @@
+@import "../../../../styles/pages/theme";
+
+.footer {
+    background-color: white;
+    padding: 20px 0;
+    border-top: 1px solid #dddfe2;
+
+    .footer-content {
+        max-width: 980px;
+        margin: 0 auto;
+        padding: 0 16px;
+    }
+
+    .footer-links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        margin-bottom: 10px;
+
+        a {
+            color: get-theme-color("text-secondary");
+            font-size: 12px;
+            text-decoration: none;
+
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+    }
+
+    .footer-copyright {
+        color: get-theme-color("text-secondary");
+        font-size: 11px;
+    }
+}

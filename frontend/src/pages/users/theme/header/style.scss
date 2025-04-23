@@ -1,0 +1,123 @@
+@import "../../../../styles/pages/theme";
+
+.header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: $header-height;
+    background-color: white;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 100;
+
+    .header-container {
+        max-width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 16px;
+    }
+
+    .header-left {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        .logo {
+            width: 40px;
+            height: 40px;
+            img {
+                width: 100%;
+                height: 100%;
+                object-fit: contain;
+            }
+        }
+
+        .search {
+            background: get-theme-color("background");
+            border-radius: 50px;
+            padding: 0 16px;
+            
+            input {
+                width: 240px;
+                height: 40px;
+                border: none;
+                background: none;
+                outline: none;
+                font-size: 15px;
+                font-family: $font-family-base;
+                
+                &::placeholder {
+                    color: get-theme-color("text-secondary");
+                }
+            }
+        }
+    }
+
+    .header-center {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        .nav-item {
+            width: 112px;
+            height: $header-height;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: get-theme-color("text-secondary");
+            border-radius: 8px;
+            transition: all 0.2s;
+
+            &:hover {
+                background-color: get-theme-color("background");
+            }
+
+            &.active {
+                color: get-theme-color("primary");
+                position: relative;
+
+                &::after {
+                    content: '';
+                    position: absolute;
+                    bottom: 0;
+                    left: 0;
+                    right: 0;
+                    height: 3px;
+                    background-color: get-theme-color("primary");
+                }
+            }
+
+            .nav-icon {
+                font-size: 24px;
+            }
+        }
+    }
+
+    .header-right {
+        .profile-button {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            padding: 0;
+            cursor: pointer;
+            overflow: hidden;
+            background: none;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+
+            img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+            &:hover {
+                transform: scale(1.05);
+                transition: transform 0.2s ease;
+            }
+        }
+    }
+}
