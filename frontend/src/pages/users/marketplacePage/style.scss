@@ -1,210 +1,163 @@
-@import "../../../styles/pages/theme";
-
-.marketplace-page {
-    margin-top: $header-height;
-    min-height: calc(100vh - #{$header-height});
-    background-color: get-theme-color("background");
-
-    .marketplace-header {
-        background: white;
-        position: sticky;
-        top: $header-height;
-        z-index: 10;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-
-        .header-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px 24px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-
-            h1 {
-                font-size: 24px;
-                font-weight: $font-weight-bold;
-                color: get-theme-color("text-primary");
-                margin: 0;
-            }
-
-            .sell-button {
-                padding: 8px 16px;
-                border: none;
-                border-radius: 8px;
-                background: get-theme-color("primary");
-                color: white;
-                font-size: 15px;
-                font-weight: $font-weight-medium;
-                cursor: pointer;
-                transition: all 0.2s ease;
-
-                &:hover {
-                    background: darken(get-theme-color("primary"), 5%);
-                }
-            }
-        }
-
-        .categories-scroll {
-            overflow-x: auto;
-            padding: 0 24px 12px;
-
-            &::-webkit-scrollbar {
-                height: 4px;
-            }
-
-            &::-webkit-scrollbar-track {
-                background: #f1f1f1;
-            }
-
-            &::-webkit-scrollbar-thumb {
-                background: #888;
-                border-radius: 4px;
-            }
-
-            .categories {
-                display: flex;
-                gap: 12px;
-                max-width: 1200px;
-                margin: 0 auto;
-
-                .category {
-                    padding: 8px 16px;
-                    border: none;
-                    border-radius: 20px;
-                    background: get-theme-color("background");
-                    color: get-theme-color("text-secondary");
-                    font-size: 14px;
-                    font-weight: $font-weight-medium;
-                    cursor: pointer;
-                    white-space: nowrap;
-                    transition: all 0.2s ease;
-
-                    &:hover {
-                        background: darken(get-theme-color("background"), 5%);
-                    }
-
-                    &.active {
-                        background: get-theme-color("primary");
-                        color: white;
-                    }
-                }
-            }
-        }
+/* Marketplace Page Styles */
+main {
+    .container {
+      max-width: 1200px;
+      margin-left: auto;
+      margin-right: auto;
     }
-
-    .products-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-        gap: 24px;
-        max-width: 1200px;
-        margin: 24px auto;
-        padding: 0 24px;
-
-        .product-card {
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-
-            .product-image {
-                position: relative;
-                aspect-ratio: 1;
-                overflow: hidden;
-                
-                img {
-                    width: 100%;
-                    height: 100%;
-                    object-fit: cover;
-                    transition: transform 0.3s ease;
-                }
-
-                .save-button {
-                    position: absolute;
-                    top: 12px;
-                    right: 12px;
-                    background: white;
-                    border: none;
-                    border-radius: 50%;
-                    width: 36px;
-                    height: 36px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    cursor: pointer;
-                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-                }
-
-                &:hover img {
-                    transform: scale(1.05);
-                }
-            }
-
-            .product-info {
-                padding: 16px;
-
-                h3 {
-                    margin: 0;
-                    font-size: 16px;
-                    font-weight: $font-weight-semibold;
-                    color: get-theme-color("text-primary");
-                }
-
-                .price {
-                    margin: 8px 0;
-                    font-size: 18px;
-                    font-weight: $font-weight-bold;
-                    color: get-theme-color("primary");
-                }
-
-                .location {
-                    margin: 4px 0;
-                    font-size: 14px;
-                    color: get-theme-color("text-secondary");
-                }
-
-                .seller-info {
-                    display: flex;
-                    gap: 8px;
-                    align-items: center;
-                    margin-top: 8px;
-                    font-size: 13px;
-                    color: get-theme-color("text-secondary");
-                }
-            }
-
-            .contact-button {
-                width: 100%;
-                padding: 12px;
-                border: none;
-                background: get-theme-color("background");
-                color: get-theme-color("primary");
-                font-size: 14px;
-                font-weight: $font-weight-medium;
-                cursor: pointer;
-                transition: background-color 0.2s ease;
-
-                &:hover {
-                    background: darken(get-theme-color("background"), 5%);
-                }
-            }
-        }
+  
+    .px-4 {
+      padding-left: 1rem;
+      padding-right: 1rem;
     }
-}
-
-@media (max-width: 768px) {
-    .marketplace-page {
-        .marketplace-header {
-            .header-content {
-                flex-direction: column;
-                gap: 16px;
-                align-items: flex-start;
-            }
-        }
-
-        .products-grid {
-            grid-template-columns: 1fr;
-            padding: 16px;
-            gap: 16px;
-        }
+  
+    .py-6 {
+      padding-top: 1.5rem;
+      padding-bottom: 1.5rem;
     }
-}
+  
+    .text-xl {
+      font-size: 1.25rem;
+      line-height: 1.75rem;
+    }
+  
+    .font-semibold {
+      font-weight: 600;
+    }
+  
+    .mb-4 {
+      margin-bottom: 1rem;
+    }
+  
+    .mb-6 {
+      margin-bottom: 1.5rem;
+    }
+  
+    .text-lg {
+      font-size: 1.125rem;
+      line-height: 1.75rem;
+    }
+  
+    .mb-3 {
+      margin-bottom: 0.75rem;
+    }
+  
+    .flex {
+      display: flex;
+    }
+  
+    .space-x-4 {
+      > :not(:last-child) {
+        margin-right: 1rem;
+      }
+    }
+  
+    .overflow-x-auto {
+      overflow-x: auto;
+    }
+  
+    .bg-white {
+      background-color: #fff;
+    }
+  
+    .dark\:bg-gray-800 {
+      .dark & {
+        background-color: #1f2937;
+      }
+    }
+  
+    .p-3 {
+      padding: 0.75rem;
+    }
+  
+    .rounded-lg {
+      border-radius: 0.5rem;
+    }
+  
+    .shadow {
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+    }
+  
+    .items-center {
+      align-items: center;
+    }
+  
+    .space-x-2 {
+      > :not(:last-child) {
+        margin-right: 0.5rem;
+      }
+    }
+  
+    .text-blue-600 {
+      color: #2563eb;
+    }
+  
+    .grid {
+      display: grid;
+    }
+  
+    .grid-cols-1 {
+      grid-template-columns: repeat(1, minmax(0, 1fr));
+    }
+  
+    .md\:grid-cols-3 {
+      @media (min-width: 768px) {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+  
+    .gap-4 {
+      gap: 1rem;
+    }
+  
+    .p-4 {
+      padding: 1rem;
+    }
+  
+    .w-full {
+      width: 100%;
+    }
+  
+    .h-40 {
+      height: 10rem;
+    }
+  
+    .object-cover {
+      object-fit: cover;
+    }
+  
+    .mb-3 {
+      margin-bottom: 0.75rem;
+    }
+  
+    .font-semibold {
+      font-weight: 600;
+    }
+  
+    .text-blue-600 {
+      color: #2563eb;
+    }
+  
+    .mt-2 {
+      margin-top: 0.5rem;
+    }
+  
+    .text-sm {
+      font-size: 0.875rem;
+      line-height: 1.25rem;
+    }
+  
+    .text-gray-500 {
+      color: #6b7280;
+    }
+  
+    .dark\:text-gray-400 {
+      .dark & {
+        color: #9ca3af;
+      }
+    }
+  
+    .justify-between {
+      justify-content: space-between;
+    }
+  }

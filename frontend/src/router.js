@@ -1,5 +1,5 @@
 import HomePage from './pages/users/homePage';
-import ProfilePage from './pages/users/profilePage';
+import PersonalPage from './pages/users/personalPage';
 import FriendsPage from './pages/users/friendsPage';
 import WatchPage from './pages/users/watchPage';
 import MarketplacePage from './pages/users/marketplacePage';
@@ -15,7 +15,7 @@ const renderUserRouter = () => {
         },
         {
             path: ROUTERS.USER.PROFILE,
-            Component: <ProfilePage />,
+            Component: <PersonalPage />,
         },
         {
             path: ROUTERS.USER.FRIENDS,
