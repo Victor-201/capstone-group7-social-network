@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../contexts/AuthContext';
 import DefaultAvatar from '../../../components/DefaultAvatar';
-import { FaExclamationTriangle, FaUser, FaLink, FaInfo, FaSave } from 'react-icons/fa';
+import { FaExclamationTriangle, FaUser, FaLink, FaInfo, FaSave, FaUpload, FaImage } from 'react-icons/fa';
 import './style.scss';
 
 const PersonalPage = () => {
@@ -13,6 +13,8 @@ const PersonalPage = () => {
   const [error, setError] = useState('');
   const [previewImage, setPreviewImage] = useState('');
   const [imageError, setImageError] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const fileInputRef = useRef(null);
   const [formData, setFormData] = useState({
     fullName: '',
     avatar: '',
