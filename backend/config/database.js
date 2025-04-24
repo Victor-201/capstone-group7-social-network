@@ -47,10 +47,76 @@ const testConnection = async () => {
 const initModels = () => {
   const models = {};
   
-  // Import và khởi tạo model User
+  // Import và khởi tạo các models
   models.User = require('../models/user.model')(sequelize);
+  models.Post = require('../models/post.model')(sequelize);
+  models.Comment = require('../models/comment.model')(sequelize);
+  models.Like = require('../models/like.model')(sequelize);
+  models.Media = require('../models/media.model')(sequelize);
+  models.Hashtag = require('../models/hashtag.model')(sequelize);
   
-  // Thêm các models khác ở đây
+  // Tạo bảng trung gian cho many-to-many relationships
+  const PostHashtag = sequelize.define('PostHashtag', {
+    postId: {
+      type: Sequelize.INTEGER,
+      field: 'post_id',
+      primaryKey: true,
+      references: {
+        model: 'posts',
+        key: 'id'
+      }
+    },
+    hashtagId: {
+      type: Sequelize.INTEGER,
+      field: 'hashtag_id',
+      primaryKey: true,
+      references: {
+        model: 'hashtags',
+        key: 'id'
+      }
+    }
+  }, {
+    tableName: 'post_hashtags',
+    timestamps: true,
+    createdAt: 'created_at',
+    updatedAt: 'updated_at'
+  });
+  
+  const SavedPost = sequelize.define('SavedPost', {
+    userId: {
+      type: Sequelize.INTEGER,
+      field: 'user_id',
+      primaryKey: true,
+      references: {
+        model: 'users',
+        key: 'id'
+      }
+    },
+    postId: {
+      type: Sequelize.INTEGER,
+      field: 'post_id',
+      primaryKey: true,
+      references: {
+        model: 'posts',
+        key: 'id'
+      }
+    }
+  }, {
+    tableName: 'saved_posts',
+    timestamps: true,
+    createdAt: 'created_at',
+    updatedAt: 'updated_at'
+  });
+  
+  models.PostHashtag = PostHashtag;
+  models.SavedPost = SavedPost;
+  
+  // Thiết lập các associations (quan hệ) giữa các models
+  Object.keys(models).forEach(modelName => {
+    if (models[modelName].associate) {
+      models[modelName].associate(models);
+    }
+  });
   
   return models;
 };

@@ -32,13 +32,41 @@ async function executeSql() {
 
     // Execute each SQL statement
     console.log('Executing SQL statements...');
+    let successCount = 0;
+    let skipCount = 0;
+    let errorCount = 0;
+    
     for (const statement of sqlStatements) {
       if (statement.trim()) {
-        await connection.query(statement);
+        try {
+          await connection.query(statement);
+          successCount++;
+        } catch (err) {
+          // Skip table already exists errors and continue
+          if (err.code === 'ER_TABLE_EXISTS_ERROR') {
+            console.log(`Table already exists, skipping: ${err.sqlMessage}`);
+            skipCount++;
+          } else {
+            console.error(`Error executing statement: ${err.message}`);
+            console.error(`SQL: ${statement.substring(0, 150)}...`);
+            errorCount++;
+          }
+        }
       }
     }
 
-    console.log('SQL file executed successfully');
+    console.log(`SQL execution completed: ${successCount} successful, ${skipCount} skipped (already exist), ${errorCount} errors`);
+    
+    // Check if we need to sync Sequelize models
+    console.log('Syncing Sequelize models with database...');
+    
+    // Import and initialize Sequelize models
+    const { sequelize, syncDatabase } = require('./config/database');
+    
+    // Sync without forcing (force: false)
+    await syncDatabase(false);
+    
+    console.log('Database setup completed successfully');
     connection.end();
   } catch (error) {
     console.error('Error executing SQL:', error);

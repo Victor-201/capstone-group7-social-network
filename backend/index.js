@@ -36,128 +36,309 @@ app.use(bodyParser.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/users', require('./routes/user.routes'));
 
-// In-memory data storage (tạm thời giữ lại cho đến khi tạo Post model)
-let posts = [
-  {
-    id: 1,
-    author: "Jane Doe",
-    authorId: "jane-doe",
-    authorAvatar: "/images/default-avatar.png",
-    content: "Just finished my latest project! 🚀 #coding #webdev",
-    image: "https://via.placeholder.com/600x400",
-    createdAt: new Date("2025-04-23T14:30:00Z").toISOString(),
-    likes: 42,
-    comments: [
-      { id: 101, author: "John Smith", content: "Amazing work!", createdAt: new Date("2025-04-23T15:00:00Z").toISOString() },
-      { id: 102, author: "Alice Johnson", content: "Congrats!", createdAt: new Date("2025-04-23T15:30:00Z").toISOString() }
-    ],
-    isLiked: false
-  },
-  {
-    id: 2,
-    author: "John Smith",
-    authorId: "john-smith",
-    authorAvatar: "/images/default-avatar.png",
-    content: "Beautiful day for a hike! 🏞️ #nature #outdoors",
-    image: "https://via.placeholder.com/600x400",
-    createdAt: new Date("2025-04-23T10:15:00Z").toISOString(),
-    likes: 28,
-    comments: [],
-    isLiked: false
-  },
-  {
-    id: 3,
-    author: "Alice Johnson",
-    authorId: "alice-johnson",
-    authorAvatar: "/images/default-avatar.png",
-    content: "Just learned about React hooks. They're game changers! #reactjs #javascript",
-    createdAt: new Date("2025-04-22T16:45:00Z").toISOString(),
-    likes: 17,
-    comments: [
-      { id: 103, author: "Jane Doe", content: "They really are! Changed how I build components.", createdAt: new Date("2025-04-22T17:30:00Z").toISOString() }
-    ],
-    isLiked: false
-  }
-];
+// Import all models
+const Post = models.Post;
+const User = models.User;
+const Comment = models.Comment;
+const Like = models.Like;
+const Media = models.Media;
+const Hashtag = models.Hashtag;
 
-// Routes for API
 // GET all posts
-app.get("/api/posts", (req, res) => {
-  res.json(posts);
+app.get("/api/posts", async (req, res) => {
+  try {
+    console.log("Attempting to fetch posts from database");
+    
+    // Get current user ID if available
+    const userId = req.headers.authorization ? req.user?.id : null;
+    
+    // If user is authenticated, only show their posts
+    const whereClause = userId ? { userId: userId } : {};
+    
+    // Fetch posts from database with comments, likes, and media
+    const posts = await Post.findAll({
+      where: whereClause,
+      include: [
+        {
+          model: User,
+          as: 'author',
+          attributes: ['id', 'username', 'fullName', 'avatar']
+        },
+        {
+          model: Comment,
+          as: 'comments',
+          include: [
+            {
+              model: User,
+              as: 'author',
+              attributes: ['id', 'username', 'fullName', 'avatar']
+            }
+          ]
+        },
+        {
+          model: Like,
+          as: 'likes',
+          include: [
+            {
+              model: User,
+              as: 'user',
+              attributes: ['id']
+            }
+          ]
+        },
+        {
+          model: Media,
+          as: 'media'
+        }
+      ],
+      order: [['created_at', 'DESC']]
+    });
+
+    console.log(`Found ${posts.length} posts`);
+
+    // Transform posts to match expected frontend format
+    const formattedPosts = posts.map(post => {
+      const postObj = post.toJSON();
+      
+      // Format comments
+      const formattedComments = postObj.comments ? postObj.comments.map(comment => ({
+        id: comment.id,
+        author: comment.author?.fullName || comment.author?.username || 'Unknown User',
+        authorId: comment.author?.id,
+        authorAvatar: comment.author?.avatar || null,
+        content: comment.content,
+        createdAt: comment.created_at
+      })) : [];
+      
+      // Get post image from media if available
+      const postImage = postObj.media && postObj.media.length > 0 ? 
+        postObj.media.find(m => m.type === 'image')?.url : null;
+      
+      // Check if current user liked the post
+      const isLiked = userId ? 
+        postObj.likes.some(like => like.user?.id === userId) : false;
+      
+      return {
+        id: postObj.id,
+        author: postObj.author?.fullName || postObj.author?.username || 'Unknown User',
+        authorId: postObj.author?.id,
+        authorAvatar: postObj.author?.avatar || null,
+        content: postObj.content,
+        image: postImage,
+        createdAt: postObj.created_at,
+        likes: postObj.likes ? postObj.likes.length : 0,
+        comments: formattedComments,
+        isLiked: isLiked
+      };
+    });
+
+    res.json(formattedPosts);
+  } catch (error) {
+    console.error("Error fetching posts:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
 });
 
 // GET single post by ID
-app.get("/api/posts/:id", (req, res) => {
-  const post = posts.find(p => p.id === parseInt(req.params.id));
-  if (!post) {
-    return res.status(404).json({ message: "Post not found" });
+app.get("/api/posts/:id", async (req, res) => {
+  try {
+    const postId = parseInt(req.params.id);
+    
+    const post = await Post.findByPk(postId, {
+      include: [
+        {
+          model: User,
+          as: 'author',
+          attributes: ['id', 'username', 'fullName', 'avatar']
+        }
+      ]
+    });
+    
+    if (!post) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+    
+    // Transform post to match expected frontend format
+    const postObj = post.toJSON();
+    const formattedPost = {
+      id: postObj.id,
+      author: postObj.author?.fullName || postObj.author?.username || 'Unknown User',
+      authorId: postObj.author?.id,
+      authorAvatar: postObj.author?.avatar || null,
+      content: postObj.content,
+      createdAt: postObj.createdAt,
+      likes: 0, // Will implement likes count later
+      comments: [], // Will implement comments later
+      isLiked: false // Will implement later
+    };
+    
+    res.json(formattedPost);
+  } catch (error) {
+    console.error("Error fetching post:", error);
+    res.status(500).json({ message: "Server error" });
   }
-  res.json(post);
 });
 
 // POST create a new post
-app.post("/api/posts", require('./middleware/auth.middleware').verifyToken, (req, res) => {
-  const { content, image } = req.body;
-  
-  if (!content) {
-    return res.status(400).json({ message: "Content is required" });
+app.post("/api/posts", require('./middleware/auth.middleware').verifyToken, async (req, res) => {
+  try {
+    const { content, image } = req.body;
+    
+    if (!content) {
+      return res.status(400).json({ message: "Content is required" });
+    }
+    
+    // Create post in database
+    const newPost = await Post.create({
+      userId: req.user.id,
+      content: content,
+      privacy: 'public'
+    });
+    
+    // Return the newly created post with user info
+    const createdPost = await Post.findByPk(newPost.id, {
+      include: [
+        {
+          model: User,
+          as: 'author',
+          attributes: ['id', 'username', 'fullName', 'avatar']
+        }
+      ]
+    });
+    
+    if (!createdPost) {
+      return res.status(500).json({ message: "Error retrieving created post" });
+    }
+    
+    // Format the response
+    const postObj = createdPost.toJSON();
+    const formattedPost = {
+      id: postObj.id,
+      author: postObj.author?.fullName || postObj.author?.username || 'Unknown User',
+      authorId: postObj.author?.id,
+      authorAvatar: postObj.author?.avatar || null,
+      content: postObj.content,
+      createdAt: postObj.createdAt,
+      likes: 0,
+      comments: [],
+      isLiked: false
+    };
+    
+    res.status(201).json(formattedPost);
+  } catch (error) {
+    console.error("Error creating post:", error);
+    res.status(500).json({ message: "Server error" });
   }
-  
-  const newPost = {
-    id: posts.length > 0 ? Math.max(...posts.map(p => p.id)) + 1 : 1,
-    author: req.user.fullName || req.user.username, // Sử dụng tên thật hoặc username của người dùng
-    authorId: req.user.id,
-    authorAvatar: req.user.avatar || "/images/default-avatar.png", // Sử dụng avatar đã cấu hình
-    content,
-    image: image || null,
-    createdAt: new Date().toISOString(),
-    likes: 0,
-    comments: [],
-    isLiked: false
-  };
-  
-  posts.unshift(newPost);
-  res.status(201).json(newPost);
 });
 
 // POST like/unlike a post
-app.post("/api/posts/:id/like", (req, res) => {
-  const post = posts.find(p => p.id === parseInt(req.params.id));
-  
-  if (!post) {
-    return res.status(404).json({ message: "Post not found" });
+app.post("/api/posts/:id/like", require('./middleware/auth.middleware').verifyToken, async (req, res) => {
+  try {
+    const postId = parseInt(req.params.id);
+    const userId = req.user.id;
+    
+    // Check if post exists
+    const post = await Post.findByPk(postId);
+    if (!post) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+    
+    // Check if user already liked the post
+    const existingLike = await Like.findOne({
+      where: {
+        postId: postId,
+        userId: userId
+      }
+    });
+    
+    // Toggle like/unlike
+    if (existingLike) {
+      // User already liked the post, so unlike it
+      await existingLike.destroy();
+      
+      // Count likes for this post
+      const likeCount = await Like.count({ where: { postId: postId } });
+      
+      res.json({ 
+        likes: likeCount, 
+        isLiked: false 
+      });
+    } else {
+      // User hasn't liked the post, so add a like
+      await Like.create({
+        postId: postId,
+        userId: userId
+      });
+      
+      // Count likes for this post
+      const likeCount = await Like.count({ where: { postId: postId } });
+      
+      res.json({ 
+        likes: likeCount, 
+        isLiked: true 
+      });
+    }
+  } catch (error) {
+    console.error("Error liking post:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
   }
-  
-  post.isLiked = !post.isLiked;
-  post.likes = post.isLiked ? post.likes + 1 : post.likes - 1;
-  
-  res.json({ likes: post.likes, isLiked: post.isLiked });
 });
 
 // POST add a comment to a post
-app.post("/api/posts/:id/comments", require('./middleware/auth.middleware').verifyToken, (req, res) => {
-  const { content } = req.body;
-  const post = posts.find(p => p.id === parseInt(req.params.id));
-  
-  if (!post) {
-    return res.status(404).json({ message: "Post not found" });
+app.post("/api/posts/:id/comments", require('./middleware/auth.middleware').verifyToken, async (req, res) => {
+  try {
+    const postId = parseInt(req.params.id);
+    const userId = req.user.id;
+    const { content } = req.body;
+    
+    if (!content) {
+      return res.status(400).json({ message: "Comment content is required" });
+    }
+    
+    // Check if post exists
+    const post = await Post.findByPk(postId);
+    if (!post) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+    
+    // Create the comment in the database
+    const newComment = await Comment.create({
+      userId: userId,
+      postId: postId,
+      content: content
+    });
+    
+    // Fetch the created comment with user info
+    const comment = await Comment.findByPk(newComment.id, {
+      include: [
+        {
+          model: User,
+          as: 'author',
+          attributes: ['id', 'username', 'fullName', 'avatar']
+        }
+      ]
+    });
+    
+    if (!comment) {
+      return res.status(500).json({ message: "Error retrieving created comment" });
+    }
+    
+    // Format the response
+    const commentObj = comment.toJSON();
+    const formattedComment = {
+      id: commentObj.id,
+      author: commentObj.author?.fullName || commentObj.author?.username || 'Unknown User',
+      authorId: commentObj.author?.id,
+      authorAvatar: commentObj.author?.avatar || null,
+      content: commentObj.content,
+      createdAt: commentObj.created_at
+    };
+    
+    res.status(201).json(formattedComment);
+  } catch (error) {
+    console.error("Error adding comment:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
   }
-  
-  if (!content) {
-    return res.status(400).json({ message: "Comment content is required" });
-  }
-  
-  const newComment = {
-    id: post.comments.length > 0 ? Math.max(...post.comments.map(c => c.id)) + 1 : 1,
-    author: req.user.fullName || req.user.username, // Sử dụng tên thật hoặc username của người dùng
-    authorId: req.user.id,
-    authorAvatar: req.user.avatar || "/images/default-avatar.png", // Sử dụng avatar đã cấu hình
-    content,
-    createdAt: new Date().toISOString()
-  };
-  
-  post.comments.push(newComment);
-  res.status(201).json(newComment);
 });
 
 // Test endpoint

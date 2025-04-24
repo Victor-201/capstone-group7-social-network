@@ -5,11 +5,16 @@ CREATE TABLE users (
     email VARCHAR(100) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     full_name VARCHAR(100) NOT NULL,
-    avatar_url VARCHAR(255) DEFAULT '/images/default-avatar.png',
+    avatar VARCHAR(255) DEFAULT '/images/default-avatar.png',
     bio TEXT,
+    location VARCHAR(100),
+    website VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    is_active BOOLEAN DEFAULT TRUE
+    is_active BOOLEAN DEFAULT TRUE,
+    role ENUM('user', 'admin') NOT NULL DEFAULT 'user',
+    INDEX idx_username (username),
+    INDEX idx_email (email)
 );
 
 -- Create Posts Table
@@ -18,9 +23,12 @@ CREATE TABLE posts (
     user_id INT NOT NULL,
     content TEXT NOT NULL,
     image_url VARCHAR(255),
+    privacy ENUM('public', 'friends', 'private') NOT NULL DEFAULT 'public',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_user_id (user_id),
+    INDEX idx_created_at (created_at)
 );
 
 -- Create Comments Table
@@ -32,7 +40,9 @@ CREATE TABLE comments (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_post_id (post_id),
+    INDEX idx_user_id (user_id)
 );
 
 -- Create Likes Table
@@ -47,7 +57,30 @@ CREATE TABLE likes (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     CHECK (post_id IS NOT NULL OR comment_id IS NOT NULL),
     UNIQUE (post_id, user_id),
-    UNIQUE (comment_id, user_id)
+    UNIQUE (comment_id, user_id),
+    INDEX idx_post_id (post_id),
+    INDEX idx_comment_id (comment_id),
+    INDEX idx_user_id (user_id)
+);
+
+-- Create Hashtags Table
+CREATE TABLE hashtags (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(50) NOT NULL UNIQUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_name (name)
+);
+
+-- Create Post Hashtags Table
+CREATE TABLE post_hashtags (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    post_id INT NOT NULL,
+    hashtag_id INT NOT NULL,
+    FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,
+    FOREIGN KEY (hashtag_id) REFERENCES hashtags(id) ON DELETE CASCADE,
+    UNIQUE (post_id, hashtag_id),
+    INDEX idx_post_id (post_id),
+    INDEX idx_hashtag_id (hashtag_id)
 );
 
 -- Create Friendships Table
@@ -63,7 +96,10 @@ CREATE TABLE friendships (
     FOREIGN KEY (user_id_2) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (action_user_id) REFERENCES users(id) ON DELETE CASCADE,
     CHECK (user_id_1 < user_id_2), -- Ensures uniqueness and prevents duplicates
-    UNIQUE (user_id_1, user_id_2)
+    UNIQUE (user_id_1, user_id_2),
+    INDEX idx_user_id_1 (user_id_1),
+    INDEX idx_user_id_2 (user_id_2),
+    INDEX idx_status (status)
 );
 
 -- Create Stories Table
@@ -74,7 +110,10 @@ CREATE TABLE stories (
     type ENUM('image', 'video') NOT NULL DEFAULT 'image',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     expires_at TIMESTAMP NOT NULL, -- stories expire after 24 hours
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_user_id (user_id),
+    INDEX idx_created_at (created_at),
+    INDEX idx_expires_at (expires_at)
 );
 
 -- Create Story Views Table
@@ -85,33 +124,41 @@ CREATE TABLE story_views (
     viewed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (story_id) REFERENCES stories(id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    UNIQUE (story_id, user_id)
+    UNIQUE (story_id, user_id),
+    INDEX idx_story_id (story_id),
+    INDEX idx_user_id (user_id)
 );
 
--- Sample Data for Users
-INSERT INTO users (username, email, password, full_name, bio) VALUES
-('jane_doe', 'jane@example.com', 'hashed_password_here', 'Jane Doe', 'Web developer and designer.'),
-('john_smith', 'john@example.com', 'hashed_password_here', 'John Smith', 'Nature enthusiast and photographer.'),
-('alice_johnson', 'alice@example.com', 'hashed_password_here', 'Alice Johnson', 'React developer.'),
-('current_user', 'me@example.com', 'hashed_password_here', 'Current User', 'This is you!');
+-- Create Notifications Table
+CREATE TABLE notifications (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    from_user_id INT,
+    type ENUM('like', 'comment', 'friend_request', 'friend_accept', 'mention') NOT NULL,
+    content TEXT,
+    post_id INT,
+    comment_id INT,
+    is_read BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (from_user_id) REFERENCES users(id) ON DELETE SET NULL,
+    FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,
+    FOREIGN KEY (comment_id) REFERENCES comments(id) ON DELETE CASCADE,
+    INDEX idx_user_id (user_id),
+    INDEX idx_from_user_id (from_user_id),
+    INDEX idx_is_read (is_read)
+);
 
--- Sample Data for Posts
-INSERT INTO posts (user_id, content, image_url) VALUES
-(1, 'Just finished my latest project! 🚀 #coding #webdev', 'https://via.placeholder.com/600x400'),
-(2, 'Beautiful day for a hike! 🏞️ #nature #outdoors', 'https://via.placeholder.com/600x400'),
-(3, 'Just learned about React hooks. They\'re game changers! #reactjs #javascript', NULL);
-
--- Sample Data for Comments
-INSERT INTO comments (post_id, user_id, content) VALUES
-(1, 2, 'Amazing work!'),
-(1, 3, 'Congrats!'),
-(3, 1, 'They really are! Changed how I build components.');
-
--- Sample Data for Likes
-INSERT INTO likes (post_id, user_id) VALUES
-(1, 2),
-(1, 3),
-(1, 4),
-(2, 1),
-(2, 3),
-(3, 2);
+-- Create Media Table
+CREATE TABLE media (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    post_id INT,
+    user_id INT NOT NULL,
+    media_url VARCHAR(255) NOT NULL,
+    type ENUM('image', 'video', 'audio', 'document') NOT NULL DEFAULT 'image',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_post_id (post_id),
+    INDEX idx_user_id (user_id)
+);
