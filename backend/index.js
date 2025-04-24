@@ -1,12 +1,21 @@
 const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
+const dotenv = require("dotenv");
+const { sequelize, testConnection, initModels } = require("./config/database");
+const authRoutes = require("./routes/auth.routes");
+// Sử dụng initModels() thay vì import trực tiếp
+const models = initModels();
+
+// Load environment variables
+dotenv.config();
+
 const app = express();
-const PORT = 8080; // Thay đổi từ 5000 sang 8080
+const PORT = process.env.PORT || 8080;
 
 // Cấu hình CORS để cho phép tất cả các nguồn
 app.use(cors({
-  origin: '*', // Cho phép tất cả các nguồn truy cập
+  origin: '*', 
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
   credentials: true
@@ -18,13 +27,16 @@ app.options('*', cors());
 // Middleware hiển thị thông tin request
 app.use((req, res, next) => {
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
-  console.log('Headers:', req.headers);
   next();
 });
 
 app.use(bodyParser.json());
 
-// In-memory data storage (replace with real database connection later)
+// Khai báo routes
+app.use('/api/auth', authRoutes);
+app.use('/api/users', require('./routes/user.routes'));
+
+// In-memory data storage (tạm thời giữ lại cho đến khi tạo Post model)
 let posts = [
   {
     id: 1,
@@ -84,7 +96,7 @@ app.get("/api/posts/:id", (req, res) => {
 });
 
 // POST create a new post
-app.post("/api/posts", (req, res) => {
+app.post("/api/posts", require('./middleware/auth.middleware').verifyToken, (req, res) => {
   const { content, image } = req.body;
   
   if (!content) {
@@ -93,9 +105,9 @@ app.post("/api/posts", (req, res) => {
   
   const newPost = {
     id: posts.length > 0 ? Math.max(...posts.map(p => p.id)) + 1 : 1,
-    author: "Current User", // In a real app, get this from auth
-    authorId: "current-user",
-    authorAvatar: "/images/default-avatar.png",
+    author: req.user.fullName || req.user.username, // Sử dụng tên thật hoặc username của người dùng
+    authorId: req.user.id,
+    authorAvatar: req.user.avatar || "/images/default-avatar.png", // Sử dụng avatar đã cấu hình
     content,
     image: image || null,
     createdAt: new Date().toISOString(),
@@ -123,7 +135,7 @@ app.post("/api/posts/:id/like", (req, res) => {
 });
 
 // POST add a comment to a post
-app.post("/api/posts/:id/comments", (req, res) => {
+app.post("/api/posts/:id/comments", require('./middleware/auth.middleware').verifyToken, (req, res) => {
   const { content } = req.body;
   const post = posts.find(p => p.id === parseInt(req.params.id));
   
@@ -137,7 +149,9 @@ app.post("/api/posts/:id/comments", (req, res) => {
   
   const newComment = {
     id: post.comments.length > 0 ? Math.max(...post.comments.map(c => c.id)) + 1 : 1,
-    author: "Current User", // In a real app, get this from auth
+    author: req.user.fullName || req.user.username, // Sử dụng tên thật hoặc username của người dùng
+    authorId: req.user.id,
+    authorAvatar: req.user.avatar || "/images/default-avatar.png", // Sử dụng avatar đã cấu hình
     content,
     createdAt: new Date().toISOString()
   };
@@ -146,25 +160,34 @@ app.post("/api/posts/:id/comments", (req, res) => {
   res.status(201).json(newComment);
 });
 
-// Original notes API from the initial file
-let notes = [];
-
-app.get("/api/notes", (req, res) => {
-  res.json(notes);
-});
-
-app.post("/api/notes", (req, res) => {
-  const { title, content } = req.body;
-  const newNote = { id: Date.now(), title, content };
-  notes.push(newNote);
-  res.status(201).json(newNote);
-});
-
 // Test endpoint
 app.get("/test", (req, res) => {
   res.json({ message: "Kết nối thành công đến backend!", status: "OK" });
 });
 
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-});
+// Khởi động server sau khi đã đồng bộ với cơ sở dữ liệu
+const startServer = async () => {
+  try {
+    // Kiểm tra kết nối tới MySQL
+    const dbConnected = await testConnection();
+    
+    if (!dbConnected) {
+      console.error('Error: Could not connect to MySQL database');
+      process.exit(1);
+    }
+    
+    // Đồng bộ các model với cơ sở dữ liệu - sử dụng force: false và alter: false để tránh lỗi
+    await sequelize.sync({ force: false, alter: false });
+    console.log('All models synchronized with database');
+    
+    // Khởi động server
+    app.listen(PORT, () => {
+      console.log(`Server is running on http://localhost:${PORT}`);
+    });
+  } catch (error) {
+    console.error('Server startup error:', error);
+    process.exit(1);
+  }
+};
+
+startServer();

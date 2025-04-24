@@ -1,40 +1,102 @@
+import { useEffect, useState } from 'react';
 import HomePage from './pages/users/homePage';
 import PersonalPage from './pages/users/personalPage';
 import WatchPage from './pages/users/watchPage';
 import MarketplacePage from './pages/users/marketplacePage';
+import LoginPage from './pages/users/loginPage';
+import RegisterPage from './pages/users/registerPage';
 import MasterLayout from './pages/users/theme/masterLayout';
 import { ROUTERS } from './utils/router';
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes, Navigate, useNavigate, useLocation } from 'react-router-dom';
+
+// Component bảo vệ route, chỉ cho phép truy cập khi đã đăng nhập
+const ProtectedRoute = ({ children }) => {
+  const token = localStorage.getItem('token');
+  
+  if (!token) {
+    return <Navigate to="/login" />;
+  }
+  
+  return children;
+};
+
+// Component điều hướng khi đã đăng nhập
+const AuthRedirect = ({ children }) => {
+  const token = localStorage.getItem('token');
+  
+  if (token) {
+    return <Navigate to="/" />;
+  }
+  
+  return children;
+};
 
 const renderUserRouter = () => {
     const userRouters = [
         {
             path: ROUTERS.USER.HOME,
-            Component: <HomePage />,
+            Component: (
+              <ProtectedRoute>
+                <HomePage />
+              </ProtectedRoute>
+            ),
         },
         {
             path: ROUTERS.USER.PROFILE,
-            Component: <PersonalPage />,
+            Component: (
+              <ProtectedRoute>
+                <PersonalPage />
+              </ProtectedRoute>
+            ),
         },
-
         {
             path: ROUTERS.USER.WATCH,
-            Component: <WatchPage />,
+            Component: (
+              <ProtectedRoute>
+                <WatchPage />
+              </ProtectedRoute>
+            ),
         },
         {
             path: ROUTERS.USER.MARKETPLACE,
-            Component: <MarketplacePage />,
+            Component: (
+              <ProtectedRoute>
+                <MarketplacePage />
+              </ProtectedRoute>
+            ),
+        },
+        {
+            path: ROUTERS.AUTH.LOGIN,
+            Component: (
+              <AuthRedirect>
+                <LoginPage />
+              </AuthRedirect>
+            ),
+        },
+        {
+            path: ROUTERS.AUTH.REGISTER,
+            Component: (
+              <AuthRedirect>
+                <RegisterPage />
+              </AuthRedirect>
+            ),
         }
     ];
     
     return (
-        <MasterLayout>
-            <Routes>
-                {userRouters.map((item, key) => (
+        <Routes>
+            {userRouters.map((item, key) => (
+                item.path === ROUTERS.AUTH.LOGIN || item.path === ROUTERS.AUTH.REGISTER ? (
                     <Route key={key} path={item.path} element={item.Component} />
-                ))}
-            </Routes>
-        </MasterLayout>
+                ) : (
+                    <Route 
+                        key={key} 
+                        path={item.path} 
+                        element={<MasterLayout>{item.Component}</MasterLayout>} 
+                    />
+                )
+            ))}
+        </Routes>
     );
 };
 

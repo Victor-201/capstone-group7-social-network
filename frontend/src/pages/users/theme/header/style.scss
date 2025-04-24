@@ -26,19 +26,33 @@
         gap: 8px;
 
         .logo {
-            width: 40px;
+            width: auto;
             height: 40px;
-            img {
-                width: 100%;
-                height: 100%;
-                object-fit: contain;
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            
+            h1 {
+                color: #1877f2;
+                font-size: 28px;
+                font-weight: bold;
+                margin: 0;
+                letter-spacing: -1px;
             }
         }
 
         .search {
-            background: get-theme-color("background");
+            background: #f0f2f5;
             border-radius: 50px;
             padding: 0 16px;
+            display: flex;
+            align-items: center;
+            
+            .search-icon {
+                color: #65676b;
+                margin-right: 8px;
+                font-size: 16px;
+            }
             
             input {
                 width: 240px;
@@ -50,7 +64,7 @@
                 font-family: $font-family-base;
                 
                 &::placeholder {
-                    color: get-theme-color("text-secondary");
+                    color: #65676b;
                 }
             }
         }
@@ -67,16 +81,16 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            color: get-theme-color("text-secondary");
+            color: #65676b;
             border-radius: 8px;
             transition: all 0.2s;
 
             &:hover {
-                background-color: get-theme-color("background");
+                background-color: #f0f2f5;
             }
 
             &.active {
-                color: get-theme-color("primary");
+                color: #1877f2;
                 position: relative;
 
                 &::after {
@@ -86,37 +100,125 @@
                     left: 0;
                     right: 0;
                     height: 3px;
-                    background-color: get-theme-color("primary");
+                    background-color: #1877f2;
                 }
             }
 
             .nav-icon {
-                font-size: 24px;
+                font-size: 20px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                
+                svg {
+                    width: 24px;
+                    height: 24px;
+                }
             }
         }
     }
 
     .header-right {
-        .profile-button {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            border: none;
-            padding: 0;
-            cursor: pointer;
-            overflow: hidden;
-            background: none;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-
-            img {
-                width: 100%;
-                height: 100%;
-                object-fit: cover;
+        display: flex;
+        align-items: center;
+        
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            
+            .profile-button {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                padding: 6px 12px;
+                border-radius: 20px;
+                text-decoration: none;
+                background-color: #f0f2f5;
+                transition: all 0.2s;
+                
+                &:hover {
+                    background-color: #e4e6eb;
+                }
+                
+                img {
+                    width: 32px;
+                    height: 32px;
+                    border-radius: 50%;
+                    object-fit: cover;
+                    border: 1px solid #dddfe2;
+                }
+                
+                .username {
+                    font-size: 14px;
+                    font-weight: 600;
+                    color: #050505;
+                    max-width: 100px;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                }
             }
-
-            &:hover {
-                transform: scale(1.05);
-                transition: transform 0.2s ease;
+            
+            .logout-button {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                padding: 8px 12px;
+                border-radius: 6px;
+                border: none;
+                background-color: #f0f2f5;
+                cursor: pointer;
+                transition: all 0.2s;
+                
+                &:hover {
+                    background-color: #e4e6eb;
+                }
+                
+                .logout-icon {
+                    font-size: 16px;
+                    display: flex;
+                    align-items: center;
+                }
+                
+                .logout-text {
+                    font-size: 14px;
+                    font-weight: 600;
+                    color: #050505;
+                }
+            }
+        }
+        
+        .auth-buttons {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            
+            .login-button, .register-button {
+                padding: 8px 16px;
+                border-radius: 6px;
+                font-size: 14px;
+                font-weight: 600;
+                text-decoration: none;
+                transition: all 0.2s;
+            }
+            
+            .login-button {
+                background-color: #e4e6eb;
+                color: #050505;
+                
+                &:hover {
+                    background-color: #dddfe2;
+                }
+            }
+            
+            .register-button {
+                background-color: #1877f2;
+                color: white;
+                
+                &:hover {
+                    background-color: #166fe5;
+                }
             }
         }
     }

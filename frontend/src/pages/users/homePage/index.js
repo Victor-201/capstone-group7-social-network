@@ -1,23 +1,47 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../../../contexts/AuthContext';
+import { 
+  FaImage, 
+  FaMapMarkerAlt, 
+  FaTags, 
+  FaHeart, 
+  FaRegHeart, 
+  FaComment, 
+  FaShare, 
+  FaBookmark, 
+  FaExternalLinkAlt,
+  FaGlobe,
+  FaEllipsisV,
+  FaThumbsUp,
+  FaReply
+} from 'react-icons/fa';
+import { IoMdSend } from 'react-icons/io';
+import { BiLoader } from 'react-icons/bi';
+import { MdErrorOutline } from 'react-icons/md';
+import DefaultAvatar from '../../../components/DefaultAvatar';
 import './style.scss';
 
 const HomePage = () => {
+  const { user, isAuthenticated } = useAuth();
   const [posts, setPosts] = useState([]);
   const [newPostContent, setNewPostContent] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [activeTab, setActiveTab] = useState('foryou');
+  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080';
 
   // Fetch posts from backend
   useEffect(() => {
     const fetchPosts = async () => {
       try {
         setIsLoading(true);
-        // Sử dụng port 8080 thay vì 5000
-        const response = await fetch('http://127.0.0.1:8080/api/posts?_t=' + new Date().getTime(), {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`${API_URL}/api/posts?_t=${new Date().getTime()}`, {
           headers: {
             'Accept': 'application/json',
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': token ? `Bearer ${token}` : ''
           }
         });
         
@@ -26,29 +50,35 @@ const HomePage = () => {
         }
         
         const data = await response.json();
-        setPosts(data.length ? data : mockPosts); // Use mock data if no posts returned
+        setPosts(data || []);
         setIsLoading(false);
       } catch (err) {
         console.error("Failed to fetch posts:", err);
-        setPosts(mockPosts); // Use mock data on error
-        setError("Failed to load posts. Using demo content instead.");
+        setPosts([]);
+        setError("Không thể tải bài viết. Vui lòng thử lại sau.");
         setIsLoading(false);
       }
     };
 
     fetchPosts();
-  }, []);
+  }, [API_URL]);
 
   // Handle post submission
   const handlePostSubmit = async (e) => {
     e.preventDefault();
-    if (!newPostContent.trim()) return;
+    if (!newPostContent.trim() || !isAuthenticated) return;
+
+    const token = localStorage.getItem('token');
+    if (!token) {
+      setError("Bạn cần đăng nhập để đăng bài");
+      return;
+    }
 
     const newPost = {
       id: Date.now(),
-      author: "Current User",
-      authorId: "current-user",
-      authorAvatar: "/images/default-avatar.png",
+      author: user?.fullName || user?.username,
+      authorId: user?.id,
+      authorAvatar: user?.avatar || null,
       content: newPostContent,
       createdAt: new Date().toISOString(),
       likes: 0,
@@ -61,11 +91,12 @@ const HomePage = () => {
     setNewPostContent('');
 
     try {
-      const response = await fetch('http://127.0.0.1:8080/api/posts', {
+      const response = await fetch(`${API_URL}/api/posts`, {
         method: 'POST',
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
           content: newPostContent
@@ -77,21 +108,26 @@ const HomePage = () => {
       }
 
       const savedPost = await response.json();
-      // Update post with server data if needed
       setPosts(prevPosts => 
         prevPosts.map(post => 
-          post.id === newPost.id ? { ...post, id: savedPost.id } : post
+          post.id === newPost.id ? savedPost : post
         )
       );
     } catch (err) {
       console.error("Failed to save post:", err);
-      // You could add error handling here, like showing a notification
+      // Rollback optimistic update
+      setPosts(prevPosts => prevPosts.filter(post => post.id !== newPost.id));
+      setError("Không thể đăng bài. Vui lòng thử lại.");
     }
   };
 
   // Handle like functionality
   const handleLike = async (postId) => {
-    // Optimistic update
+    if (!isAuthenticated) return;
+    
+    const token = localStorage.getItem('token');
+    if (!token) return;
+
     setPosts(prevPosts => 
       prevPosts.map(post => 
         post.id === postId 
@@ -105,24 +141,21 @@ const HomePage = () => {
     );
 
     try {
-      const response = await fetch(`http://127.0.0.1:8080/api/posts/${postId}/like`, {
+      const response = await fetch(`${API_URL}/api/posts/${postId}/like`, {
         method: 'POST',
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
         }
       });
       
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
-      
-      // Cập nhật state từ phản hồi server nếu cần
-      const data = await response.json();
-      
     } catch (err) {
       console.error("Failed to like post:", err);
-      // Revert optimistic update on error
+      // Rollback optimistic update
       setPosts(prevPosts => 
         prevPosts.map(post => 
           post.id === postId 
@@ -137,396 +170,394 @@ const HomePage = () => {
     }
   };
 
-  // Mock data for development
-  const mockPosts = [
-    {
-      id: 1,
-      author: "Jane Doe",
-      authorId: "jane-doe",
-      authorAvatar: "/images/default-avatar.png",
-      content: "Just finished my latest project! 🚀 #coding #webdev",
-      image: "https://via.placeholder.com/600x400",
-      createdAt: "2025-04-23T14:30:00Z",
-      likes: 42,
-      comments: [
-        { id: 101, author: "John Smith", content: "Amazing work!", createdAt: "2025-04-23T15:00:00Z" },
-        { id: 102, author: "Alice Johnson", content: "Congrats!", createdAt: "2025-04-23T15:30:00Z" }
-      ],
-      isLiked: false
-    },
-    {
-      id: 2,
-      author: "John Smith",
-      authorId: "john-smith",
-      authorAvatar: "/images/default-avatar.png",
-      content: "Beautiful day for a hike! 🏞️ #nature #outdoors",
-      image: "https://via.placeholder.com/600x400",
-      createdAt: "2025-04-23T10:15:00Z",
-      likes: 28,
-      comments: [],
-      isLiked: true
-    },
-    {
-      id: 3,
-      author: "Alice Johnson",
-      authorId: "alice-johnson",
-      authorAvatar: "/images/default-avatar.png",
-      content: "Just learned about React hooks. They're game changers! #reactjs #javascript",
-      createdAt: "2025-04-22T16:45:00Z",
-      likes: 17,
-      comments: [
-        { id: 103, author: "Jane Doe", content: "They really are! Changed how I build components.", createdAt: "2025-04-22T17:30:00Z" }
-      ],
-      isLiked: false
-    }
-  ];
+  // Extract hashtags from post content
+  const extractHashtags = (content) => {
+    if (!content) return [];
+    const regex = /#(\w+)/g;
+    const matches = content.match(regex);
+    if (!matches) return [];
+    return matches.map(tag => tag.slice(1));
+  };
 
   // Format date to relative time (e.g. "2 hours ago")
   const formatRelativeTime = (dateString) => {
+    if (!dateString) return '';
+    
     const date = new Date(dateString);
     const now = new Date();
     const diffInSeconds = Math.floor((now - date) / 1000);
     
     if (diffInSeconds < 60) {
-      return `${diffInSeconds} seconds ago`;
+      return `${diffInSeconds}s`;
     }
     
     const diffInMinutes = Math.floor(diffInSeconds / 60);
     if (diffInMinutes < 60) {
-      return `${diffInMinutes} minute${diffInMinutes > 1 ? 's' : ''} ago`;
+      return `${diffInMinutes}m`;
     }
     
     const diffInHours = Math.floor(diffInMinutes / 60);
     if (diffInHours < 24) {
-      return `${diffInHours} hour${diffInHours > 1 ? 's' : ''} ago`;
+      return `${diffInHours}h`;
     }
     
     const diffInDays = Math.floor(diffInHours / 24);
     if (diffInDays < 7) {
-      return `${diffInDays} day${diffInDays > 1 ? 's' : ''} ago`;
+      return `${diffInDays}d`;
     }
     
-    const options = { year: 'numeric', month: 'short', day: 'numeric' };
+    const options = { month: 'short', day: 'numeric' };
     return date.toLocaleDateString(undefined, options);
   };
 
+  // Handle comment submission
+  const handleAddComment = async (postId, commentText) => {
+    if (!commentText.trim() || !isAuthenticated) return;
+    
+    const token = localStorage.getItem('token');
+    if (!token) return;
+    
+    try {
+      const response = await fetch(`${API_URL}/api/posts/${postId}/comments`, {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ content: commentText })
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      
+      const newComment = await response.json();
+      
+      setPosts(prevPosts => 
+        prevPosts.map(post => 
+          post.id === postId 
+            ? { ...post, comments: [...(post.comments || []), newComment] }
+            : post
+        )
+      );
+    } catch (err) {
+      console.error("Failed to add comment:", err);
+    }
+  };
+
   return (
-    <div className="home-page">
-      <div className="home-container">
-        {/* Left Sidebar */}
-        <aside className="sidebar sidebar-left">
-          <div className="sidebar-section">
-            <ul className="sidebar-menu">
-              <li className="sidebar-menu-item">
-                <Link to="/profile" className="sidebar-link">
-                  <img src="/images/default-avatar.png" alt="Profile" className="sidebar-avatar" />
-                  <span>Your Profile</span>
-                </Link>
-              </li>
-              <li className="sidebar-menu-item">
-                <Link to="/friends" className="sidebar-link">
-                  <span className="menu-icon">👥</span>
-                  <span>Friends</span>
-                </Link>
-              </li>
-              <li className="sidebar-menu-item">
-                <Link to="/groups" className="sidebar-link">
-                  <span className="menu-icon">👪</span>
-                  <span>Groups</span>
-                </Link>
-              </li>
-              <li className="sidebar-menu-item">
-                <Link to="/marketplace" className="sidebar-link">
-                  <span className="menu-icon">🛍️</span>
-                  <span>Marketplace</span>
-                </Link>
-              </li>
-              <li className="sidebar-menu-item">
-                <Link to="/watch" className="sidebar-link">
-                  <span className="menu-icon">📺</span>
-                  <span>Watch</span>
-                </Link>
-              </li>
-              <li className="sidebar-menu-item">
-                <Link to="/events" className="sidebar-link">
-                  <span className="menu-icon">📅</span>
-                  <span>Events</span>
-                </Link>
-              </li>
-              <li className="sidebar-menu-item">
-                <Link to="/memories" className="sidebar-link">
-                  <span className="menu-icon">⏱️</span>
-                  <span>Memories</span>
-                </Link>
-              </li>
-              <li className="sidebar-menu-item">
-                <Link to="/saved" className="sidebar-link">
-                  <span className="menu-icon">🔖</span>
-                  <span>Saved</span>
-                </Link>
-              </li>
-            </ul>
-          </div>
-          <div className="sidebar-section">
-            <h3 className="sidebar-heading">Your Shortcuts</h3>
-            <ul className="sidebar-menu">
-              <li className="sidebar-menu-item">
-                <a href="#" className="sidebar-link">
-                  <span className="menu-icon">🎮</span>
-                  <span>Gaming Group</span>
-                </a>
-              </li>
-              <li className="sidebar-menu-item">
-                <a href="#" className="sidebar-link">
-                  <span className="menu-icon">💻</span>
-                  <span>Web Development</span>
-                </a>
-              </li>
-              <li className="sidebar-menu-item">
-                <a href="#" className="sidebar-link">
-                  <span className="menu-icon">📱</span>
-                  <span>Mobile App Design</span>
-                </a>
-              </li>
-            </ul>
-          </div>
-        </aside>
-
-        {/* Main Content */}
-        <main className="main-content">
-          {/* Stories Section */}
-          <div className="stories-container">
-            <div className="story story-create">
-              <div className="story-content">
-                <div className="story-create-image">
-                  <img src="/images/default-avatar.png" alt="Create Story" className="story-avatar" />
+    <div className="nova-home">
+      <div className="nova-container">
+        <div className="nova-content">
+          <div className="nova-sidebar">
+            <div className="sidebar-card profile-card">
+              <div className="profile-cover">
+                <div className="profile-avatar-large">
+                  {user?.avatar ? (
+                    <img 
+                      src={user.avatar} 
+                      alt="Profile" 
+                      onError={(e) => {
+                        e.target.style.display = 'none';
+                      }}
+                    />
+                  ) : (
+                    <DefaultAvatar size={80} />
+                  )}
                 </div>
-                <div className="story-create-button">
-                  <span className="story-create-icon">+</span>
-                </div>
-                <p className="story-text">Create Story</p>
               </div>
-            </div>
-            <div className="story">
-              <img src="https://via.placeholder.com/180x320" alt="Story" className="story-image" />
-              <div className="story-content">
-                <div className="story-avatar-container">
-                  <img src="/images/default-avatar.png" alt="User" className="story-avatar" />
-                </div>
-                <p className="story-text">Jane Doe</p>
-              </div>
-            </div>
-            <div className="story">
-              <img src="https://via.placeholder.com/180x320" alt="Story" className="story-image" />
-              <div className="story-content">
-                <div className="story-avatar-container">
-                  <img src="/images/default-avatar.png" alt="User" className="story-avatar" />
-                </div>
-                <p className="story-text">John Smith</p>
-              </div>
-            </div>
-            <div className="story">
-              <img src="https://via.placeholder.com/180x320" alt="Story" className="story-image" />
-              <div className="story-content">
-                <div className="story-avatar-container">
-                  <img src="/images/default-avatar.png" alt="User" className="story-avatar" />
-                </div>
-                <p className="story-text">Alice Johnson</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Create Post */}
-          <div className="create-post-container">
-            <div className="create-post-header">
-              <img src="/images/default-avatar.png" alt="User" className="user-avatar" />
-              <form onSubmit={handlePostSubmit} className="create-post-form">
-                <input 
-                  type="text" 
-                  className="create-post-input" 
-                  placeholder="What's on your mind?" 
-                  value={newPostContent}
-                  onChange={(e) => setNewPostContent(e.target.value)}
-                />
-                <button 
-                  type="submit" 
-                  className="create-post-button"
-                  disabled={!newPostContent.trim()}
-                >
-                  Post
-                </button>
-              </form>
-            </div>
-            <div className="create-post-actions">
-              <button className="post-action-button">
-                <span className="action-icon">🎥</span>
-                <span>Live Video</span>
-              </button>
-              <button className="post-action-button">
-                <span className="action-icon">🖼️</span>
-                <span>Photo/Video</span>
-              </button>
-              <button className="post-action-button">
-                <span className="action-icon">😊</span>
-                <span>Feeling/Activity</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Posts Feed */}
-          <div className="posts-container">
-            {isLoading ? (
-              <div className="loading-indicator">
-                <p>Loading posts...</p>
-              </div>
-            ) : error ? (
-              <div className="error-message">
-                <p>{error}</p>
-              </div>
-            ) : (
-              posts.map(post => (
-                <div className="post" key={post.id}>
-                  <div className="post-header">
-                    <div className="post-user-info">
-                      <img src={post.authorAvatar} alt={post.author} className="post-avatar" />
-                      <div className="post-meta">
-                        <h4 className="post-author">{post.author}</h4>
-                        <p className="post-time">{formatRelativeTime(post.createdAt)}</p>
-                      </div>
+              <div className="profile-info">
+                <h3>{user?.fullName || user?.username || "Khách"}</h3>
+                <p className="profile-handle">@{user?.username || "guest"}</p>
+                {isAuthenticated && (
+                  <div className="profile-stats">
+                    <div className="stat">
+                      <span className="stat-number">0</span>
+                      <span className="stat-label">Bài viết</span>
                     </div>
-                    <button className="post-options">
-                      <span>⋮</span>
-                    </button>
+                    <div className="stat">
+                      <span className="stat-number">0</span>
+                      <span className="stat-label">Bạn bè</span>
+                    </div>
                   </div>
-                  <div className="post-content">
-                    <p>{post.content}</p>
-                    {post.image && (
-                      <div className="post-image-container">
-                        <img src={post.image} alt="Post" className="post-image" />
-                      </div>
+                )}
+              </div>
+            </div>
+
+            <div className="sidebar-card trending-card">
+              <h3 className="card-title">Chủ đề phổ biến</h3>
+              <ul className="trending-list">
+                <li className="trending-item">
+                  <span className="trending-tag">#technology</span>
+                  <span className="trending-count">24.3k bài viết</span>
+                </li>
+                <li className="trending-item">
+                  <span className="trending-tag">#ai</span>
+                  <span className="trending-count">18.9k bài viết</span>
+                </li>
+                <li className="trending-item">
+                  <span className="trending-tag">#design</span>
+                  <span className="trending-count">12.5k bài viết</span>
+                </li>
+                <li className="trending-item">
+                  <span className="trending-tag">#nova</span>
+                  <span className="trending-count">8.7k bài viết</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="nova-main">
+            {/* Create Post */}
+            {isAuthenticated && (
+              <div className="create-post-card">
+                <form onSubmit={handlePostSubmit} className="create-post-form">
+                  <div className="post-form-header">
+                    {user?.avatar ? (
+                      <img 
+                        src={user.avatar} 
+                        alt="User" 
+                        className="post-avatar" 
+                        onError={(e) => {
+                          e.target.style.display = 'none';
+                        }}
+                      />
+                    ) : (
+                      <DefaultAvatar size={48} />
                     )}
+                    <textarea 
+                      className="post-input" 
+                      placeholder="Chia sẻ suy nghĩ của bạn..." 
+                      value={newPostContent}
+                      onChange={(e) => setNewPostContent(e.target.value)}
+                      rows={newPostContent.length > 0 ? 3 : 1}
+                    />
                   </div>
-                  <div className="post-stats">
-                    <div className="post-likes">
-                      <span className="like-icon">👍</span>
-                      <span>{post.likes}</span>
+                  <div className="post-form-footer">
+                    <div className="post-attachments">
+                      <button type="button" className="attachment-button">
+                        <span className="attachment-icon"><FaImage /></span>
+                        <span className="attachment-label">Hình ảnh</span>
+                      </button>
+                      <button type="button" className="attachment-button">
+                        <span className="attachment-icon"><FaMapMarkerAlt /></span>
+                        <span className="attachment-label">Vị trí</span>
+                      </button>
+                      <button type="button" className="attachment-button">
+                        <span className="attachment-icon"><FaTags /></span>
+                        <span className="attachment-label">Chủ đề</span>
+                      </button>
                     </div>
-                    <div className="post-comments-count">
-                      <span>{post.comments.length} comments</span>
-                    </div>
-                  </div>
-                  <div className="post-actions">
                     <button 
-                      className={`post-action-button ${post.isLiked ? 'liked' : ''}`}
-                      onClick={() => handleLike(post.id)}
+                      type="submit" 
+                      className="post-submit"
+                      disabled={!newPostContent.trim()}
                     >
-                      <span className="action-icon">👍</span>
-                      <span>Like</span>
-                    </button>
-                    <button className="post-action-button">
-                      <span className="action-icon">💬</span>
-                      <span>Comment</span>
-                    </button>
-                    <button className="post-action-button">
-                      <span className="action-icon">➡️</span>
-                      <span>Share</span>
+                      Đăng
                     </button>
                   </div>
-                  {post.comments.length > 0 && (
-                    <div className="post-comments">
-                      {post.comments.map(comment => (
-                        <div className="comment" key={comment.id}>
-                          <img src="/images/default-avatar.png" alt={comment.author} className="comment-avatar" />
-                          <div className="comment-content">
-                            <h5 className="comment-author">{comment.author}</h5>
-                            <p className="comment-text">{comment.content}</p>
-                            <div className="comment-actions">
-                              <button className="comment-action">Like</button>
-                              <button className="comment-action">Reply</button>
-                              <span className="comment-time">{formatRelativeTime(comment.createdAt)}</span>
+                </form>
+              </div>
+            )}
+
+            {/* Feed Filter */}
+            <div className="feed-filter">
+              <button className={`filter-button ${activeTab === 'foryou' ? 'active' : ''}`} onClick={() => setActiveTab('foryou')}>Dành cho bạn</button>
+              <button className={`filter-button ${activeTab === 'following' ? 'active' : ''}`} onClick={() => setActiveTab('following')}>Theo dõi</button>
+              <button className={`filter-button ${activeTab === 'trending' ? 'active' : ''}`} onClick={() => setActiveTab('trending')}>Thịnh hành</button>
+            </div>
+
+            {/* Posts Feed */}
+            <div className="posts-container">
+              {isLoading ? (
+                <div className="loading-card">
+                  <BiLoader className="loader-icon" />
+                  <p>Đang tải bài viết...</p>
+                </div>
+              ) : error ? (
+                <div className="error-card">
+                  <MdErrorOutline className="error-icon" />
+                  <p>{error}</p>
+                </div>
+              ) : posts.length === 0 ? (
+                <div className="empty-card">
+                  <p>Không có bài viết nào để hiển thị.</p>
+                  {isAuthenticated && (
+                    <p className="empty-card-action">Hãy là người đầu tiên chia sẻ bài viết!</p>
+                  )}
+                </div>
+              ) : (
+                posts.map(post => {
+                  const tags = post.tags || extractHashtags(post.content);
+                  return (
+                    <div className="post-card" key={post.id}>
+                      <div className="post-header">
+                        <div className="post-author">
+                          {post.authorAvatar ? (
+                            <img 
+                              src={post.authorAvatar} 
+                              alt={post.author} 
+                              className="author-avatar" 
+                              onError={(e) => {
+                                e.target.style.display = 'none';
+                              }}
+                            />
+                          ) : (
+                            <DefaultAvatar size={48} />
+                          )}
+                          <div className="author-info">
+                            <div className="author-name">{post.author}</div>
+                            <div className="post-meta">
+                              <span className="post-time">{formatRelativeTime(post.createdAt)}</span>
+                              <span className="dot-separator">•</span>
+                              <span className="visibility-icon"><FaGlobe /></span>
                             </div>
                           </div>
                         </div>
-                      ))}
-                    </div>
-                  )}
-                  <div className="add-comment">
-                    <img src="/images/default-avatar.png" alt="User" className="comment-avatar" />
-                    <input type="text" className="comment-input" placeholder="Write a comment..." />
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-        </main>
+                        <button className="post-menu">
+                          <FaEllipsisV className="menu-icon" />
+                        </button>
+                      </div>
 
-        {/* Right Sidebar */}
-        <aside className="sidebar sidebar-right">
-          <div className="sidebar-section">
-            <h3 className="sidebar-heading">Sponsored</h3>
-            <div className="sponsored-item">
-              <img src="https://via.placeholder.com/150x100" alt="Sponsored" className="sponsored-image" />
-              <div className="sponsored-content">
-                <h4>Premium Web Hosting</h4>
-                <p>Get 50% off your first 3 months</p>
-              </div>
-            </div>
-            <div className="sponsored-item">
-              <img src="https://via.placeholder.com/150x100" alt="Sponsored" className="sponsored-image" />
-              <div className="sponsored-content">
-                <h4>Learn Web Development</h4>
-                <p>Start your journey today</p>
-              </div>
+                      <div className="post-content">
+                        <p>{post.content}</p>
+                        
+                        {tags.length > 0 && (
+                          <div className="post-tags">
+                            {tags.map(tag => (
+                              <span key={tag} className="post-tag">#{tag}</span>
+                            ))}
+                          </div>
+                        )}
+                        
+                        {post.image && (
+                          <div className="post-media">
+                            <img 
+                              src={post.image} 
+                              alt="Post" 
+                              className="post-image" 
+                              onError={(e) => {
+                                e.target.style.display = 'none';
+                              }}
+                            />
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="post-actions">
+                        <button 
+                          className={`post-action ${post.isLiked ? 'liked' : ''}`}
+                          onClick={() => handleLike(post.id)}
+                        >
+                          <span className="action-icon">
+                            {post.isLiked ? <FaHeart /> : <FaRegHeart />}
+                          </span>
+                          <span className="action-count">{post.likes || 0}</span>
+                        </button>
+                        <button className="post-action">
+                          <span className="action-icon"><FaComment /></span>
+                          <span className="action-count">{post.comments ? post.comments.length : 0}</span>
+                        </button>
+                        <button className="post-action">
+                          <span className="action-icon"><FaShare /></span>
+                          <span className="action-count">0</span>
+                        </button>
+                        <button className="post-action">
+                          <span className="action-icon"><FaBookmark /></span>
+                        </button>
+                        <button className="post-action">
+                          <span className="action-icon"><FaExternalLinkAlt /></span>
+                        </button>
+                      </div>
+
+                      {post.comments && post.comments.length > 0 && (
+                        <div className="post-comments">
+                          <h4 className="comments-header">
+                            <span className="comments-count">{post.comments.length} Bình luận</span>
+                          </h4>
+                          <div className="comments-list">
+                            {post.comments.map(comment => (
+                              <div className="comment-item" key={comment.id}>
+                                {comment.authorAvatar ? (
+                                  <img 
+                                    src={comment.authorAvatar} 
+                                    alt={comment.author} 
+                                    className="comment-avatar" 
+                                    onError={(e) => {
+                                      e.target.style.display = 'none';
+                                    }}
+                                  />
+                                ) : (
+                                  <DefaultAvatar size={36} />
+                                )}
+                                <div className="comment-content">
+                                  <div className="comment-header">
+                                    <span className="comment-author">{comment.author}</span>
+                                    <span className="comment-time">{formatRelativeTime(comment.createdAt)}</span>
+                                  </div>
+                                  <p className="comment-text">{comment.content}</p>
+                                  <div className="comment-actions">
+                                    <button className="comment-action">
+                                      <FaThumbsUp size={12} /> Thích
+                                    </button>
+                                    <button className="comment-action">
+                                      <FaReply size={12} /> Trả lời
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {isAuthenticated && (
+                        <div className="add-comment">
+                          {user?.avatar ? (
+                            <img 
+                              src={user.avatar} 
+                              alt="User" 
+                              className="comment-avatar" 
+                              onError={(e) => {
+                                e.target.style.display = 'none';
+                              }}
+                            />
+                          ) : (
+                            <DefaultAvatar size={36} />
+                          )}
+                          <input 
+                            type="text" 
+                            className="comment-input" 
+                            placeholder="Thêm bình luận..." 
+                            onKeyPress={(e) => {
+                              if (e.key === 'Enter') {
+                                handleAddComment(post.id, e.target.value);
+                                e.target.value = '';
+                              }
+                            }}
+                          />
+                          <button 
+                            className="comment-submit"
+                            onClick={(e) => {
+                              const input = e.target.previousSibling;
+                              if (input.value.trim()) {
+                                handleAddComment(post.id, input.value);
+                                input.value = '';
+                              }
+                            }}
+                          >
+                            <IoMdSend />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })
+              )}
             </div>
           </div>
-          <div className="sidebar-section">
-            <h3 className="sidebar-heading">Birthdays</h3>
-            <div className="birthday-item">
-              <span className="birthday-icon">🎂</span>
-              <p><strong>John Smith</strong> and <strong>2 others</strong> have birthdays today.</p>
-            </div>
-          </div>
-          <div className="sidebar-section">
-            <h3 className="sidebar-heading">Contacts</h3>
-            <ul className="contacts-list">
-              <li className="contact-item">
-                <div className="contact-info">
-                  <img src="/images/default-avatar.png" alt="Contact" className="contact-avatar" />
-                  <span className="contact-name">Jane Doe</span>
-                </div>
-                <span className="online-indicator"></span>
-              </li>
-              <li className="contact-item">
-                <div className="contact-info">
-                  <img src="/images/default-avatar.png" alt="Contact" className="contact-avatar" />
-                  <span className="contact-name">John Smith</span>
-                </div>
-                <span className="online-indicator"></span>
-              </li>
-              <li className="contact-item">
-                <div className="contact-info">
-                  <img src="/images/default-avatar.png" alt="Contact" className="contact-avatar" />
-                  <span className="contact-name">Alice Johnson</span>
-                </div>
-                <span className="online-indicator"></span>
-              </li>
-              <li className="contact-item">
-                <div className="contact-info">
-                  <img src="/images/default-avatar.png" alt="Contact" className="contact-avatar" />
-                  <span className="contact-name">Bob Wilson</span>
-                </div>
-                <span className="online-indicator offline"></span>
-              </li>
-              <li className="contact-item">
-                <div className="contact-info">
-                  <img src="/images/default-avatar.png" alt="Contact" className="contact-avatar" />
-                  <span className="contact-name">Emily Brown</span>
-                </div>
-                <span className="online-indicator"></span>
-              </li>
-            </ul>
-          </div>
-        </aside>
+        </div>
       </div>
     </div>
   );

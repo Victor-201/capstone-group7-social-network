@@ -11,5 +11,9 @@ export const ROUTERS = {
         TERMS: "/terms",
         CAREERS: "/careers"
     },
+    AUTH: {
+        LOGIN: "/login",
+        REGISTER: "/register"
+    },
     ADMIN: "/admin" 
 };
