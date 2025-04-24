@@ -38,7 +38,7 @@ module.exports = (sequelize) => {
     tableName: 'likes',
     timestamps: true,
     createdAt: 'created_at',
-    updatedAt: 'updated_at'
+    updatedAt: false  // Tắt updatedAt vì không có cột này trong database
   });
 
   Like.associate = (models) => {

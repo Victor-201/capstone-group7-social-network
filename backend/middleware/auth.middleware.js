@@ -5,6 +5,19 @@ const { initModels } = require('../config/database');
 const models = initModels();
 const User = models.User;
 
+// Hàm giải mã token
+const decodeToken = (token) => {
+  try {
+    return jwt.verify(
+      token, 
+      process.env.JWT_SECRET || 'your_jwt_secret_key'
+    );
+  } catch (error) {
+    console.error('Token decode error:', error);
+    return null;
+  }
+};
+
 exports.verifyToken = async (req, res, next) => {
   try {
     // Lấy token từ header
@@ -69,3 +82,5 @@ exports.verifyToken = async (req, res, next) => {
     });
   }
 };
+
+module.exports.decodeToken = decodeToken;

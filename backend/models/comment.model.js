@@ -28,15 +28,6 @@ module.exports = (sequelize) => {
     content: {
       type: DataTypes.TEXT,
       allowNull: false
-    },
-    parentId: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-      field: 'parent_id',
-      references: {
-        model: 'comments',
-        key: 'id'
-      }
     }
   }, {
     tableName: 'comments',
@@ -47,10 +38,7 @@ module.exports = (sequelize) => {
 
   Comment.associate = (models) => {
     Comment.belongsTo(models.User, { foreignKey: 'user_id', as: 'author' });
-    Comment.belongsTo(models.Post, { foreignKey: 'post_id', as: 'post' });
-    Comment.belongsTo(models.Comment, { foreignKey: 'parent_id', as: 'parent' });
-    Comment.hasMany(models.Comment, { foreignKey: 'parent_id', as: 'replies' });
-    Comment.hasMany(models.Like, { foreignKey: 'comment_id', as: 'likes' });
+    Comment.belongsTo(models.Post, { foreignKey: 'post_id' });
   };
 
   return Comment;

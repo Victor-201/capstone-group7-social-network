@@ -49,13 +49,23 @@ app.get("/api/posts", async (req, res) => {
   try {
     console.log("Attempting to fetch posts from database");
     
-    // Get current user ID if available
-    const userId = req.headers.authorization ? req.user?.id : null;
+    // Lấy ID người dùng từ token nếu có
+    let userId = null;
+    if (req.headers.authorization) {
+      const token = req.headers.authorization.split(' ')[1];
+      if (token) {
+        const authMiddleware = require('./middleware/auth.middleware');
+        const decoded = authMiddleware.decodeToken(token);
+        userId = decoded?.id;
+      }
+    }
     
-    // If user is authenticated, only show their posts
+    console.log("Current user ID:", userId);
+    
+    // Nếu có userId, chỉ lấy bài viết của người dùng đó
     const whereClause = userId ? { userId: userId } : {};
     
-    // Fetch posts from database with comments, likes, and media
+    // Fetch posts from database
     const posts = await Post.findAll({
       where: whereClause,
       include: [
@@ -78,6 +88,7 @@ app.get("/api/posts", async (req, res) => {
         {
           model: Like,
           as: 'likes',
+          attributes: ['id', 'userId', 'postId'],
           include: [
             {
               model: User,
@@ -110,9 +121,10 @@ app.get("/api/posts", async (req, res) => {
         createdAt: comment.created_at
       })) : [];
       
-      // Get post image from media if available
-      const postImage = postObj.media && postObj.media.length > 0 ? 
-        postObj.media.find(m => m.type === 'image')?.url : null;
+      // Get post image from media if available - Thử các trường khác nhau
+      const postImage = postObj.media && postObj.media.length > 0 
+        ? postObj.media.find(m => m.type === 'image')?.mediaUrl || null
+        : null;
       
       // Check if current user liked the post
       const isLiked = userId ? 

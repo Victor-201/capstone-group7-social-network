@@ -16,32 +16,35 @@ module.exports = (sequelize) => {
         key: 'id'
       }
     },
+    userId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      field: 'user_id',
+      references: {
+        model: 'users',
+        key: 'id'
+      }
+    },
+    mediaUrl: {
+      type: DataTypes.STRING(255),
+      allowNull: false,
+      field: 'media_url'  // Tên cột thực tế trong database
+    },
     type: {
-      type: DataTypes.ENUM('image', 'video', 'document'),
+      type: DataTypes.ENUM('image', 'video', 'audio', 'document'),
+      allowNull: false,
       defaultValue: 'image'
-    },
-    url: {
-      type: DataTypes.STRING(255),
-      allowNull: false
-    },
-    thumbnailUrl: {
-      type: DataTypes.STRING(255),
-      allowNull: true,
-      field: 'thumbnail_url'
-    },
-    description: {
-      type: DataTypes.TEXT,
-      allowNull: true
     }
   }, {
     tableName: 'media',
     timestamps: true,
     createdAt: 'created_at',
-    updatedAt: 'updated_at'
+    updatedAt: false  // Không có cột updated_at trong SQL
   });
 
   Media.associate = (models) => {
     Media.belongsTo(models.Post, { foreignKey: 'post_id', as: 'post' });
+    Media.belongsTo(models.User, { foreignKey: 'user_id', as: 'user' });
   };
 
   return Media;
