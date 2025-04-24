@@ -5,6 +5,7 @@ import WatchPage from './pages/users/watchPage';
 import MarketplacePage from './pages/users/marketplacePage';
 import LoginPage from './pages/users/loginPage';
 import RegisterPage from './pages/users/registerPage';
+import FriendsPage from './pages/users/friendsPage'; // Import trang Friends
 import MasterLayout from './pages/users/theme/masterLayout';
 import { ROUTERS } from './utils/router';
 import { Route, Routes, Navigate, useNavigate, useLocation } from 'react-router-dom';
@@ -79,6 +80,14 @@ const renderUserRouter = () => {
             Component: (
               <ProtectedRoute>
                 <GroupsPage />
+              </ProtectedRoute>
+            ),
+        },
+        {
+            path: '/friends',
+            Component: (
+              <ProtectedRoute>
+                <FriendsPage />
               </ProtectedRoute>
             ),
         },

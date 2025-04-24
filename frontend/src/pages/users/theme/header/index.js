@@ -2,7 +2,7 @@ import { memo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../../contexts/AuthContext';
 import DefaultAvatar from '../../../../components/DefaultAvatar';
-import { FaHome, FaVideo, FaShoppingCart, FaUsers, FaSignOutAlt, FaSearch } from 'react-icons/fa';
+import { FaHome, FaVideo, FaShoppingCart, FaUsers, FaSignOutAlt, FaSearch, FaUserFriends } from 'react-icons/fa';
 import './style.scss';
 
 const Header = () => {
@@ -39,6 +39,9 @@ const Header = () => {
                     </Link>
                     <Link to="/groups" className="nav-item">
                         <span className="nav-icon"><FaUsers /></span>
+                    </Link>
+                    <Link to="/friends" className="nav-item">
+                        <span className="nav-icon"><FaUserFriends /></span>
                     </Link>
                 </nav>
                 <div className="header-right">

@@ -9,7 +9,8 @@ export const ROUTERS = {
         HELP: "/help",
         PRIVACY: "/privacy",
         TERMS: "/terms",
-        CAREERS: "/careers"
+        CAREERS: "/careers",
+        USER_PROFILE: "/user/:id" // Thêm route cho trang cá nhân người dùng khác
     },
     AUTH: {
         LOGIN: "/login",

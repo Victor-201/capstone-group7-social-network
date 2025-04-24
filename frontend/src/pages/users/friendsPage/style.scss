@@ -1,0 +1,281 @@
+.friends-page {
+  padding: 20px 0;
+  background-color: #f0f2f5;
+  min-height: calc(100vh - 60px);
+  
+  .container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 15px;
+  }
+  
+  .page-title {
+    margin-bottom: 20px;
+    color: #1877f2;
+    font-size: 1.8rem;
+    text-align: center;
+  }
+  
+  .message {
+    padding: 12px 15px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    font-weight: 500;
+    
+    &.success-message {
+      background-color: #dff2bf;
+      color: #4f8a10;
+    }
+    
+    &.error-message {
+      background-color: #ffdddd;
+      color: #d8000c;
+      display: flex;
+      align-items: center;
+      
+      .error-icon {
+        margin-right: 10px;
+      }
+    }
+  }
+  
+  .tabs {
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    
+    .tab-button {
+      flex: 1;
+      min-width: 120px;
+      padding: 12px 10px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #65676b;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      border-bottom: 3px solid transparent;
+      
+      .tab-icon {
+        margin-right: 8px;
+      }
+      
+      &:hover {
+        background-color: #f0f2f5;
+      }
+      
+      &.active {
+        color: #1877f2;
+        border-bottom-color: #1877f2;
+      }
+      
+      @media (max-width: 768px) {
+        min-width: 33.33%;
+        font-size: 0.9rem;
+        padding: 10px 5px;
+        
+        .tab-icon {
+          margin-right: 4px;
+        }
+      }
+      
+      @media (max-width: 576px) {
+        min-width: 50%;
+        
+        span {
+          display: none;
+        }
+        
+        .tab-icon {
+          margin-right: 0;
+          font-size: 1.1rem;
+        }
+      }
+    }
+  }
+  
+  .content {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    min-height: 300px;
+    
+    h2 {
+      margin-bottom: 20px;
+      color: #1c1e21;
+      font-size: 1.2rem;
+    }
+    
+    .loading-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 0;
+      
+      .spinner {
+        animation: spin 1s linear infinite;
+        font-size: 2rem;
+        color: #1877f2;
+        margin-bottom: 15px;
+      }
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 40px 0;
+      color: #65676b;
+    }
+    
+    .user-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+      
+      @media (max-width: 576px) {
+        grid-template-columns: 1fr;
+      }
+      
+      .user-card {
+        border: 1px solid #e4e6eb;
+        border-radius: 8px;
+        padding: 15px;
+        display: flex;
+        flex-direction: column;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        
+        &:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .user-avatar {
+          display: flex;
+          justify-content: center;
+          margin-bottom: 15px;
+          
+          img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+          }
+        }
+        
+        .user-info {
+          text-align: center;
+          margin-bottom: 15px;
+          
+          h3 {
+            margin: 0 0 5px;
+            font-size: 1.1rem;
+            color: #1c1e21;
+          }
+          
+          .username {
+            color: #65676b;
+            margin: 0 0 8px;
+            font-size: 0.9rem;
+          }
+          
+          .bio {
+            color: #65676b;
+            font-size: 0.9rem;
+            margin: 10px 0 0;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+          }
+          
+          .request-time {
+            font-size: 0.8rem;
+            color: #65676b;
+            margin-top: 5px;
+          }
+        }
+        
+        .user-actions {
+          margin-top: auto;
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+          
+          .action-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: background-color 0.2s ease;
+            
+            .action-icon {
+              margin-right: 8px;
+            }
+            
+            .spinner {
+              animation: spin 1s linear infinite;
+              margin-right: 8px;
+            }
+            
+            &:disabled {
+              opacity: 0.6;
+              cursor: not-allowed;
+            }
+            
+            &.add-button, &.accept-button, &.follow-button {
+              background-color: #e7f3ff;
+              color: #1877f2;
+              
+              &:hover {
+                background-color: #dce6f2;
+              }
+            }
+            
+            &.remove-button, &.reject-button, &.unfollow-button {
+              background-color: #f0f2f5;
+              color: #65676b;
+              
+              &:hover {
+                background-color: #e4e6eb;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  .auth-message {
+    text-align: center;
+    padding: 40px 0;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    
+    h2 {
+      color: #65676b;
+    }
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

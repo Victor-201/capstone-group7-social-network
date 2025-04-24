@@ -13,4 +13,10 @@ router.put('/change-password', verifyToken, userController.changePassword);
 // Upload ảnh đại diện
 router.post('/upload-avatar', verifyToken, upload.single('avatar'), userController.uploadAvatar);
 
+// Tìm kiếm người dùng
+router.get('/search', userController.searchUsers);
+
+// Lấy thông tin người dùng theo ID
+router.get('/:id', userController.getUserById);
+
 module.exports = router;

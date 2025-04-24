@@ -2,6 +2,7 @@ const { initModels } = require('../config/database');
 const bcrypt = require('bcryptjs');
 const path = require('path');
 const fs = require('fs');
+const { Op } = require('sequelize');
 
 // Khởi tạo models
 const models = initModels();
@@ -162,5 +163,139 @@ exports.uploadAvatar = async (req, res) => {
     }
     
     res.status(500).json({ message: 'Lỗi server: ' + error.message });
+  }
+};
+
+// Tìm kiếm người dùng
+exports.searchUsers = async (req, res) => {
+  try {
+    const { query } = req.query;
+    
+    if (!query || query.trim() === '') {
+      return res.status(400).json({ message: 'Search query is required' });
+    }
+
+    // Tìm người dùng theo username hoặc fullName
+    const users = await User.findAll({
+      where: {
+        [Op.or]: [
+          { username: { [Op.like]: `%${query}%` } },
+          { fullName: { [Op.like]: `%${query}%` } }
+        ]
+      },
+      attributes: ['id', 'username', 'fullName', 'avatar', 'bio'],
+      limit: 20
+    });
+    
+    res.json(users);
+  } catch (error) {
+    console.error('Search users error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+// Lấy thông tin người dùng theo ID
+exports.getUserById = async (req, res) => {
+  try {
+    const userId = req.params.id;
+    
+    // Kiểm tra xem người dùng có tồn tại không
+    const user = await User.findByPk(userId, {
+      attributes: ['id', 'username', 'fullName', 'avatar', 'bio', 'createdAt']
+    });
+    
+    if (!user) {
+      return res.status(404).json({ message: 'Không tìm thấy người dùng' });
+    }
+    
+    // Nếu có người dùng đang đăng nhập, kiểm tra các thông tin về kết bạn
+    let friendshipStatus = null;
+    let isFollowing = false;
+    
+    if (req.headers.authorization) {
+      try {
+        const token = req.headers.authorization.split(' ')[1];
+        const authMiddleware = require('../middleware/auth.middleware');
+        const decoded = authMiddleware.decodeToken(token);
+        
+        if (decoded?.id && decoded.id !== parseInt(userId)) {
+          // Kiểm tra trạng thái kết bạn
+          const { userId1, userId2 } = decoded.id < parseInt(userId) 
+            ? { userId1: decoded.id, userId2: parseInt(userId) }
+            : { userId1: parseInt(userId), userId2: decoded.id };
+
+          const friendship = await models.Friendship.findOne({
+            where: {
+              userId1,
+              userId2
+            }
+          });
+          
+          if (friendship) {
+            friendshipStatus = {
+              status: friendship.status,
+              actionUserId: friendship.actionUserId
+            };
+          }
+          
+          // Kiểm tra xem có đang theo dõi hay không
+          const follow = await models.Follower.findOne({
+            where: {
+              followerId: decoded.id,
+              followedId: userId
+            }
+          });
+          
+          isFollowing = !!follow;
+        }
+      } catch (err) {
+        console.error("Auth check error:", err);
+      }
+    }
+    
+    // Thêm số lượng bạn bè và người theo dõi
+    const friendsCount = await models.Friendship.count({
+      where: {
+        [Op.or]: [
+          { userId1: userId },
+          { userId2: userId }
+        ],
+        status: 'accepted'
+      }
+    });
+    
+    const followersCount = await models.Follower.count({
+      where: {
+        followedId: userId
+      }
+    });
+    
+    const followingCount = await models.Follower.count({
+      where: {
+        followerId: userId
+      }
+    });
+    
+    // Số lượng bài viết
+    const postsCount = await models.Post.count({
+      where: {
+        userId: userId
+      }
+    });
+    
+    res.json({
+      ...user.toJSON(),
+      friendshipStatus,
+      isFollowing,
+      stats: {
+        friendsCount,
+        followersCount,
+        followingCount,
+        postsCount
+      }
+    });
+  } catch (error) {
+    console.error('Get user by ID error:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 };
