@@ -2,10 +2,14 @@ const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const dotenv = require("dotenv");
+const path = require("path");
+const fs = require("fs");
 const { sequelize, testConnection, initModels } = require("./config/database");
 const authRoutes = require("./routes/auth.routes");
 const userRoutes = require("./routes/user.routes");
 const groupsRoutes = require("./routes/groups.routes");
+const friendshipRoutes = require("./routes/friendship.routes");
+const followerRoutes = require("./routes/follower.routes");
 // Sử dụng initModels() thay vì import trực tiếp
 const models = initModels();
 
@@ -26,6 +30,9 @@ app.use(cors({
 // Middleware để xử lý preflight requests
 app.options('*', cors());
 
+// Serve static files from uploads directory
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 // Middleware hiển thị thông tin request
 app.use((req, res, next) => {
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
@@ -38,6 +45,8 @@ app.use(bodyParser.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/groups', groupsRoutes);
+app.use('/api/friends', friendshipRoutes);
+app.use('/api/follow', followerRoutes);
 
 // Import all models
 const Post = models.Post;
@@ -359,6 +368,70 @@ app.post("/api/posts/:id/comments", require('./middleware/auth.middleware').veri
 // Test endpoint
 app.get("/test", (req, res) => {
   res.json({ message: "Kết nối thành công đến backend!", status: "OK" });
+});
+
+// File diagnostic endpoint
+app.get("/api/file-check", (req, res) => {
+  try {
+    const filePath = req.query.path;
+    const uploadsDir = path.join(__dirname, 'uploads');
+    const avatarsDir = path.join(uploadsDir, 'avatars');
+    
+    // Check if uploads directory exists
+    const uploadsExists = fs.existsSync(uploadsDir);
+    
+    // Check if avatars directory exists
+    const avatarsExists = fs.existsSync(avatarsDir);
+    
+    // Create directories if they don't exist
+    if (!uploadsExists) {
+      fs.mkdirSync(uploadsDir, { recursive: true });
+    }
+    
+    if (!avatarsExists) {
+      fs.mkdirSync(avatarsDir, { recursive: true });
+    }
+    
+    // List files in avatars directory
+    const avatarFiles = fs.existsSync(avatarsDir) 
+      ? fs.readdirSync(avatarsDir) 
+      : [];
+    
+    // Check specific file if path parameter is provided
+    let fileExists = false;
+    let fullFilePath = '';
+    
+    if (filePath) {
+      // Handle both relative and absolute paths
+      if (filePath.startsWith('/')) {
+        // Remove leading slash
+        const relativePath = filePath.substring(1);
+        fullFilePath = path.join(__dirname, relativePath);
+      } else {
+        fullFilePath = path.join(__dirname, filePath);
+      }
+      
+      fileExists = fs.existsSync(fullFilePath);
+    }
+    
+    res.json({
+      uploadsDirectoryExists: uploadsExists,
+      avatarsDirectoryExists: avatarsExists,
+      avatarFiles: avatarFiles,
+      fileCheckRequested: !!filePath,
+      requestedFilePath: filePath || '',
+      fullFilePath: fullFilePath || '',
+      fileExists: fileExists,
+      serverDirectory: __dirname,
+      uploadsPath: uploadsDir,
+      avatarsPath: avatarsDir
+    });
+  } catch (error) {
+    res.status(500).json({ 
+      error: error.message, 
+      stack: error.stack 
+    });
+  }
 });
 
 // Khởi động server sau khi đã đồng bộ với cơ sở dữ liệu
