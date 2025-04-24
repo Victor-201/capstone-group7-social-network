@@ -4,6 +4,8 @@ const bodyParser = require("body-parser");
 const dotenv = require("dotenv");
 const { sequelize, testConnection, initModels } = require("./config/database");
 const authRoutes = require("./routes/auth.routes");
+const userRoutes = require("./routes/user.routes");
+const groupsRoutes = require("./routes/groups.routes");
 // Sử dụng initModels() thay vì import trực tiếp
 const models = initModels();
 
@@ -34,7 +36,8 @@ app.use(bodyParser.json());
 
 // Khai báo routes
 app.use('/api/auth', authRoutes);
-app.use('/api/users', require('./routes/user.routes'));
+app.use('/api/users', userRoutes);
+app.use('/api/groups', groupsRoutes);
 
 // Import all models
 const Post = models.Post;

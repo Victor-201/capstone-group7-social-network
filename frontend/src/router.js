@@ -8,6 +8,7 @@ import RegisterPage from './pages/users/registerPage';
 import MasterLayout from './pages/users/theme/masterLayout';
 import { ROUTERS } from './utils/router';
 import { Route, Routes, Navigate, useNavigate, useLocation } from 'react-router-dom';
+import GroupsPage from './pages/users/groupsPage'; // Import trang Groups
 
 // Component bảo vệ route, chỉ cho phép truy cập khi đã đăng nhập
 const ProtectedRoute = ({ children }) => {
@@ -50,6 +51,14 @@ const renderUserRouter = () => {
             ),
         },
         {
+            path: '/personal',
+            Component: (
+              <ProtectedRoute>
+                <PersonalPage />
+              </ProtectedRoute>
+            ),
+        },
+        {
             path: ROUTERS.USER.WATCH,
             Component: (
               <ProtectedRoute>
@@ -62,6 +71,14 @@ const renderUserRouter = () => {
             Component: (
               <ProtectedRoute>
                 <MarketplacePage />
+              </ProtectedRoute>
+            ),
+        },
+        {
+            path: '/groups',
+            Component: (
+              <ProtectedRoute>
+                <GroupsPage />
               </ProtectedRoute>
             ),
         },
