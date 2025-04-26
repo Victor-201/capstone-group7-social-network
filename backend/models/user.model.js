@@ -30,24 +30,49 @@ module.exports = (sequelize) => {
     },
     fullName: {
       type: DataTypes.STRING(100),
-      allowNull: false, // Thay đổi thành false vì cột trong DB không cho phép NULL
-      field: 'full_name' // Chỉ định tên cột trong database
+      allowNull: false,
+      field: 'full_name'
     },
     avatar: {
       type: DataTypes.STRING(255),
       allowNull: true,
-      defaultValue: 'default-avatar.png'
+      defaultValue: '/images/default-avatar.png'
+    },
+    coverImage: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+      field: 'cover_image'
     },
     bio: {
       type: DataTypes.TEXT,
       allowNull: true,
-      field: 'bio' // Chỉ định tên cột trong database
+      field: 'bio'
+    },
+    location: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+      field: 'location'
+    },
+    workplace: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+      field: 'workplace'
+    },
+    education: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+      field: 'education'
+    },
+    relationship: {
+      type: DataTypes.STRING(50),
+      allowNull: true,
+      field: 'relationship'
     },
     isActive: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: true,
-      field: 'is_active' // Chỉ định tên cột trong database
+      field: 'is_active'
     },
     role: {
       type: DataTypes.ENUM('user', 'admin'),
@@ -109,14 +134,14 @@ module.exports = (sequelize) => {
 
     // Followers
     User.belongsToMany(models.User, {
-      through: models.Follower,  // Sử dụng model Follower thay vì chuỗi
+      through: models.Follower,
       as: 'followers',
       foreignKey: 'followed_id',
       otherKey: 'follower_id'
     });
 
     User.belongsToMany(models.User, {
-      through: models.Follower,  // Sử dụng model Follower thay vì chuỗi
+      through: models.Follower,
       as: 'following',
       foreignKey: 'follower_id',
       otherKey: 'followed_id'

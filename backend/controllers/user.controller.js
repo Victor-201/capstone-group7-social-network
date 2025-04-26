@@ -12,7 +12,14 @@ const User = models.User;
 exports.updateProfile = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { fullName, avatar, bio } = req.body;
+    const { 
+      fullName, 
+      bio, 
+      location, 
+      workplace, 
+      education, 
+      relationship 
+    } = req.body;
 
     // Tìm người dùng trong cơ sở dữ liệu
     const user = await User.findByPk(userId);
@@ -23,8 +30,11 @@ exports.updateProfile = async (req, res) => {
 
     // Cập nhật thông tin
     if (fullName) user.fullName = fullName;
-    if (avatar) user.avatar = avatar;
-    if (bio) user.bio = bio;
+    if (bio !== undefined) user.bio = bio;
+    if (location !== undefined) user.location = location;
+    if (workplace !== undefined) user.workplace = workplace;
+    if (education !== undefined) user.education = education;
+    if (relationship !== undefined) user.relationship = relationship;
 
     // Lưu thay đổi
     await user.save();
@@ -38,7 +48,12 @@ exports.updateProfile = async (req, res) => {
         email: user.email,
         fullName: user.fullName,
         avatar: user.avatar,
-        bio: user.bio
+        coverImage: user.coverImage,
+        bio: user.bio,
+        location: user.location,
+        workplace: user.workplace,
+        education: user.education,
+        relationship: user.relationship
       }
     });
   } catch (error) {
@@ -66,51 +81,40 @@ exports.changePassword = async (req, res) => {
     }
 
     // Kiểm tra mật khẩu hiện tại
-    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    const isMatch = await user.comparePassword(currentPassword);
     if (!isMatch) {
       return res.status(400).json({ message: 'Current password is incorrect' });
     }
 
-    // Hash mật khẩu mới
-    const salt = await bcrypt.genSalt(10);
-    user.password = await bcrypt.hash(newPassword, salt);
-
-    // Lưu thay đổi
+    // Cập nhật mật khẩu mới
+    user.password = newPassword;
     await user.save();
 
-    res.json({ message: 'Password changed successfully' });
+    res.json({ message: 'Password updated successfully' });
   } catch (error) {
     console.error('Change password error:', error);
     res.status(500).json({ message: 'Server error' });
   }
 };
 
-// Upload và cập nhật ảnh đại diện
+// Upload ảnh đại diện
 exports.uploadAvatar = async (req, res) => {
   try {
-    const userId = req.user.id;
-    const { fullName, bio } = req.body;
-
-    // Debug log
-    console.log('File upload request received:', req.file);
-
-    // Kiểm tra xem có file được tải lên không
     if (!req.file) {
-      return res.status(400).json({ message: 'Không có file ảnh nào được tải lên' });
+      return res.status(400).json({ message: 'No file uploaded' });
     }
 
-    // Tìm người dùng trong cơ sở dữ liệu
-    const user = await User.findByPk(userId);
+    const userId = req.user.id;
+    const { fullName, bio, location, workplace, education, relationship } = req.body;
     
+    // Tìm người dùng
+    const user = await User.findByPk(userId);
     if (!user) {
-      // Xóa file nếu không tìm thấy người dùng để tránh rác
-      fs.unlinkSync(req.file.path);
       return res.status(404).json({ message: 'User not found' });
     }
 
-    // Nếu người dùng đã có avatar tùy chỉnh trước đó (không phải mặc định), xóa file cũ
-    if (user.avatar && !user.avatar.startsWith('http') && !user.avatar.startsWith('/uploads/avatars/default-avatar.png')) {
-      // Remove the leading slash if it exists for correct path resolution
+    // Xóa avatar cũ nếu có
+    if (user.avatar && user.avatar !== '/images/default-avatar.png') {
       const avatarPath = user.avatar.startsWith('/') ? user.avatar.substring(1) : user.avatar;
       const oldAvatarPath = path.join(__dirname, '..', avatarPath);
       
@@ -132,7 +136,11 @@ exports.uploadAvatar = async (req, res) => {
 
     // Cập nhật các thông tin khác nếu có
     if (fullName) user.fullName = fullName;
-    if (bio) user.bio = bio;
+    if (bio !== undefined) user.bio = bio;
+    if (location !== undefined) user.location = location;
+    if (workplace !== undefined) user.workplace = workplace;
+    if (education !== undefined) user.education = education;
+    if (relationship !== undefined) user.relationship = relationship;
 
     // Lưu thay đổi
     await user.save();
@@ -146,11 +154,84 @@ exports.uploadAvatar = async (req, res) => {
         email: user.email,
         fullName: user.fullName,
         avatar: user.avatar,
-        bio: user.bio
+        coverImage: user.coverImage,
+        bio: user.bio,
+        location: user.location,
+        workplace: user.workplace,
+        education: user.education,
+        relationship: user.relationship
       }
     });
   } catch (error) {
     console.error('Upload avatar error:', error);
+    
+    // Xóa file trong trường hợp xảy ra lỗi
+    if (req.file) {
+      try {
+        fs.unlinkSync(req.file.path);
+        console.log('Deleted uploaded file due to error');
+      } catch (unlinkError) {
+        console.error('Error deleting uploaded file:', unlinkError);
+      }
+    }
+    
+    res.status(500).json({ message: 'Lỗi server: ' + error.message });
+  }
+};
+
+// Upload ảnh bìa
+exports.uploadCoverImage = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: 'No file uploaded' });
+    }
+
+    const userId = req.user.id;
+    
+    // Tìm người dùng
+    const user = await User.findByPk(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Xóa ảnh bìa cũ nếu có
+    if (user.coverImage) {
+      const coverPath = user.coverImage.startsWith('/') ? user.coverImage.substring(1) : user.coverImage;
+      const oldCoverPath = path.join(__dirname, '..', coverPath);
+      
+      console.log('Attempting to delete old cover image:', oldCoverPath);
+      
+      if (fs.existsSync(oldCoverPath)) {
+        fs.unlinkSync(oldCoverPath);
+        console.log('Old cover image deleted successfully');
+      } else {
+        console.log('Old cover image file not found, nothing to delete');
+      }
+    }
+
+    // Cập nhật đường dẫn ảnh bìa mới
+    const coverUrl = `/uploads/covers/${req.file.filename}`;
+    console.log('New cover image URL:', coverUrl);
+    user.coverImage = coverUrl;
+
+    // Lưu thay đổi
+    await user.save();
+
+    // Trả về thông tin đã cập nhật
+    res.json({
+      message: 'Ảnh bìa đã được cập nhật thành công',
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        fullName: user.fullName,
+        avatar: user.avatar,
+        coverImage: user.coverImage,
+        bio: user.bio
+      }
+    });
+  } catch (error) {
+    console.error('Upload cover image error:', error);
     
     // Xóa file trong trường hợp xảy ra lỗi
     if (req.file) {
@@ -174,7 +255,7 @@ exports.searchUsers = async (req, res) => {
     if (!query || query.trim() === '') {
       return res.status(400).json({ message: 'Search query is required' });
     }
-
+    
     // Tìm người dùng theo username hoặc fullName
     const users = await User.findAll({
       where: {
@@ -201,7 +282,10 @@ exports.getUserById = async (req, res) => {
     
     // Kiểm tra xem người dùng có tồn tại không
     const user = await User.findByPk(userId, {
-      attributes: ['id', 'username', 'fullName', 'avatar', 'bio', 'createdAt']
+      attributes: [
+        'id', 'username', 'fullName', 'avatar', 'coverImage', 'bio', 
+        'location', 'workplace', 'education', 'relationship', 'createdAt'
+      ]
     });
     
     if (!user) {
@@ -276,23 +360,14 @@ exports.getUserById = async (req, res) => {
       }
     });
     
-    // Số lượng bài viết
-    const postsCount = await models.Post.count({
-      where: {
-        userId: userId
-      }
-    });
-    
+    // Trả về thông tin người dùng cùng với các thông tin bổ sung
     res.json({
       ...user.toJSON(),
       friendshipStatus,
       isFollowing,
-      stats: {
-        friendsCount,
-        followersCount,
-        followingCount,
-        postsCount
-      }
+      friendsCount,
+      followersCount,
+      followingCount
     });
   } catch (error) {
     console.error('Get user by ID error:', error);

@@ -1,70 +1,111 @@
-# Getting Started with Create React App
+# Hướng dẫn thiết lập Frontend
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Yêu cầu
 
-## Available Scripts
+- Node.js (v14.0.0 trở lên)
+- npm hoặc yarn
 
-In the project directory, you can run:
+## Cài đặt
 
-### `npm start`
+### Bước 1: Cài đặt các phụ thuộc
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+Mở terminal và chạy lệnh sau:
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+```bash
+npm install
+```
 
-### `npm test`
+Hoặc nếu bạn sử dụng yarn:
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+```bash
+yarn install
+```
 
-### `npm run build`
+### Bước 2: Cấu hình kết nối với Backend
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Đảm bảo rằng API URL trong file cấu hình trỏ đến địa chỉ đúng của backend.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+Nếu backend không chạy trên cổng mặc định (8080), bạn cần điều chỉnh trong file `.env`:
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```
+REACT_APP_API_URL=http://localhost:8080/api
+```
 
-### `npm run eject`
+### Bước 3: Chạy ứng dụng
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+#### Chế độ phát triển
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+```bash
+npm start
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+Hoặc:
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+```bash
+yarn start
+```
 
-## Learn More
+Ứng dụng sẽ chạy ở chế độ phát triển tại [http://localhost:3000](http://localhost:3000)
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+#### Build cho production
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+```bash
+npm run build
+```
 
-### Code Splitting
+Hoặc:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+```bash
+yarn build
+```
 
-### Analyzing the Bundle Size
+Kết quả build sẽ được lưu trong thư mục `build/`.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+## Cấu trúc thư mục
 
-### Making a Progressive Web App
+```
+frontend/
+├── public/              # Assets tĩnh
+│   ├── favicon.ico
+│   ├── index.html       # Template HTML gốc
+│   └── ...
+├── src/                 # Mã nguồn React
+│   ├── components/      # Các component tái sử dụng
+│   ├── contexts/        # React Context
+│   ├── pages/           # Các trang của ứng dụng
+│   │   └── users/       # Các trang liên quan đến người dùng
+│   ├── styles/          # SCSS styles
+│   ├── utils/           # Các tiện ích
+│   ├── index.js         # Điểm khởi đầu ứng dụng
+│   └── router.js        # Cấu hình routing
+├── package.json         # Danh sách phụ thuộc và scripts
+└── README.md            # Tài liệu
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+## Tính năng chính
 
-### Advanced Configuration
+- **Đăng nhập/Đăng ký**: Trang đăng nhập và đăng ký tài khoản
+- **Trang chủ**: Hiển thị bảng tin với các bài viết từ bạn bè và người theo dõi
+- **Trang cá nhân**: Hiển thị thông tin và bài viết của người dùng
+- **Trang bạn bè**: Quản lý kết bạn và theo dõi
+- **Trang nhóm**: Tham gia và tương tác trong các nhóm
+- **Trang marketplace**: Mua bán sản phẩm
+- **Trang watch**: Xem video
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+## Gỡ lỗi phổ biến
 
-### Deployment
+### Lỗi kết nối API
+Nếu gặp lỗi kết nối đến API, hãy đảm bảo:
+1. Backend đang chạy
+2. URL API trong cấu hình frontend đúng
+3. Không có vấn đề về CORS
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+### Lỗi "Module not found"
+Nếu gặp lỗi không tìm thấy module:
+1. Chạy lại `npm install` để cài đặt các phụ thuộc
+2. Kiểm tra tên module trong import có đúng không (phân biệt chữ hoa/thường)
 
-### `npm run build` fails to minify
+## Liên hệ hỗ trợ
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Nếu bạn gặp khó khăn khi thiết lập, vui lòng liên hệ:
+- Email: support@group7.example.com

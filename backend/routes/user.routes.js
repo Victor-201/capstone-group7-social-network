@@ -13,6 +13,9 @@ router.put('/change-password', verifyToken, userController.changePassword);
 // Upload ảnh đại diện
 router.post('/upload-avatar', verifyToken, upload.single('avatar'), userController.uploadAvatar);
 
+// Upload ảnh bìa
+router.post('/upload-cover', verifyToken, upload.single('coverImage'), userController.uploadCoverImage);
+
 // Tìm kiếm người dùng
 router.get('/search', userController.searchUsers);
 
