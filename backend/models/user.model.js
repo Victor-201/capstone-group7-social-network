@@ -109,14 +109,14 @@ module.exports = (sequelize) => {
 
     // Followers
     User.belongsToMany(models.User, {
-      through: models.Follower,
+      through: models.Follower,  // Sử dụng model Follower thay vì chuỗi
       as: 'followers',
       foreignKey: 'followed_id',
       otherKey: 'follower_id'
     });
 
     User.belongsToMany(models.User, {
-      through: models.Follower,
+      through: models.Follower,  // Sử dụng model Follower thay vì chuỗi
       as: 'following',
       foreignKey: 'follower_id',
       otherKey: 'followed_id'

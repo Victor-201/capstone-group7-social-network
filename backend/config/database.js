@@ -55,6 +55,8 @@ const initModels = () => {
   models.Media = require('../models/media.model')(sequelize);
   models.Hashtag = require('../models/hashtag.model')(sequelize);
   models.Group = require('../models/group.model')(sequelize);
+  models.Follower = require('../models/follower.model')(sequelize);
+  models.Friendship = require('../models/friendship.model')(sequelize);
   
   // Tạo bảng trung gian cho many-to-many relationships
   const PostHashtag = sequelize.define('PostHashtag', {
