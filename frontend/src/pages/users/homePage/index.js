@@ -29,37 +29,38 @@ const HomePage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState('foryou');
+  const [message, setMessage] = useState(null);
   const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080';
 
   // Fetch posts from backend
-  useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        setIsLoading(true);
-        const token = localStorage.getItem('token');
-        const response = await fetch(`${API_URL}/api/posts?_t=${new Date().getTime()}`, {
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-            'Authorization': token ? `Bearer ${token}` : ''
-          }
-        });
-        
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
+  const fetchPosts = async () => {
+    try {
+      setIsLoading(true);
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_URL}/api/posts?_t=${new Date().getTime()}`, {
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization': token ? `Bearer ${token}` : ''
         }
-        
-        const data = await response.json();
-        setPosts(data || []);
-        setIsLoading(false);
-      } catch (err) {
-        console.error("Failed to fetch posts:", err);
-        setPosts([]);
-        setError("Không thể tải bài viết. Vui lòng thử lại sau.");
-        setIsLoading(false);
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
       }
-    };
+      
+      const data = await response.json();
+      setPosts(data || []);
+      setIsLoading(false);
+    } catch (err) {
+      console.error("Failed to fetch posts:", err);
+      setPosts([]);
+      setError("Không thể tải bài viết. Vui lòng thử lại sau.");
+      setIsLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchPosts();
   }, [API_URL]);
 
@@ -74,8 +75,10 @@ const HomePage = () => {
       return;
     }
 
+    // Create a temporary post for optimistic update
+    const tempId = Date.now(); // Temporary ID for optimistic update
     const newPost = {
-      id: Date.now(),
+      id: tempId,
       author: user?.fullName || user?.username,
       authorId: user?.id,
       authorAvatar: user?.avatar || null,
@@ -86,11 +89,12 @@ const HomePage = () => {
       isLiked: false
     };
 
-    // Optimistic update
+    // Optimistic update - add the new post to the UI immediately
     setPosts([newPost, ...posts]);
     setNewPostContent('');
 
     try {
+      // Send the post to the server
       const response = await fetch(`${API_URL}/api/posts`, {
         method: 'POST',
         headers: {
@@ -104,20 +108,29 @@ const HomePage = () => {
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
+        const errorData = await response.json();
+        console.error("Post creation error:", errorData);
+        throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
       }
 
+      // Get the saved post from response and update the state
       const savedPost = await response.json();
+      console.log("Post created successfully:", savedPost);
+      
+      // Replace the temporary post with the actual saved post
       setPosts(prevPosts => 
         prevPosts.map(post => 
-          post.id === newPost.id ? savedPost : post
+          post.id === tempId ? savedPost : post
         )
       );
+
+      // Refresh the posts list to ensure we have the latest data
+      fetchPosts();
     } catch (err) {
       console.error("Failed to save post:", err);
       // Rollback optimistic update
-      setPosts(prevPosts => prevPosts.filter(post => post.id !== newPost.id));
-      setError("Không thể đăng bài. Vui lòng thử lại.");
+      setPosts(prevPosts => prevPosts.filter(post => post.id !== tempId));
+      setError("Không thể đăng bài. Vui lòng thử lại sau.");
     }
   };
 
@@ -167,6 +180,63 @@ const HomePage = () => {
             : post
         )
       );
+    }
+  };
+
+  // Handle share functionality
+  const handlePostShare = async (postId) => {
+    if (!isAuthenticated) {
+      setError("Bạn cần đăng nhập để chia sẻ bài viết");
+      return;
+    }
+
+    // Show dialog to add share content
+    const shareContent = prompt("Chia sẻ bài viết này với nội dung của bạn:", "");
+    
+    // If user cancels prompt, return
+    if (shareContent === null) return;
+    
+    const token = localStorage.getItem('token');
+    if (!token) return;
+
+    try {
+      const response = await fetch(`${API_URL}/api/share`, {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          postId,
+          content: shareContent,
+          privacy: 'public'
+        })
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
+      }
+      
+      const result = await response.json();
+      setMessage("Đã chia sẻ bài viết thành công!");
+      
+      // Re-fetch posts to see updates
+      fetchPosts();
+      
+      // Clear message after 3 seconds
+      setTimeout(() => {
+        setMessage(null);
+      }, 3000);
+    } catch (err) {
+      console.error("Failed to share post:", err);
+      setError(err.message || "Không thể chia sẻ bài viết. Vui lòng thử lại sau.");
+      
+      // Clear error after 3 seconds
+      setTimeout(() => {
+        setError(null);
+      }, 3000);
     }
   };
 
@@ -459,7 +529,10 @@ const HomePage = () => {
                           <span className="action-icon"><FaComment /></span>
                           <span className="action-count">{post.comments ? post.comments.length : 0}</span>
                         </button>
-                        <button className="post-action">
+                        <button 
+                          className="post-action"
+                          onClick={() => handlePostShare(post.id)}
+                        >
                           <span className="action-icon"><FaShare /></span>
                           <span className="action-count">0</span>
                         </button>

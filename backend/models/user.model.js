@@ -41,7 +41,8 @@ module.exports = (sequelize) => {
     coverImage: {
       type: DataTypes.STRING(255),
       allowNull: true,
-      field: 'cover_image'
+      field: 'cover_image',
+      defaultValue: null  // Explicitly set default value to null
     },
     bio: {
       type: DataTypes.TEXT,

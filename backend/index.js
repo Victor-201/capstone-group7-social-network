@@ -10,6 +10,7 @@ const userRoutes = require("./routes/user.routes");
 const groupsRoutes = require("./routes/groups.routes");
 const friendshipRoutes = require("./routes/friendship.routes");
 const followerRoutes = require("./routes/follower.routes");
+const shareRoutes = require("./routes/share.routes");
 // Sử dụng initModels() thay vì import trực tiếp
 const models = initModels();
 
@@ -17,7 +18,7 @@ const models = initModels();
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 8081; // Thay đổi cổng mặc định từ 8080 sang 8081
 
 // Cấu hình CORS để cho phép tất cả các nguồn
 app.use(cors({
@@ -29,6 +30,26 @@ app.use(cors({
 
 // Middleware để xử lý preflight requests
 app.options('*', cors());
+
+// Tạo các thư mục uploads nếu chưa tồn tại
+const ensureUploadDirs = () => {
+  const uploadDirs = [
+    path.join(__dirname, 'uploads'),
+    path.join(__dirname, 'uploads/avatars'),
+    path.join(__dirname, 'uploads/covers'),
+    path.join(__dirname, 'uploads/posts')
+  ];
+  
+  uploadDirs.forEach(dir => {
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+      console.log(`Created directory: ${dir}`);
+    }
+  });
+};
+
+// Đảm bảo thư mục uploads tồn tại
+ensureUploadDirs();
 
 // Serve static files from uploads directory
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
@@ -47,6 +68,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/groups', groupsRoutes);
 app.use('/api/friends', friendshipRoutes);
 app.use('/api/follow', followerRoutes);
+app.use('/api/share', shareRoutes);
 
 // Import all models
 const Post = models.Post;

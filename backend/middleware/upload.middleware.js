@@ -5,7 +5,14 @@ const fs = require('fs');
 // Define storage location for uploaded files
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    const uploadDir = path.join(__dirname, '../uploads/avatars');
+    let uploadDir;
+    
+    // Xác định thư mục lưu trữ dựa trên loại tệp đang tải lên
+    if (req.route.path === '/upload-cover') {
+      uploadDir = path.join(__dirname, '../uploads/covers');
+    } else {
+      uploadDir = path.join(__dirname, '../uploads/avatars');
+    }
     
     // Create directory if it doesn't exist
     if (!fs.existsSync(uploadDir)) {
@@ -21,7 +28,8 @@ const storage = multer.diskStorage({
     // Create unique filename with timestamp and original extension
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
     const fileExt = path.extname(file.originalname);
-    const filename = 'avatar-' + uniqueSuffix + fileExt;
+    const filePrefix = req.route.path === '/upload-cover' ? 'cover-' : 'avatar-';
+    const filename = filePrefix + uniqueSuffix + fileExt;
     console.log(`Generated filename: ${filename}`);
     cb(null, filename);
   }

@@ -8,33 +8,71 @@ const { Op } = require('sequelize');
 const models = initModels();
 const User = models.User;
 
-// Cập nhật thông tin người dùng
+// Cập nhật thông tin cá nhân
 exports.updateProfile = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { 
-      fullName, 
-      bio, 
-      location, 
-      workplace, 
-      education, 
-      relationship 
-    } = req.body;
-
-    // Tìm người dùng trong cơ sở dữ liệu
+    const { fullName, bio, location, workplace, education, relationship } = req.body;
+    
+    console.log('Update profile request body:', req.body);
+    console.log('Update profile files:', req.files);
+    
+    // Tìm người dùng
     const user = await User.findByPk(userId);
     
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    // Cập nhật thông tin
-    if (fullName) user.fullName = fullName;
+    // Cập nhật thông tin cơ bản
+    if (fullName !== undefined) user.fullName = fullName;
     if (bio !== undefined) user.bio = bio;
     if (location !== undefined) user.location = location;
     if (workplace !== undefined) user.workplace = workplace;
     if (education !== undefined) user.education = education;
     if (relationship !== undefined) user.relationship = relationship;
+
+    // Kiểm tra và xử lý ảnh đại diện nếu có
+    if (req.files && req.files.avatar) {
+      // Xóa avatar cũ nếu có
+      if (user.avatar && user.avatar !== '/images/default-avatar.png' && !user.avatar.includes('http')) {
+        const avatarPath = user.avatar.startsWith('/') ? user.avatar.substring(1) : user.avatar;
+        const oldAvatarPath = path.join(__dirname, '..', avatarPath);
+        
+        try {
+          if (fs.existsSync(oldAvatarPath)) {
+            fs.unlinkSync(oldAvatarPath);
+            console.log('Old avatar deleted successfully');
+          }
+        } catch (err) {
+          console.error('Error deleting old avatar:', err);
+        }
+      }
+      
+      // Cập nhật đường dẫn mới
+      user.avatar = `/uploads/avatars/${req.files.avatar[0].filename}`;
+    }
+    
+    // Kiểm tra và xử lý ảnh bìa nếu có
+    if (req.files && req.files.coverImage) {
+      // Xóa ảnh bìa cũ nếu có
+      if (user.coverImage && !user.coverImage.includes('http')) {
+        const coverPath = user.coverImage.startsWith('/') ? user.coverImage.substring(1) : user.coverImage;
+        const oldCoverPath = path.join(__dirname, '..', coverPath);
+        
+        try {
+          if (fs.existsSync(oldCoverPath)) {
+            fs.unlinkSync(oldCoverPath);
+            console.log('Old cover image deleted successfully');
+          }
+        } catch (err) {
+          console.error('Error deleting old cover image:', err);
+        }
+      }
+      
+      // Cập nhật đường dẫn mới
+      user.coverImage = `/uploads/covers/${req.files.coverImage[0].filename}`;
+    }
 
     // Lưu thay đổi
     await user.save();
@@ -58,7 +96,7 @@ exports.updateProfile = async (req, res) => {
     });
   } catch (error) {
     console.error('Update profile error:', error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Server error: ' + error.message });
   }
 };
 

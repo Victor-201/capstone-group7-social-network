@@ -52,6 +52,11 @@ module.exports = (sequelize) => {
     Post.hasMany(models.Like, { foreignKey: 'post_id', as: 'likes' });
     Post.hasMany(models.Media, { foreignKey: 'post_id', as: 'media' });
     
+    // Add relation to Share model
+    if (models.Share) {
+      Post.hasMany(models.Share, { foreignKey: 'post_id', as: 'shares' });
+    }
+    
     if (models.Hashtag) {
       Post.belongsToMany(models.Hashtag, { 
         through: 'post_hashtags', 

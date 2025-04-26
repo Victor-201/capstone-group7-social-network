@@ -25,7 +25,9 @@ import {
   FaHome,
   FaGraduationCap,
   FaHeart,
-  FaTimes
+  FaTimes,
+  FaSpinner,
+  FaCheck
 } from 'react-icons/fa';
 import './style.scss';
 
@@ -55,6 +57,12 @@ const PersonalPage = () => {
     work: '',
     relationship: '',
   });
+  
+  // New state variables for popups
+  const [showAvatarPopup, setShowAvatarPopup] = useState(false);
+  const [showCoverPopup, setShowCoverPopup] = useState(false);
+  const [savingAvatar, setSavingAvatar] = useState(false);
+  const [savingCover, setSavingCover] = useState(false);
 
   const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080';
 
@@ -103,7 +111,8 @@ const PersonalPage = () => {
   const fetchUserPosts = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`${API_URL}/api/posts/user/${user.id}`, {
+      // Use the userId parameter with the main posts endpoint
+      const response = await fetch(`${API_URL}/api/posts?userId=${user.id}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -149,7 +158,7 @@ const PersonalPage = () => {
     }));
   };
 
-  // Handle avatar file selection
+  // Handle file selection and show popup - Avatar
   const handleFileSelect = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -159,12 +168,13 @@ const PersonalPage = () => {
       const reader = new FileReader();
       reader.onload = (e) => {
         setPreviewImage(e.target.result);
+        setShowAvatarPopup(true); // Show the popup after selecting image
       };
       reader.readAsDataURL(file);
     }
   };
 
-  // Handle cover photo file selection
+  // Handle cover photo file selection and show popup
   const handleCoverFileSelect = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -174,6 +184,7 @@ const PersonalPage = () => {
       const reader = new FileReader();
       reader.onload = (e) => {
         setPreviewCoverImage(e.target.result);
+        setShowCoverPopup(true); // Show the popup after selecting image
       };
       reader.readAsDataURL(file);
     }
@@ -187,6 +198,96 @@ const PersonalPage = () => {
   // Trigger cover file input click
   const triggerCoverFileInput = () => {
     coverFileInputRef.current.click();
+  };
+
+  // Save avatar image to database
+  const handleSaveAvatar = async () => {
+    setSavingAvatar(true);
+    setError('');
+    
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('Bạn cần đăng nhập để thực hiện thao tác này');
+      }
+
+      // Prepare form data for avatar update only
+      const formDataToSend = new FormData();
+      formDataToSend.append('avatar', selectedFile);
+
+      const response = await fetch(`${API_URL}/api/users/profile`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        body: formDataToSend
+      });
+
+      if (!response.ok) {
+        let errorMessage = 'Có lỗi xảy ra khi cập nhật ảnh đại diện';
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.message || errorMessage;
+        } catch (err) {
+          errorMessage = `Lỗi ${response.status}: ${response.statusText}`;
+        }
+        throw new Error(errorMessage);
+      }
+
+      const data = await response.json();
+      updateUserInfo(data.user);
+      setMessage('Cập nhật ảnh đại diện thành công');
+      setShowAvatarPopup(false);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setSavingAvatar(false);
+    }
+  };
+
+  // Save cover image to database
+  const handleSaveCover = async () => {
+    setSavingCover(true);
+    setError('');
+    
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('Bạn cần đăng nhập để thực hiện thao tác này');
+      }
+
+      // Prepare form data for cover update only
+      const formDataToSend = new FormData();
+      formDataToSend.append('coverImage', selectedCoverFile);
+
+      const response = await fetch(`${API_URL}/api/users/profile`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        body: formDataToSend
+      });
+
+      if (!response.ok) {
+        let errorMessage = 'Có lỗi xảy ra khi cập nhật ảnh bìa';
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.message || errorMessage;
+        } catch (err) {
+          errorMessage = `Lỗi ${response.status}: ${response.statusText}`;
+        }
+        throw new Error(errorMessage);
+      }
+
+      const data = await response.json();
+      updateUserInfo(data.user);
+      setMessage('Cập nhật ảnh bìa thành công');
+      setShowCoverPopup(false);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setSavingCover(false);
+    }
   };
 
   // Handle form submission
@@ -282,9 +383,60 @@ const PersonalPage = () => {
     console.log("Comment on post:", postId);
   };
 
+  // Handle sharing a post
   const handlePostShare = async (postId) => {
-    // Implementation for sharing a post
-    console.log("Share post:", postId);
+    if (!isAuthenticated) {
+      setError("Bạn cần đăng nhập để chia sẻ bài viết");
+      return;
+    }
+
+    // Show dialog to add share content
+    const shareContent = prompt("Chia sẻ bài viết này với nội dung của bạn:", "");
+    
+    // If user cancels prompt, return
+    if (shareContent === null) return;
+    
+    const token = localStorage.getItem('token');
+    if (!token) return;
+
+    try {
+      const response = await fetch(`${API_URL}/api/share`, {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          postId,
+          content: shareContent,
+          privacy: 'public'
+        })
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
+      }
+      
+      const result = await response.json();
+      setMessage("Đã chia sẻ bài viết thành công!");
+      
+      // Re-fetch posts to see updates
+      fetchUserPosts();
+      
+      // Clear message after 3 seconds
+      setTimeout(() => {
+        setMessage(null);
+      }, 3000);
+    } catch (err) {
+      setError(err.message || "Không thể chia sẻ bài viết. Vui lòng thử lại sau.");
+      
+      // Clear error after 3 seconds
+      setTimeout(() => {
+        setError(null);
+      }, 3000);
+    }
   };
 
   if (fetchingData) {
@@ -337,6 +489,31 @@ const PersonalPage = () => {
                 onChange={handleCoverFileSelect}
                 accept="image/*"
               />
+              {showCoverPopup && (
+                <div className="popup">
+                  <div className="popup-content">
+                    <h3>Xác nhận thay đổi ảnh bìa</h3>
+                    <div className="popup-preview">
+                      <img src={previewCoverImage} alt="Cover Preview" />
+                    </div>
+                    <div className="popup-actions">
+                      <button 
+                        className="popup-cancel-button" 
+                        onClick={() => setShowCoverPopup(false)}
+                      >
+                        Hủy
+                      </button>
+                      <button 
+                        className="popup-save-button" 
+                        onClick={handleSaveCover}
+                        disabled={savingCover}
+                      >
+                        {savingCover ? 'Đang lưu...' : 'Lưu'}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Profile Picture and Name */}
@@ -362,6 +539,31 @@ const PersonalPage = () => {
                     onChange={handleFileSelect}
                     accept="image/*"
                   />
+                  {showAvatarPopup && (
+                    <div className="popup">
+                      <div className="popup-content">
+                        <h3>Xác nhận thay đổi ảnh đại diện</h3>
+                        <div className="popup-preview">
+                          <img src={previewImage} alt="Avatar Preview" />
+                        </div>
+                        <div className="popup-actions">
+                          <button 
+                            className="popup-cancel-button" 
+                            onClick={() => setShowAvatarPopup(false)}
+                          >
+                            Hủy
+                          </button>
+                          <button 
+                            className="popup-save-button" 
+                            onClick={handleSaveAvatar}
+                            disabled={savingAvatar}
+                          >
+                            {savingAvatar ? 'Đang lưu...' : 'Lưu'}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
               <div className="profile-info-header">
