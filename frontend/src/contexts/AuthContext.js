@@ -25,32 +25,47 @@ export const AuthProvider = ({ children }) => {
         const storedUser = localStorage.getItem('user');
         
         if (token && storedUser) {
-          // Kiểm tra xem token có hợp lệ không
-          const response = await fetch(`${API_URL}/api/auth/me`, {
-            headers: {
-              Authorization: `Bearer ${token}`
+          try {
+            // Kiểm tra xem token có hợp lệ không
+            const response = await fetch(`${API_URL}/api/auth/me`, {
+              headers: {
+                Authorization: `Bearer ${token}`
+              }
+            });
+            
+            if (response.ok) {
+              // Token hợp lệ
+              const updatedUserData = await response.json();
+              const parsedStoredUser = JSON.parse(storedUser);
+              // Merge stored user data with any updated data from server
+              const mergedUser = { ...parsedStoredUser, ...updatedUserData };
+              setUser(mergedUser);
+              localStorage.setItem('user', JSON.stringify(mergedUser));
+              setIsAuthenticated(true);
+            } else if (response.status === 401) {
+              // Token không hợp lệ, xóa dữ liệu cũ
+              localStorage.removeItem('token');
+              localStorage.removeItem('user');
+            } else {
+              // For other errors, keep user logged in but use stored data
+              // This prevents logout on server unavailability
+              setUser(JSON.parse(storedUser));
+              setIsAuthenticated(true);
             }
-          });
-          
-          if (response.ok) {
-            // Token hợp lệ
+          } catch (error) {
+            // If server is down or network error, still use local data
+            console.error('Auth check error:', error);
             setUser(JSON.parse(storedUser));
             setIsAuthenticated(true);
-          } else {
-            // Token không hợp lệ, xóa dữ liệu cũ
-            localStorage.removeItem('token');
-            localStorage.removeItem('user');
           }
         }
-      } catch (error) {
-        console.error('Auth check error:', error);
       } finally {
         setIsLoading(false);
       }
     };
     
     checkLoggedIn();
-  }, []);
+  }, [API_URL]);
 
   // Hàm đăng nhập
   const login = async (username, password) => {

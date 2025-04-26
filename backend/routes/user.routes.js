@@ -4,14 +4,20 @@ const userController = require('../controllers/user.controller');
 const { verifyToken } = require('../middleware/auth.middleware');
 const upload = require('../middleware/upload.middleware');
 
-// Cập nhật thông tin cá nhân (bao gồm avatar)
-router.put('/profile', verifyToken, userController.updateProfile);
+// Cập nhật thông tin cá nhân (bao gồm avatar và ảnh bìa)
+router.put('/profile', verifyToken, upload.fields([
+  { name: 'avatar', maxCount: 1 },
+  { name: 'coverImage', maxCount: 1 }
+]), userController.updateProfile);
 
 // Đổi mật khẩu
 router.put('/change-password', verifyToken, userController.changePassword);
 
 // Upload ảnh đại diện
 router.post('/upload-avatar', verifyToken, upload.single('avatar'), userController.uploadAvatar);
+
+// Upload ảnh bìa
+router.post('/upload-cover', verifyToken, upload.single('coverImage'), userController.uploadCoverImage);
 
 // Tìm kiếm người dùng
 router.get('/search', userController.searchUsers);
