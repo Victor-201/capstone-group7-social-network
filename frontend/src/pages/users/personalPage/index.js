@@ -213,6 +213,8 @@ const PersonalPage = () => {
   };
 
   return (
+
+    
     <div className="personal-page">
       <div className="profile-container">
         <h1>Cài đặt hồ sơ cá nhân</h1>
