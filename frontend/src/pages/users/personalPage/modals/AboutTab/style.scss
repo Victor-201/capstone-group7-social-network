@@ -1,0 +1,119 @@
+@use "sass:map";
+@import "../../../../../styles/pages/theme";
+.about {
+  display: flex;
+  gap: 16px;
+
+  @media (max-width: 900px) {
+    flex-direction: column;
+  }
+
+  &__sidebar {
+    width: 340px;
+
+    @media (max-width: 900px) {
+      width: 100%;
+    }
+  }
+
+  &__nav {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+
+    &-item {
+      a {
+        display: block;
+        padding: 12px 16px;
+        color: #1a1a1a; // Thay thế bằng màu sắc trực tiếp (text-color)
+        font-weight: 600;
+        text-decoration: none;
+        border-radius: 6px;
+        font-size: 15px;
+
+        &:hover {
+          background-color: #34c759; // Thay thế bằng màu sắc trực tiếp (secondary-color)
+        }
+      }
+
+      &--active {
+        a {
+          background-color: #34c759; // Thay thế bằng màu sắc trực tiếp (secondary-color)
+          color: #4a90e2; // Thay thế bằng màu sắc trực tiếp (primary-color)
+        }
+      }
+    }
+  }
+
+  &__content {
+    flex: 1;
+  }
+
+  &__section {
+  }
+
+  &__card {
+    margin-bottom: 16px;
+
+    h3 {
+      font-size: 18px;
+      margin: 0 0 12px;
+      font-weight: 600;
+    }
+  }
+
+  &__item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 0;
+    position: relative;
+
+    .about-icon {
+      color: #6c757d; // Thay thế bằng màu sắc trực tiếp (secondary-text-color)
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+
+    .about__text {
+      flex: 1;
+
+      p {
+        margin: 0;
+        font-size: 15px;
+        font-weight: 600;
+      }
+
+      span {
+        color: #6c757d; // Thay thế bằng màu sắc trực tiếp (secondary-text-color)
+        font-size: 13px;
+      }
+    }
+  }
+
+  &__edit-btn {
+    background-color: #34c759; // Thay thế bằng màu sắc trực tiếp (secondary-color)
+    color: #6c757d; // Thay thế bằng màu sắc trực tiếp (secondary-text-color)
+    padding: 8px;
+    border-radius: 50%;
+
+    &:hover {
+      background-color: darken(#34c759, 10%); // Thay thế bằng màu sắc trực tiếp (secondary-color)
+    }
+
+    svg {
+      font-size: 16px;
+    }
+  }
+}
+
+@media (max-width: 600px) {
+  .about {
+    &__nav-item {
+      a {
+        font-size: 14px;
+        padding: 10px 12px;
+      }
+    }
+  }
+}

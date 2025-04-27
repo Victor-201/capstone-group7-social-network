@@ -1,0 +1,95 @@
+@use "sass:map";
+@import "../../styles/pages/theme";
+.friend-card {
+  overflow: hidden;
+
+  &__avatar {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    display: block;
+  }
+
+  &__info {
+    padding: 12px;
+  }
+
+  h3 {
+    font-size: 16px;
+    margin: 0 0 8px;
+    font-weight: 600;
+
+    &:hover {
+      text-decoration: underline;
+      cursor: pointer;
+    }
+  }
+
+  &__mutual {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: $secondary-text-color;
+    font-size: 14px;
+    margin-bottom: 12px;
+
+    .small-icon {
+      font-size: 16px;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    gap: 8px;
+
+    button {
+      flex: 1;
+    }
+  }
+}
+
+.btn {
+  @include button;
+
+  &--primary {
+    background: linear-gradient(135deg, $primary-color, lighten($primary-color, 10%));
+    color: $white;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+
+    &:hover {
+      background: linear-gradient(135deg, lighten($primary-color, 10%), $primary-color);
+      box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+      transform: translateY(-2px);
+    }
+
+    &:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    svg {
+      font-size: 18px;
+    }
+  }
+
+  &--secondary {
+    background: linear-gradient(135deg, $secondary-color, lighten($secondary-color, 5%));
+    color: $text-color;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+
+    &:hover {
+      background: linear-gradient(135deg, lighten($secondary-color, 5%), darken($secondary-color, 10%));
+      box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+      transform: translateY(-2px);
+    }
+
+    &:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    svg {
+      font-size: 18px;
+    }
+  }
+}
