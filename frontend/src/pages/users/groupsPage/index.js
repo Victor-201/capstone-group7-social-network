@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../../contexts/AuthContext';
-import DefaultAvatar from '../../../components/DefaultAvatar';
 import { FaUsers, FaSearch, FaPlus, FaUserPlus, FaSignOutAlt, FaSpinner } from 'react-icons/fa';
 import './style.scss';
 

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../../contexts/AuthContext';
-import DefaultAvatar from '../../../components/DefaultAvatar';
 import { FaUser, FaUserPlus, FaUserMinus, FaUsers, FaUserCheck, FaUserTimes, FaSpinner, FaExclamationTriangle } from 'react-icons/fa';
 import './style.scss';
 
@@ -293,7 +292,7 @@ const FriendsPage = () => {
                             {friend.avatar ? (
                               <img src={friend.avatar} alt={friend.fullName} />
                             ) : (
-                              <DefaultAvatar size={60} />
+                              <image src='upload/images/default-avatar.jpg' alt={friend.fullName}></image>
                             )}
                           </div>
                           <div className="user-info">
@@ -366,7 +365,7 @@ const FriendsPage = () => {
                             {request.requester.avatar ? (
                               <img src={request.requester.avatar} alt={request.requester.fullName} />
                             ) : (
-                              <DefaultAvatar size={60} />
+                              <image src='upload/images/default-avatar.jpg' alt={request.requester.fullName}></image>
                             )}
                           </div>
                           <div className="user-info">
@@ -423,7 +422,7 @@ const FriendsPage = () => {
                             {follower.avatar ? (
                               <img src={follower.avatar} alt={follower.fullName} />
                             ) : (
-                              <DefaultAvatar size={60} />
+                              <image src='upload/images/default-avatar.jpg' alt={follower.fullName}></image>
                             )}
                           </div>
                           <div className="user-info">
@@ -498,7 +497,8 @@ const FriendsPage = () => {
                             {followedUser.avatar ? (
                               <img src={followedUser.avatar} alt={followedUser.fullName} />
                             ) : (
-                              <DefaultAvatar size={60} />
+                              <image src='upload/images/default-avatar.jpg' alt={followUser.fullName}></image>
+
                             )}
                           </div>
                           <div className="user-info">
@@ -558,7 +558,8 @@ const FriendsPage = () => {
                             {suggestedUser.avatar ? (
                               <img src={suggestedUser.avatar} alt={suggestedUser.fullName} />
                             ) : (
-                              <DefaultAvatar size={60} />
+                              <image src='upload/images/default-avatar.jpg' alt={suggestedUser.fullName}></image>
+                              
                             )}
                           </div>
                           <div className="user-info">

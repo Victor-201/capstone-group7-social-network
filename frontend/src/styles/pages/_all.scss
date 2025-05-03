@@ -23,6 +23,7 @@ body {
     max-width: 1440px;
     min-height: calc(100vh - 120px - 65.5px);
     padding: $theme-padding;
+    padding-top: $header-height;
     overflow-y: auto;
     box-sizing: border-box;
 }

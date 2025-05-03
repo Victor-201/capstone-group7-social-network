@@ -37,10 +37,6 @@ const PersonalPage = () => {
           <div className="tab-contents">
             {activeTab === "posts" && <PostsTab />}
             {activeTab === "about" && <AboutTab />}
-            {/* {activeTab === "friends" && <FriendsTab />}
-          {activeTab === "photos" && <PhotosTab />}
-          {activeTab === "videos" && <VideosTab />}
-          {activeTab === "reels" && <ReelsTab />} */}
           </div>
         </main>
       </article>

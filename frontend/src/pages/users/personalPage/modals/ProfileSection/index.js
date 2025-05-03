@@ -1,8 +1,8 @@
 import { FiPlus, FiUsers, FiEdit, FiCheckCircle, FiMoreHorizontal } from "react-icons/fi";
-import { BsCameraFill } from "react-icons/bs"; // Giữ BsCameraFill nếu bạn thích icon này
+import { BsCameraFill } from "react-icons/bs";
 import avatarImage from "../../../../../assets/images/logo192.png";
 import coverImage from "../../../../../assets/images/logo192.png";
-import friend1Image from "../../../../../assets/images/logo192.png"; // Thay đổi đường dẫn đến ảnh bạn bè của bạn
+import friend1Image from "../../../../../assets/images/logo192.png";
 import "./style.scss";
 
 const ProfileSection = ({ tabsRef, activeTab, handleTabClick }) => {
@@ -16,7 +16,10 @@ const ProfileSection = ({ tabsRef, activeTab, handleTabClick }) => {
     <section className="profile">
       <div className="profile__cover-container">
         <img src={coverImage} alt="Cover" className="profile__cover" />
-        <button className="profile__edit-cover-btn" onClick={() => handleEditAction("thay đổi ảnh bìa")}>
+        <button
+          className="profile__edit-cover-btn"
+          onClick={() => handleEditAction("thay đổi ảnh bìa")}
+        >
           <BsCameraFill />
           Chỉnh sửa ảnh bìa
         </button>
@@ -25,19 +28,21 @@ const ProfileSection = ({ tabsRef, activeTab, handleTabClick }) => {
         <div className="profile__avatar-container">
           <div className="profile__avatar-wrapper">
             <img src={avatarImage} alt="Avatar" className="profile__avatar" />
-            <div className="profile__edit-avatar-overlay" onClick={() => handleEditAction("thay đổi ảnh đại diện")}>
+            <div
+              className="profile__edit-avatar-overlay"
+              onClick={() => handleEditAction("thay đổi ảnh đại diện")}
+            >
               <BsCameraFill />
             </div>
           </div>
         </div>
         <div className="profile__info">
           <div className="profile__name-container">
-            <h1 className="profile__name">Nguyễn Văn A</h1>
+            <h1 className="profile__name">Nguyễn Văn lưởng</h1>
             <div className="profile__verified-badge">
               <FiCheckCircle />
             </div>
           </div>
-          <p className="profile__bio">Xin chào! Đây là tiểu sử của tôi.</p>
           <div className="profile__friends-info">
             <FiUsers />
             <span>1.5K bạn bè</span>
@@ -52,7 +57,10 @@ const ProfileSection = ({ tabsRef, activeTab, handleTabClick }) => {
               <FiPlus />
               Thêm vào story
             </button>
-            <button className="btn btn--secondary" onClick={() => handleEditAction("chỉnh sửa trang cá nhân")}>
+            <button
+              className="btn btn--secondary"
+              onClick={() => handleEditAction("chỉnh sửa trang cá nhân")}
+            >
               <FiEdit />
               Chỉnh sửa trang cá nhân
             </button>
@@ -62,7 +70,7 @@ const ProfileSection = ({ tabsRef, activeTab, handleTabClick }) => {
           </div>
         </div>
       </div>
-      <div className="tabs" ref={tabsRef}>
+      <div className="tabs" ref={tabsRef}> 
         <nav className="tabs__nav">
           <ul>
             {[
@@ -73,7 +81,10 @@ const ProfileSection = ({ tabsRef, activeTab, handleTabClick }) => {
               { id: "videos", label: "Video" },
               { id: "reels", label: "Reels" },
             ].map((tab) => (
-              <li key={tab.id} className={`tabs__item ${activeTab === tab.id ? "tabs__item--active" : ""}`}>
+              <li
+                key={tab.id}
+                className={`tabs__item ${activeTab === tab.id ? "tabs__item--active" : ""}`}
+              >
                 <a href={`#${tab.id}`} onClick={() => handleTabClick(tab.id)}>
                   {tab.label}
                 </a>

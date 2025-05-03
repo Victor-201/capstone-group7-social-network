@@ -1,7 +1,6 @@
 import React, { memo, useState, useEffect, useRef } from 'react';
 import { ROUTERS } from '../../utils/router';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
-import DefaultAvatar from '../../components/DefaultAvatar';
 import { FaHome, FaPhotoVideo, FaShoppingCart, FaUsers, FaSignOutAlt, FaSearch, FaUserFriends } from 'react-icons/fa';
 import './style.scss';
 
@@ -118,15 +117,11 @@ const Header = () => {
                     </nav>
                     <div className="header-right">
                         <Link to={ROUTERS.USER.USER_PROFILE} className="profile-button">
-                            {user?.avatar ? (
-                                <img
-                                    src={user.avatar}
-                                    alt="Profile"
-                                    onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'block'; }}
-                                />
-                            ) : (
-                                <DefaultAvatar size={32} />
-                            )}
+                            <img
+                                src={user.avatar ? `uploads/images/${user.avatar}` : `uploads/images/default_avatar.png`}
+                                alt="Avatar"
+                                className="avatar"
+                            />
                             <span className="username">{user?.fullName || user?.username}</span>
                         </Link>
                         <button className="logout-button" onClick={handleLogout}>

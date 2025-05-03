@@ -19,7 +19,6 @@ import {
 import { IoMdSend } from 'react-icons/io';
 import { BiLoader } from 'react-icons/bi';
 import { MdErrorOutline } from 'react-icons/md';
-import DefaultAvatar from '../../../components/DefaultAvatar';
 import './style.scss';
 
 const HomePage = () => {
@@ -333,7 +332,10 @@ const HomePage = () => {
                       }}
                     />
                   ) : (
-                    <DefaultAvatar size={80} />
+                    <img
+                      src="upload/images/avatar-default.jpg" // Placeholder image if no avatar
+                      alt="Profile"
+                    />
                   )}
                 </div>
               </div>
@@ -394,7 +396,11 @@ const HomePage = () => {
                         }}
                       />
                     ) : (
-                      <DefaultAvatar size={48} />
+                      <image
+                        src="upload/images/avatar-default.jpg" // Placeholder image if no avatar
+                        alt="User"
+                        className="post-avatar"
+                      />
                     )}
                     <textarea 
                       className="post-input" 
@@ -474,7 +480,7 @@ const HomePage = () => {
                               }}
                             />
                           ) : (
-                            <DefaultAvatar size={48} />
+                            <img src="upload/images/avatar-default.jpg" alt={post.author} className="author-avatar" onError={(e) => { e.target.style.display = 'none'; }}></img>
                           )}
                           <div className="author-info">
                             <div className="author-name">{post.author}</div>
@@ -562,7 +568,7 @@ const HomePage = () => {
                                     }}
                                   />
                                 ) : (
-                                  <DefaultAvatar size={36} />
+                                  <img src="upload/images/avatar-default.jpg" alt={comment.author} className="comment-avatar" onError={(e) => { e.target.style.display = 'none'; }}></img>
                                 )}
                                 <div className="comment-content">
                                   <div className="comment-header">
@@ -597,7 +603,7 @@ const HomePage = () => {
                               }}
                             />
                           ) : (
-                            <DefaultAvatar size={36} />
+                            <img src="upload/images/avatar-default.jpg" alt="User" className="comment-avatar" onError={(e) => { e.target.style.display = 'none'; }}></img>
                           )}
                           <input 
                             type="text" 

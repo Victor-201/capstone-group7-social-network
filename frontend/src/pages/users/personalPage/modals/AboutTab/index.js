@@ -41,7 +41,7 @@ const AboutTab = () => {
                 <FaBriefcase className="about-icon" />
                 <div className="about__text">
                   <p>
-                    Làm việc tại <strong>Truyền Thông Trùng Trung THPT Hàm Nghi</strong>
+                    Làm việc tại <b>Truyền Thông Trùng Trung THPT Hàm Nghi</b>
                   </p>
                   <span>Từ 10 tháng 5, 2020 đến nay</span>
                 </div>
