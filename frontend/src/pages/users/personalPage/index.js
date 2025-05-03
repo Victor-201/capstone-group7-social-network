@@ -30,18 +30,20 @@ const PersonalPage = () => {
   }, []);
 
   return (
-    <div className="personal-page">
-      <main className="main">
-        <ProfileSection tabsRef={tabsRef} activeTab={activeTab} handleTabClick={handleTabClick} />
-        <div className="tab-contents">
-          {activeTab === "posts" && <PostsTab />}
-          {activeTab === "about" && <AboutTab />}
-          {/* {activeTab === "friends" && <FriendsTab />}
+    <div className="container">
+      <article className="personal-page">
+        <main className="main">
+          <ProfileSection tabsRef={tabsRef} activeTab={activeTab} handleTabClick={handleTabClick} />
+          <div className="tab-contents">
+            {activeTab === "posts" && <PostsTab />}
+            {activeTab === "about" && <AboutTab />}
+            {/* {activeTab === "friends" && <FriendsTab />}
           {activeTab === "photos" && <PhotosTab />}
           {activeTab === "videos" && <VideosTab />}
           {activeTab === "reels" && <ReelsTab />} */}
-        </div>
-      </main>
+          </div>
+        </main>
+      </article>
     </div>
   );
 };
