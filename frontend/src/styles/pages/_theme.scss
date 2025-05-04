@@ -1,9 +1,17 @@
-//common theme styles
 $theme-colors: (
-    "primary-color": #f2f4f7,
-    "secondary-color": #ffffff,
-    "text-primary": #1a1a1a,
-    "text-secondary": #6c757d
+    //background colors
+    "background-color-light": #eef5f1,
+    "background-color-dark": #051f24,
+    //colors 
+    "primary-color": #fdfdfd,
+    "secondary-color": #91bea0,
+    "tertiary-color": #115745,
+    "quaternary-color": #051f24,
+    //text colors
+    "text-primary": #051f24,
+    "text-secondary": #115745,
+    "text-tertiary": #91bea0,
+    "text-quaternary": #fdfdfd,
 );
 
 @function get-theme-color($key) {

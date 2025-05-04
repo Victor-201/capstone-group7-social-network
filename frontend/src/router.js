@@ -4,99 +4,45 @@ import WatchPage from './pages/users/watchPage';
 import MarketplacePage from './pages/users/marketplacePage';
 import LoginPage from './pages/users/loginPage';
 import RegisterPage from './pages/users/registerPage';
-import FriendsPage from './pages/users/friendsPage'; // Import trang Friends
+import FriendsPage from './pages/users/friendsPage';
+import GroupsPage from './pages/users/groupsPage';
 import MasterLayout from './layouts/masterLayout';
 import { ROUTERS } from './utils/router';
-import { Route, Routes, Navigate } from 'react-router-dom';
-import GroupsPage from './pages/users/groupsPage'; // Import trang Groups
-
-// Component bảo vệ route, chỉ cho phép truy cập khi đã đăng nhập
-const ProtectedRoute = ({ children }) => {
-  const token = localStorage.getItem('token');
-
-  if (!token) {
-    return <Navigate to="/login" />;
-  }
-
-  return children;
-};
-
-// Component điều hướng khi đã đăng nhập
-const AuthRedirect = ({ children }) => {
-  const token = localStorage.getItem('token');
-
-  if (token) {
-    return <Navigate to="/" />;
-  }
-
-  return children;
-};
+import { Route, Routes } from 'react-router-dom';
 
 const renderUserRouter = () => {
   const userRouters = [
     {
       path: ROUTERS.USER.HOME,
-      Component: (
-        <ProtectedRoute>
-          <HomePage />
-        </ProtectedRoute>
-      ),
+      Component: <HomePage />,
     },
     {
       path: ROUTERS.USER.FRIENDS,
-      Component: (
-        <ProtectedRoute>
-          <FriendsPage />
-        </ProtectedRoute>
-      ),
+      Component: <FriendsPage />,
     },
     {
       path: ROUTERS.USER.WATCH,
-      Component: (
-        <ProtectedRoute>
-          <WatchPage />
-        </ProtectedRoute>
-      ),
+      Component: <WatchPage />,
     },
     {
       path: ROUTERS.USER.MARKETPLACE,
-      Component: (
-        <ProtectedRoute>
-          <MarketplacePage />
-        </ProtectedRoute>
-      ),
+      Component: <MarketplacePage />,
     },
     {
       path: ROUTERS.USER.GROUPS,
-      Component: (
-        <ProtectedRoute>
-          <GroupsPage />
-        </ProtectedRoute>
-      ),
+      Component: <GroupsPage />,
     },
     {
       path: ROUTERS.USER.USER_PROFILE,
-      Component: (
-        <ProtectedRoute>
-          <PersonalPage />
-        </ProtectedRoute>
-      ),
+      Component: <PersonalPage />,
     },
     {
       path: ROUTERS.AUTH.LOGIN,
-      Component: (
-        <AuthRedirect>
-          <LoginPage />
-        </AuthRedirect>
-      ),
+      Component: <LoginPage />,
     },
     {
       path: ROUTERS.AUTH.REGISTER,
-      Component: (
-        <AuthRedirect>
-          <RegisterPage />
-        </AuthRedirect>
-      ),
+      Component: <RegisterPage />,
     }
   ];
 
