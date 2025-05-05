@@ -33,7 +33,7 @@ const renderUserRouter = () => {
       Component: <GroupsPage />,
     },
     {
-      path: ROUTERS.USER.USER_PROFILE,
+      path: ROUTERS.USER.PROFILE,
       Component: <PersonalPage />,
     },
     {

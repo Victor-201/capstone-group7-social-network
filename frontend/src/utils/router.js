@@ -10,7 +10,7 @@ export const ROUTERS = {
         PRIVACY: "/privacy",
         TERMS: "/terms",
         CAREERS: "/careers",
-        USER_PROFILE: "/user/:id" // Thêm route cho trang cá nhân người dùng khác
+        PROFILE: "/user/:id" // Thêm route cho trang cá nhân người dùng khác
     },
     AUTH: {
         LOGIN: "/login",
