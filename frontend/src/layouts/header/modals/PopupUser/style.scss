@@ -1,4 +1,5 @@
 @import "../../../../styles/pages/theme.scss";
+
 .header-popup {
   position: absolute;
   top: calc(100% + 8px);
@@ -8,101 +9,154 @@
   border: 1px solid #ddd;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  padding: 12px 0;
+  padding: 12px;
+  box-sizing: border-box;
   z-index: 1000;
 
-  &__user {
+  &__section {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
+}
 
-    .popup__user-info {
-      display: flex;
-      align-items: center;
-      margin: 0 auto;
-      width: 90%;
-      padding: 12px 16px;
-      box-sizing: border-box;
-      border-radius: 10px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  &__user-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__user-info {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 10px 16px;
+    background-color: get-theme-color("primary-color");
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    text-decoration: none;
+  }
+
+  &__avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 12px;
+  }
+
+  &__username {
+    font-weight: 600;
+    color: #333;
+    font-size: 16px;
+  }
+
+  &__menu {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin: 0;
+    padding: 0;
+  }
+
+  &__menu-item {
+    margin: 0;
+  }
+
+  &__menu-button {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    padding: 10px 16px;
+    border-radius: 10px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 15px;
+    color: #333;
+    transition: background-color 0.2s;
+
+    &:hover {
+      background-color: #f2f2f2;
     }
+  }
 
-    .popup__avatar {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      object-fit: cover;
-      margin-right: 12px;
+  &__menu-icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background-color: rgba(get-theme-color("secondary-color"), 0.3);
+    font-size: 22px;
+    margin-right: 12px;
+    color: get-theme-color("quaternary-color");
+  }
+
+  &__menu-label {
+    flex: 1;
+    text-align: left;
+  }
+
+  &__menu-arrow {
+    font-size: 18px;
+    color: #ccc;
+  }
+
+  &__footer {
+    margin-top: 12px;
+    padding: 0 16px;
+    font-size: 12px;
+    color: #999;
+    line-height: 1.4;
+  }
+
+  &__section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  &__section-title {
+    font-size: 24px;
+    margin: 0;
+    color: #333;
+  }
+
+  &__section-more {
+    background: none;
+    border: none;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 24px;
+    color: #666;
+    cursor: pointer;
+
+    &:hover {
+      background-color: rgba(get-theme-color("secondary-color"), 0.3);
     }
+  }
 
-    .popup__username {
-      font-weight: 600;
-      color: #333;
-      font-size: 16px;
-    }
+  &__notification-list,
+  &__message-list {
+    list-style: none;
+    margin: 0;
+    padding: 0 16px;
+  }
 
-    .popup__menu-list {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-      margin: 0;
-      padding: 0;
-    }
+  &__notification-item,
+  &__message-item {
+    padding: 10px 0;
+  }
 
-    .popup__menu-item {
-      margin: 0;
-    }
-
-    .popup__menu-button {
-      width: 100%;
-      display: flex;
-      align-items: center;
-      padding: 10px 16px;
-      background: none;
-      border: none;
-      cursor: pointer;
-      font-size: 15px;
-      color: #333;
-      transition: background-color 0.2s;
-
-      &:hover {
-        background-color: #f2f2f2;
-      }
-    }
-
-    .popup__icon {
-      width: 40px;
-      height: 40px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 50%;
-      background-color: rgba(
-        $color: get-theme-color("secondary-color"),
-        $alpha: 0.3
-      );
-      font-size: 22px;
-      margin-right: 12px;
-      color: get-theme-color("quaternary-color");
-    }
-
-    .popup__label {
-      flex: 1;
-      text-align: left;
-    }
-
-    .popup__arrow {
-      font-size: 18px;
-      color: #ccc;
-    }
-
-    .popup__footer {
-      margin-top: 12px;
-      padding: 0 16px;
-      font-size: 12px;
-      color: #999;
-      line-height: 1.4;
-    }
+  &__notification-text,
+  &__message-text {
+    font-size: 14px;
+    color: #333;
   }
 }
