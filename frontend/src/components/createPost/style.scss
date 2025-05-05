@@ -18,7 +18,7 @@
 
   &__input {
     flex: 1;
-    background-color: #34c759; // Thay thế bằng giá trị trực tiếp
+    background-color: get-theme-color('quinary-color'); // Thay thế bằng giá trị trực tiếp
     border-radius: 20px;
     padding: 10px 16px;
     cursor: pointer;
@@ -29,9 +29,7 @@
       font-size: 15px;
     }
 
-    &:hover {
-      background-color: darken(#34c759, 5%); // Thay thế bằng màu sắc trực tiếp
-    }
+   
   }
 
   &__actions {
