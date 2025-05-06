@@ -9,10 +9,7 @@ module.exports = (sequelize) => {
     },
     friend_id: {
       type: DataTypes.UUID,
-      references: {
-        model: 'user_infos',
-        key: 'id'
-      }
+      allowNull: false,
     },
     status: {
       type: DataTypes.ENUM('pending', 'accepted', 'rejected'),

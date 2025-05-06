@@ -10,7 +10,7 @@ CREATE TABLE UserInfos (
 );
 
 -- Table: UsersAccount
-CREATE TABLE UsersAccount (
+CREATE TABLE UserAccount (
     user_id CHAR(36) PRIMARY KEY REFERENCES UserInfos(id),
     username VARCHAR(255) UNIQUE NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,

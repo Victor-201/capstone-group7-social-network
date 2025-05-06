@@ -2,12 +2,12 @@ const { DataTypes } = require('sequelize');
 module.exports = (sequelize) => {
   const Follow = sequelize.define('Follow', {
     follower_id: {
-      type: DataTypes.CHAR(36),
+      type: DataTypes.UUID,
       allowNull: false,
       primaryKey: true
     },
     following_id: {
-      type: DataTypes.CHAR(36),
+      type: DataTypes.UUID,
       allowNull: false,
       primaryKey: true
     },

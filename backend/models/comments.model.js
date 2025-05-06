@@ -9,17 +9,11 @@ module.exports = (sequelize) => {
     },
     post_id: {
       type: DataTypes.UUID,
-      references: {
-        model: 'posts',
-        key: 'id'
-      }
+      allowNull: false,
     },
     user_id: {
       type: DataTypes.UUID,
-      references: {
-        model: 'user_infos',
-        key: 'id'
-      }
+      allowNull: false,
     },
     content: {
       type: DataTypes.TEXT,
@@ -29,10 +23,6 @@ module.exports = (sequelize) => {
     },
     parent_comment_id: {
       type: DataTypes.UUID,
-      references: {
-        model: 'comments',
-        key: 'id'
-      },
       allowNull: true,
     },
     created_at: {
@@ -47,8 +37,16 @@ module.exports = (sequelize) => {
   Comment.associate = (models) => {
     Comment.belongsTo(models.UserInfo, { foreignKey: 'user_id' });
     Comment.belongsTo(models.Post, { foreignKey: 'post_id' });
-    Comment.belongsTo(models.Comment, { foreignKey: 'parent_comment_id' });
+  
+    Comment.belongsTo(models.Comment, {
+      foreignKey: 'parent_comment_id',
+      as: 'ParentComment'
+    });
+  
+    Comment.hasMany(models.Comment, {
+      foreignKey: 'parent_comment_id',
+      as: 'Replies'
+    });
   };
-
   return Comment;
-};
+}

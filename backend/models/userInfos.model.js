@@ -36,6 +36,18 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'follower_id',
         otherKey: 'following_id'
       });
+      // UserInfo associations
+      UserInfo.belongsToMany(models.Chat, {
+        through: models.ChatParticipant,
+        foreignKey: 'user_id',
+        otherKey: 'chat_id',
+        as: 'Chats'
+      });
+
+      UserInfo.hasMany(models.Message, {
+        foreignKey: 'sender_id',
+        as: 'Messages'
+      });
     };
   
     return UserInfo;
