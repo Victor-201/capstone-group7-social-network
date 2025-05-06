@@ -6,22 +6,96 @@ import './style.scss';
 const FriendsPage = () => {
   const { user, isAuthenticated, getFriendsList, getPendingFriendRequests, getFollowers, getFollowing, sendFriendRequest, respondToFriendRequest, removeFriend, followUser, unfollowUser, checkFollowStatus } = useAuth();
   const [activeTab, setActiveTab] = useState('friends');
-  const [friends, setFriends] = useState([]);
-  const [pendingRequests, setPendingRequests] = useState([]);
-  const [followers, setFollowers] = useState([]);
-  const [following, setFollowing] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [friends, setFriends] = useState([
+    {
+      id: 'friend-1',
+      fullName: 'Phạm Văn D',
+      username: 'phamvand',
+      avatar: null,
+      bio: 'Bạn từ thời đại học'
+    },
+    {
+      id: 'friend-2',
+      fullName: 'Hoàng Thị E',
+      username: 'hoangthie',
+      avatar: null,
+      bio: 'Đồng nghiệp cũ'
+    }
+  ]);
+  const [pendingRequests, setPendingRequests] = useState([
+    {
+      id: 'request-1',
+      requester: {
+        id: 'requester-1',
+        fullName: 'Đỗ Văn F',
+        username: 'dovanf',
+        avatar: null
+      },
+      createdAt: new Date().toISOString()
+    },
+    {
+      id: 'request-2',
+      requester: {
+        id: 'requester-2',
+        fullName: 'Vũ Thị G',
+        username: 'vuthig',
+        avatar: null
+      },
+      createdAt: new Date(Date.now() - 86400000).toISOString() // 1 ngày trước
+    }
+  ]);
+  const [followers, setFollowers] = useState([
+    {
+      id: 'follower-1',
+      fullName: 'Ngô Văn H',
+      username: 'ngovanh',
+      avatar: null,
+      bio: 'Người theo dõi nhiệt tình'
+    }
+  ]);
+  const [following, setFollowing] = useState([
+    {
+      id: 'following-1',
+      fullName: 'Trịnh Thị I',
+      username: 'trinhthii',
+      avatar: null,
+      bio: 'Blogger nổi tiếng'
+    }
+  ]);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [actionLoading, setActionLoading] = useState({});
   const [message, setMessage] = useState(null);
-  const [suggestedUsers, setSuggestedUsers] = useState([]);
+  const [suggestedUsers, setSuggestedUsers] = useState([
+    {
+      id: 'test-user-1',
+      fullName: 'Nguyễn Văn A',
+      username: 'nguyenvana',
+      avatar: null,
+      bio: 'Xin chào! Tôi là Nguyễn Văn A'
+    },
+    {
+      id: 'test-user-2', 
+      fullName: 'Trần Thị B',
+      username: 'tranthib',
+      avatar: null,
+      bio: 'Rất vui được làm quen!'
+    },
+    {
+      id: 'test-user-3',
+      fullName: 'Lê Văn C',
+      username: 'levanc',
+      avatar: null,
+      bio: 'Tôi thích đọc sách và du lịch'
+    }
+  ]);
 
-  // Fetch all data when component mounts
-  useEffect(() => {
+  // Comment out useEffect temporarily for testing
+  /*useEffect(() => {
     if (isAuthenticated) {
       fetchData();
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated]);*/
 
   // Fetch all data for the page
   const fetchData = async () => {
@@ -205,18 +279,6 @@ const FriendsPage = () => {
   const isUserFriend = (userId) => {
     return friends.some(friend => friend.id === userId);
   };
-
-  if (!isAuthenticated) {
-    return (
-      <div className="friends-page">
-        <div className="container">
-          <div className="auth-message">
-            <h2>Vui lòng đăng nhập để xem trang bạn bè</h2>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="friends-page">
@@ -574,11 +636,11 @@ const FriendsPage = () => {
                               disabled={actionLoading[`request_${suggestedUser.id}`]}
                             >
                               {actionLoading[`request_${suggestedUser.id}`] ? (
-                                <FaSpinner className="spinner" />
-                              ) : (
-                                <FaUserPlus className="action-icon" />
-                              )}
-                              Kết bạn
+                                  <FaSpinner className="spinner" />
+                                ) : (
+                                  <FaUserPlus className="action-icon" />
+                                )}
+                                Kết bạn
                             </button>
                             
                             {!isUserFollowed(suggestedUser.id) ? (

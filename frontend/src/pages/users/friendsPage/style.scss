@@ -1,272 +1,222 @@
+@import '../../../styles/pages/theme';
+
 .friends-page {
-  padding: 20px 0;
-  background-color: #f0f2f5;
-  min-height: calc(100vh - 60px);
+  padding: 2rem 0;
   
   .container {
-    max-width: 1000px;
+    max-width: 1200px;
     margin: 0 auto;
-    padding: 0 15px;
+    padding: 0 1rem;
   }
-  
+
   .page-title {
-    margin-bottom: 20px;
-    color: #1877f2;
-    font-size: 1.8rem;
-    text-align: center;
+    color: get-theme-color("text-primary");
+    font-size: 1.75rem;
+    margin-bottom: 1.5rem;
+    font-weight: $font-weight-semibold;
   }
-  
+
   .message {
-    padding: 12px 15px;
-    margin-bottom: 20px;
+    padding: 1rem;
     border-radius: 8px;
-    font-weight: 500;
+    margin-bottom: 1rem;
     
     &.success-message {
-      background-color: #dff2bf;
-      color: #4f8a10;
+      background-color: get-theme-color("secondary-color");
+      color: get-theme-color("text-quaternary");
+      border: 1px solid get-theme-color("tertiary-color");
     }
     
     &.error-message {
-      background-color: #ffdddd;
-      color: #d8000c;
+      background-color: get-theme-color("red-color");
+      color: get-theme-color("text-quaternary");
+      border: 1px solid get-theme-color("red-color");
       display: flex;
       align-items: center;
-      
-      .error-icon {
-        margin-right: 10px;
-      }
+      gap: 0.5rem;
     }
   }
-  
+
   .tabs {
     display: flex;
-    flex-wrap: wrap;
-    margin-bottom: 20px;
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-    
+    gap: 1rem;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid get-theme-color("tertiary-color");
+    padding-bottom: 0.5rem;
+
     .tab-button {
-      flex: 1;
-      min-width: 120px;
-      padding: 12px 10px;
-      background: none;
-      border: none;
-      cursor: pointer;
-      color: #65676b;
-      font-weight: 500;
       display: flex;
       align-items: center;
-      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.25rem;
+      border-radius: 8px;
+      border: none;
+      background: none;
+      color: get-theme-color("text-secondary");
+      cursor: pointer;
       transition: all 0.2s ease;
-      border-bottom: 3px solid transparent;
-      
-      .tab-icon {
-        margin-right: 8px;
-      }
-      
+
       &:hover {
-        background-color: #f0f2f5;
+        background-color: get-theme-color("background-color-light");
       }
-      
+
       &.active {
-        color: #1877f2;
-        border-bottom-color: #1877f2;
+        background-color: get-theme-color("tertiary-color");
+        color: get-theme-color("text-quaternary");
       }
-      
-      @media (max-width: 768px) {
-        min-width: 33.33%;
-        font-size: 0.9rem;
-        padding: 10px 5px;
-        
-        .tab-icon {
-          margin-right: 4px;
-        }
-      }
-      
-      @media (max-width: 576px) {
-        min-width: 50%;
-        
-        span {
-          display: none;
-        }
-        
-        .tab-icon {
-          margin-right: 0;
-          font-size: 1.1rem;
-        }
+
+      .tab-icon {
+        font-size: 1.25rem;
       }
     }
   }
-  
-  .content {
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-    padding: 20px;
-    min-height: 300px;
-    
-    h2 {
-      margin-bottom: 20px;
-      color: #1c1e21;
-      font-size: 1.2rem;
+
+  .user-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    padding: 1rem 0;
+  }
+
+  .user-card {
+    background-color: get-theme-color("primary-color");
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border: 1px solid get-theme-color("tertiary-color");
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
     }
-    
-    .loading-container {
+
+    .user-avatar {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      margin-bottom: 1rem;
+      overflow: hidden;
+      
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+
+    .user-info {
+      text-align: center;
+      margin-bottom: 1.5rem;
+
+      h3 {
+        color: get-theme-color("text-primary");
+        font-size: 1.25rem;
+        font-weight: $font-weight-semibold;
+        margin-bottom: 0.25rem;
+      }
+
+      .username {
+        color: get-theme-color("text-secondary");
+        font-size: 0.875rem;
+        margin-bottom: 0.5rem;
+      }
+
+      .bio {
+        color: get-theme-color("text-secondary");
+        font-size: 0.875rem;
+        line-height: 1.4;
+      }
+    }
+
+    .user-actions {
       display: flex;
       flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 40px 0;
-      
-      .spinner {
-        animation: spin 1s linear infinite;
-        font-size: 2rem;
-        color: #1877f2;
-        margin-bottom: 15px;
-      }
-    }
-    
-    .empty-state {
-      text-align: center;
-      padding: 40px 0;
-      color: #65676b;
-    }
-    
-    .user-cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 20px;
-      
-      @media (max-width: 576px) {
-        grid-template-columns: 1fr;
-      }
-      
-      .user-card {
-        border: 1px solid #e4e6eb;
-        border-radius: 8px;
-        padding: 15px;
+      gap: 0.75rem;
+
+      .action-button {
         display: flex;
-        flex-direction: column;
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-        
-        &:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 0.75rem;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        font-weight: $font-weight-medium;
+        transition: all 0.2s ease;
+
+        .action-icon {
+          font-size: 1.25rem;
         }
-        
-        .user-avatar {
-          display: flex;
-          justify-content: center;
-          margin-bottom: 15px;
-          
-          img {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            object-fit: cover;
-          }
-        }
-        
-        .user-info {
-          text-align: center;
-          margin-bottom: 15px;
-          
-          h3 {
-            margin: 0 0 5px;
-            font-size: 1.1rem;
-            color: #1c1e21;
-          }
-          
-          .username {
-            color: #65676b;
-            margin: 0 0 8px;
-            font-size: 0.9rem;
-          }
-          
-          .bio {
-            color: #65676b;
-            font-size: 0.9rem;
-            margin: 10px 0 0;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-          }
-          
-          .request-time {
-            font-size: 0.8rem;
-            color: #65676b;
-            margin-top: 5px;
+
+        &.add-button {
+          background-color: get-theme-color("tertiary-color");
+          color: get-theme-color("text-quaternary");
+
+          &:hover {
+            background-color: darken(get-theme-color("tertiary-color"), 5%);
           }
         }
-        
-        .user-actions {
-          margin-top: auto;
-          display: flex;
-          flex-direction: column;
-          gap: 10px;
-          
-          .action-button {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 8px 12px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: 500;
-            font-size: 0.9rem;
-            transition: background-color 0.2s ease;
-            
-            .action-icon {
-              margin-right: 8px;
-            }
-            
-            .spinner {
-              animation: spin 1s linear infinite;
-              margin-right: 8px;
-            }
-            
-            &:disabled {
-              opacity: 0.6;
-              cursor: not-allowed;
-            }
-            
-            &.add-button, &.accept-button, &.follow-button {
-              background-color: #e7f3ff;
-              color: #1877f2;
-              
-              &:hover {
-                background-color: #dce6f2;
-              }
-            }
-            
-            &.remove-button, &.reject-button, &.unfollow-button {
-              background-color: #f0f2f5;
-              color: #65676b;
-              
-              &:hover {
-                background-color: #e4e6eb;
-              }
-            }
+
+        &.remove-button {
+          background-color: get-theme-color("red-color");
+          color: get-theme-color("text-quaternary");
+
+          &:hover {
+            background-color: darken(get-theme-color("red-color"), 5%);
           }
+        }
+
+        &.follow-button {
+          background-color: get-theme-color("secondary-color");
+          color: get-theme-color("text-quaternary");
+
+          &:hover {
+            background-color: darken(get-theme-color("secondary-color"), 5%);
+          }
+        }
+
+        &.unfollow-button {
+          background-color: get-theme-color("background-color-light");
+          color: get-theme-color("text-primary");
+
+          &:hover {
+            background-color: darken(get-theme-color("background-color-light"), 5%);
+          }
+        }
+
+        &:disabled {
+          opacity: 0.7;
+          cursor: not-allowed;
         }
       }
     }
   }
-  
-  .auth-message {
+
+  .empty-state {
     text-align: center;
-    padding: 40px 0;
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    padding: 3rem 1rem;
+    color: get-theme-color("text-secondary");
     
-    h2 {
-      color: #65676b;
+    p {
+      font-size: 1rem;
+      margin-bottom: 1rem;
+    }
+  }
+
+  .loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 1rem;
+    color: get-theme-color("text-secondary");
+
+    .spinner {
+      animation: spin 1s linear infinite;
+      font-size: 2rem;
+      margin-bottom: 1rem;
     }
   }
 }
