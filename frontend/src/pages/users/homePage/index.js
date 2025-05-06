@@ -1,325 +1,130 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import { useAuth } from '../../../contexts/AuthContext';
-import { 
-  FaImage, 
-  FaMapMarkerAlt, 
-  FaTags, 
-  FaHeart, 
-  FaRegHeart, 
-  FaComment, 
-  FaShare, 
-  FaBookmark, 
-  FaExternalLinkAlt,
-  FaGlobe,
-  FaEllipsisV,
-  FaThumbsUp,
-  FaReply
-} from 'react-icons/fa';
-import { IoMdSend } from 'react-icons/io';
-import { BiLoader } from 'react-icons/bi';
-import { MdErrorOutline } from 'react-icons/md';
+import { FaUsers, FaSpinner, FaExclamationTriangle } from 'react-icons/fa';
+import CreatePost from '../../../components/createPost';
+import NewsFeed from '../../../components/newsFeed';
+import ReelsSection from '../../../components/reelsSection';
+import AddFriendCard, { AddFriendSuggestion } from '../../../components/addFriendCard';
 import './style.scss';
 
 const HomePage = () => {
   const { user, isAuthenticated } = useAuth();
   const [posts, setPosts] = useState([]);
-  const [newPostContent, setNewPostContent] = useState('');
+  const [reels, setReels] = useState([]);
+  const [suggestedUsers, setSuggestedUsers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState('foryou');
   const [message, setMessage] = useState(null);
-  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080';
-
-  // Fetch posts from backend
-  const fetchPosts = async () => {
-    try {
-      setIsLoading(true);
-      const token = localStorage.getItem('token');
-      const response = await fetch(`${API_URL}/api/posts?_t=${new Date().getTime()}`, {
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-          'Authorization': token ? `Bearer ${token}` : ''
-        }
-      });
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-      
-      const data = await response.json();
-      setPosts(data || []);
-      setIsLoading(false);
-    } catch (err) {
-      console.error("Failed to fetch posts:", err);
-      setPosts([]);
-      setError("Không thể tải bài viết. Vui lòng thử lại sau.");
-      setIsLoading(false);
-    }
-  };
 
   useEffect(() => {
-    fetchPosts();
-  }, [API_URL]);
-
-  // Handle post submission
-  const handlePostSubmit = async (e) => {
-    e.preventDefault();
-    if (!newPostContent.trim() || !isAuthenticated) return;
-
-    const token = localStorage.getItem('token');
-    if (!token) {
-      setError("Bạn cần đăng nhập để đăng bài");
-      return;
-    }
-
-    // Create a temporary post for optimistic update
-    const tempId = Date.now(); // Temporary ID for optimistic update
-    const newPost = {
-      id: tempId,
-      author: user?.fullName || user?.username,
-      authorId: user?.id,
-      authorAvatar: user?.avatar || null,
-      content: newPostContent,
-      createdAt: new Date().toISOString(),
-      likes: 0,
-      comments: [],
-      isLiked: false
-    };
-
-    // Optimistic update - add the new post to the UI immediately
-    setPosts([newPost, ...posts]);
-    setNewPostContent('');
-
-    try {
-      // Send the post to the server
-      const response = await fetch(`${API_URL}/api/posts`, {
-        method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          content: newPostContent
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error("Post creation error:", errorData);
-        throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
+    // Dữ liệu mẫu cho posts
+    setPosts([
+      {
+        id: 1,
+        author: "Nguyễn Văn A",
+        authorAvatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=John",
+        content: "Đây là bài viết mẫu #demo",
+        createdAt: new Date().toISOString(),
+        likes: 5,
+        isLiked: false,
+        comments: [
+          {
+            id: 1,
+            author: "Bình luận viên",
+            authorAvatar: "",
+            content: "Bình luận mẫu",
+            createdAt: new Date().toISOString()
+          }
+        ],
+        tags: ["demo"]
+      },
+      {
+        id: 2,
+        author: "Trần Thị B",
+        authorAvatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Jane",
+        content: "Bài viết thứ hai với #hashtag",
+        createdAt: new Date().toISOString(),
+        likes: 2,
+        isLiked: true,
+        comments: [],
+        tags: ["hashtag"]
       }
-
-      // Get the saved post from response and update the state
-      const savedPost = await response.json();
-      console.log("Post created successfully:", savedPost);
-      
-      // Replace the temporary post with the actual saved post
-      setPosts(prevPosts => 
-        prevPosts.map(post => 
-          post.id === tempId ? savedPost : post
-        )
-      );
-
-      // Refresh the posts list to ensure we have the latest data
-      fetchPosts();
-    } catch (err) {
-      console.error("Failed to save post:", err);
-      // Rollback optimistic update
-      setPosts(prevPosts => prevPosts.filter(post => post.id !== tempId));
-      setError("Không thể đăng bài. Vui lòng thử lại sau.");
-    }
-  };
-
-  // Handle like functionality
-  const handleLike = async (postId) => {
-    if (!isAuthenticated) return;
-    
-    const token = localStorage.getItem('token');
-    if (!token) return;
-
-    setPosts(prevPosts => 
-      prevPosts.map(post => 
-        post.id === postId 
-          ? {
-              ...post,
-              isLiked: !post.isLiked,
-              likes: post.isLiked ? post.likes - 1 : post.likes + 1
-            }
-          : post
-      )
-    );
-
-    try {
-      const response = await fetch(`${API_URL}/api/posts/${postId}/like`, {
-        method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
+    ]);
+    // Dữ liệu mẫu cho reels
+    setReels([
+      {
+        id: 1,
+        author: "Nguyễn Văn B",
+        authorAvatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Bob",
+        videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4",
+        caption: "Reel mẫu vui nhộn",
+        createdAt: new Date().toISOString(),
+        likes: 2,
+        isLiked: false,
+        comments: [],
+        music: "Nhạc nền mẫu"
       }
-    } catch (err) {
-      console.error("Failed to like post:", err);
-      // Rollback optimistic update
-      setPosts(prevPosts => 
-        prevPosts.map(post => 
-          post.id === postId 
-            ? {
-                ...post,
-                isLiked: !post.isLiked,
-                likes: post.isLiked ? post.likes - 1 : post.likes + 1
-              }
-            : post
-        )
-      );
-    }
-  };
-
-  // Handle share functionality
-  const handlePostShare = async (postId) => {
-    if (!isAuthenticated) {
-      setError("Bạn cần đăng nhập để chia sẻ bài viết");
-      return;
-    }
-
-    // Show dialog to add share content
-    const shareContent = prompt("Chia sẻ bài viết này với nội dung của bạn:", "");
-    
-    // If user cancels prompt, return
-    if (shareContent === null) return;
-    
-    const token = localStorage.getItem('token');
-    if (!token) return;
-
-    try {
-      const response = await fetch(`${API_URL}/api/share`, {
-        method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          postId,
-          content: shareContent,
-          privacy: 'public'
-        })
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
+    ]);
+    // Dữ liệu mẫu cho suggested users
+    setSuggestedUsers([
+      {
+        id: 1,
+        fullName: "Nguyễn Văn C",
+        username: "nguyenvanc",
+        avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Chris",
+        bio: "Bạn mới gợi ý"
+      },
+      {
+        id: 2,
+        fullName: "Lê Thị D",
+        username: "lethid",
+        avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Lisa",
+        bio: "Gợi ý kết bạn từ hệ thống"
       }
-      
-      const result = await response.json();
-      setMessage("Đã chia sẻ bài viết thành công!");
-      
-      // Re-fetch posts to see updates
-      fetchPosts();
-      
-      // Clear message after 3 seconds
-      setTimeout(() => {
-        setMessage(null);
-      }, 3000);
-    } catch (err) {
-      console.error("Failed to share post:", err);
-      setError(err.message || "Không thể chia sẻ bài viết. Vui lòng thử lại sau.");
-      
-      // Clear error after 3 seconds
-      setTimeout(() => {
-        setError(null);
-      }, 3000);
-    }
-  };
+    ]);
+    setIsLoading(false);
+    setError(null);
+  }, []);
 
-  // Extract hashtags from post content
-  const extractHashtags = (content) => {
-    if (!content) return [];
-    const regex = /#(\w+)/g;
-    const matches = content.match(regex);
-    if (!matches) return [];
-    return matches.map(tag => tag.slice(1));
-  };
-
-  // Format date to relative time (e.g. "2 hours ago")
+  // Format date to relative time
   const formatRelativeTime = (dateString) => {
     if (!dateString) return '';
-    
     const date = new Date(dateString);
     const now = new Date();
     const diffInSeconds = Math.floor((now - date) / 1000);
-    
-    if (diffInSeconds < 60) {
-      return `${diffInSeconds}s`;
-    }
-    
+    if (diffInSeconds < 60) return `${diffInSeconds}s`;
     const diffInMinutes = Math.floor(diffInSeconds / 60);
-    if (diffInMinutes < 60) {
-      return `${diffInMinutes}m`;
-    }
-    
+    if (diffInMinutes < 60) return `${diffInMinutes}m`;
     const diffInHours = Math.floor(diffInMinutes / 60);
-    if (diffInHours < 24) {
-      return `${diffInHours}h`;
-    }
-    
+    if (diffInHours < 24) return `${diffInHours}h`;
     const diffInDays = Math.floor(diffInHours / 24);
-    if (diffInDays < 7) {
-      return `${diffInDays}d`;
-    }
-    
+    if (diffInDays < 7) return `${diffInDays}d`;
     const options = { month: 'short', day: 'numeric' };
     return date.toLocaleDateString(undefined, options);
   };
 
-  // Handle comment submission
-  const handleAddComment = async (postId, commentText) => {
-    if (!commentText.trim() || !isAuthenticated) return;
-    
-    const token = localStorage.getItem('token');
-    if (!token) return;
-    
-    try {
-      const response = await fetch(`${API_URL}/api/posts/${postId}/comments`, {
-        method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ content: commentText })
-      });
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-      
-      const newComment = await response.json();
-      
-      setPosts(prevPosts => 
-        prevPosts.map(post => 
-          post.id === postId 
-            ? { ...post, comments: [...(post.comments || []), newComment] }
-            : post
-        )
-      );
-    } catch (err) {
-      console.error("Failed to add comment:", err);
-    }
-  };
+  // Dummy handlers
+  const handlePostLike = () => {};
+  const handlePostComment = () => {};
+  const handlePostShare = () => {};
+  const handlePostBookmark = () => {};
+  const handlePostExternalLink = () => {};
+  const handlePostMenuClick = () => {};
+  const handleReelLike = () => {};
+  const handleReelComment = () => {};
+  const handleReelShare = () => {};
+  const handleReelMenuClick = () => {};
+  const handleAddFriend = () => {};
+  const handleFollowUser = () => {};
+  const handleUnfollowUser = () => {};
 
   return (
     <div className="nova-home">
       <div className="nova-container">
         <div className="nova-content">
           <div className="nova-sidebar">
+            {/* Profile Card */}
             <div className="sidebar-card profile-card">
               <div className="profile-cover">
                 <div className="profile-avatar-large">
@@ -333,7 +138,7 @@ const HomePage = () => {
                     />
                   ) : (
                     <img
-                      src="upload/images/avatar-default.jpg" // Placeholder image if no avatar
+                      src="upload/images/avatar-default.jpg"
                       alt="Profile"
                     />
                   )}
@@ -357,284 +162,85 @@ const HomePage = () => {
               </div>
             </div>
 
-            <div className="sidebar-card trending-card">
-              <h3 className="card-title">Chủ đề phổ biến</h3>
-              <ul className="trending-list">
-                <li className="trending-item">
-                  <span className="trending-tag">#technology</span>
-                  <span className="trending-count">24.3k bài viết</span>
-                </li>
-                <li className="trending-item">
-                  <span className="trending-tag">#ai</span>
-                  <span className="trending-count">18.9k bài viết</span>
-                </li>
-                <li className="trending-item">
-                  <span className="trending-tag">#design</span>
-                  <span className="trending-count">12.5k bài viết</span>
-                </li>
-                <li className="trending-item">
-                  <span className="trending-tag">#nova</span>
-                  <span className="trending-count">8.7k bài viết</span>
-                </li>
-              </ul>
-            </div>
+            {/* Suggested Friends */}
+            {suggestedUsers.length > 0 && (
+              <AddFriendSuggestion
+                users={suggestedUsers}
+                onAdd={handleAddFriend}
+                onFollow={handleFollowUser}
+                onUnfollow={handleUnfollowUser}
+                isFollowing={() => false}
+                onSeeAll={() => alert('Xem tất cả gợi ý kết bạn!')}
+              />
+            )}
           </div>
 
           <div className="nova-main">
             {/* Create Post */}
-            {isAuthenticated && (
-              <div className="create-post-card">
-                <form onSubmit={handlePostSubmit} className="create-post-form">
-                  <div className="post-form-header">
-                    {user?.avatar ? (
-                      <img 
-                        src={user.avatar} 
-                        alt="User" 
-                        className="post-avatar" 
-                        onError={(e) => {
-                          e.target.style.display = 'none';
-                        }}
-                      />
-                    ) : (
-                      <image
-                        src="upload/images/avatar-default.jpg" // Placeholder image if no avatar
-                        alt="User"
-                        className="post-avatar"
-                      />
-                    )}
-                    <textarea 
-                      className="post-input" 
-                      placeholder="Chia sẻ suy nghĩ của bạn..." 
-                      value={newPostContent}
-                      onChange={(e) => setNewPostContent(e.target.value)}
-                      rows={newPostContent.length > 0 ? 3 : 1}
-                    />
-                  </div>
-                  <div className="post-form-footer">
-                    <div className="post-attachments">
-                      <button type="button" className="attachment-button">
-                        <span className="attachment-icon"><FaImage /></span>
-                        <span className="attachment-label">Hình ảnh</span>
-                      </button>
-                      <button type="button" className="attachment-button">
-                        <span className="attachment-icon"><FaMapMarkerAlt /></span>
-                        <span className="attachment-label">Vị trí</span>
-                      </button>
-                      <button type="button" className="attachment-button">
-                        <span className="attachment-icon"><FaTags /></span>
-                        <span className="attachment-label">Chủ đề</span>
-                      </button>
-                    </div>
-                    <button 
-                      type="submit" 
-                      className="post-submit"
-                      disabled={!newPostContent.trim()}
-                    >
-                      Đăng
-                    </button>
-                  </div>
-                </form>
-              </div>
-            )}
+            {isAuthenticated && <CreatePost />}
 
             {/* Feed Filter */}
             <div className="feed-filter">
-              <button className={`filter-button ${activeTab === 'foryou' ? 'active' : ''}`} onClick={() => setActiveTab('foryou')}>Dành cho bạn</button>
-              <button className={`filter-button ${activeTab === 'following' ? 'active' : ''}`} onClick={() => setActiveTab('following')}>Theo dõi</button>
-              <button className={`filter-button ${activeTab === 'trending' ? 'active' : ''}`} onClick={() => setActiveTab('trending')}>Thịnh hành</button>
+              <button 
+                className={`filter-button ${activeTab === 'foryou' ? 'active' : ''}`} 
+                onClick={() => setActiveTab('foryou')}
+              >
+                Dành cho bạn
+              </button>
+              <button 
+                className={`filter-button ${activeTab === 'following' ? 'active' : ''}`} 
+                onClick={() => setActiveTab('following')}
+              >
+                Theo dõi
+              </button>
+              <button 
+                className={`filter-button ${activeTab === 'trending' ? 'active' : ''}`} 
+                onClick={() => setActiveTab('trending')}
+              >
+                Thịnh hành
+              </button>
             </div>
 
-            {/* Posts Feed */}
-            <div className="posts-container">
-              {isLoading ? (
-                <div className="loading-card">
-                  <BiLoader className="loader-icon" />
-                  <p>Đang tải bài viết...</p>
-                </div>
-              ) : error ? (
-                <div className="error-card">
-                  <MdErrorOutline className="error-icon" />
-                  <p>{error}</p>
-                </div>
-              ) : posts.length === 0 ? (
-                <div className="empty-card">
-                  <p>Không có bài viết nào để hiển thị.</p>
-                  {isAuthenticated && (
-                    <p className="empty-card-action">Hãy là người đầu tiên chia sẻ bài viết!</p>
-                  )}
-                </div>
-              ) : (
-                posts.map(post => {
-                  const tags = post.tags || extractHashtags(post.content);
-                  return (
-                    <div className="post-card" key={post.id}>
-                      <div className="post-header">
-                        <div className="post-author">
-                          {post.authorAvatar ? (
-                            <img 
-                              src={post.authorAvatar} 
-                              alt={post.author} 
-                              className="author-avatar" 
-                              onError={(e) => {
-                                e.target.style.display = 'none';
-                              }}
-                            />
-                          ) : (
-                            <img src="upload/images/avatar-default.jpg" alt={post.author} className="author-avatar" onError={(e) => { e.target.style.display = 'none'; }}></img>
-                          )}
-                          <div className="author-info">
-                            <div className="author-name">{post.author}</div>
-                            <div className="post-meta">
-                              <span className="post-time">{formatRelativeTime(post.createdAt)}</span>
-                              <span className="dot-separator">•</span>
-                              <span className="visibility-icon"><FaGlobe /></span>
-                            </div>
-                          </div>
-                        </div>
-                        <button className="post-menu">
-                          <FaEllipsisV className="menu-icon" />
-                        </button>
-                      </div>
+            {/* News Feed */}
+            {isLoading ? (
+              <div className="loading-card">
+                <FaSpinner className="loader-icon" />
+                <p>Đang tải bài viết...</p>
+              </div>
+            ) : error ? (
+              <div className="error-card">
+                <FaExclamationTriangle className="error-icon" />
+                <p>{error}</p>
+              </div>
+            ) : (
+              <>
+                <NewsFeed
+                  posts={posts}
+                  onLike={handlePostLike}
+                  onComment={handlePostComment}
+                  onShare={handlePostShare}
+                  onBookmark={handlePostBookmark}
+                  onExternalLink={handlePostExternalLink}
+                  onMenuClick={handlePostMenuClick}
+                  formatRelativeTime={formatRelativeTime}
+                />
 
-                      <div className="post-content">
-                        <p>{post.content}</p>
-                        
-                        {tags.length > 0 && (
-                          <div className="post-tags">
-                            {tags.map(tag => (
-                              <span key={tag} className="post-tag">#{tag}</span>
-                            ))}
-                          </div>
-                        )}
-                        
-                        {post.image && (
-                          <div className="post-media">
-                            <img 
-                              src={post.image} 
-                              alt="Post" 
-                              className="post-image" 
-                              onError={(e) => {
-                                e.target.style.display = 'none';
-                              }}
-                            />
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="post-actions">
-                        <button 
-                          className={`post-action ${post.isLiked ? 'liked' : ''}`}
-                          onClick={() => handleLike(post.id)}
-                        >
-                          <span className="action-icon">
-                            {post.isLiked ? <FaHeart /> : <FaRegHeart />}
-                          </span>
-                          <span className="action-count">{post.likes || 0}</span>
-                        </button>
-                        <button className="post-action">
-                          <span className="action-icon"><FaComment /></span>
-                          <span className="action-count">{post.comments ? post.comments.length : 0}</span>
-                        </button>
-                        <button 
-                          className="post-action"
-                          onClick={() => handlePostShare(post.id)}
-                        >
-                          <span className="action-icon"><FaShare /></span>
-                          <span className="action-count">0</span>
-                        </button>
-                        <button className="post-action">
-                          <span className="action-icon"><FaBookmark /></span>
-                        </button>
-                        <button className="post-action">
-                          <span className="action-icon"><FaExternalLinkAlt /></span>
-                        </button>
-                      </div>
-
-                      {post.comments && post.comments.length > 0 && (
-                        <div className="post-comments">
-                          <h4 className="comments-header">
-                            <span className="comments-count">{post.comments.length} Bình luận</span>
-                          </h4>
-                          <div className="comments-list">
-                            {post.comments.map(comment => (
-                              <div className="comment-item" key={comment.id}>
-                                {comment.authorAvatar ? (
-                                  <img 
-                                    src={comment.authorAvatar} 
-                                    alt={comment.author} 
-                                    className="comment-avatar" 
-                                    onError={(e) => {
-                                      e.target.style.display = 'none';
-                                    }}
-                                  />
-                                ) : (
-                                  <img src="upload/images/avatar-default.jpg" alt={comment.author} className="comment-avatar" onError={(e) => { e.target.style.display = 'none'; }}></img>
-                                )}
-                                <div className="comment-content">
-                                  <div className="comment-header">
-                                    <span className="comment-author">{comment.author}</span>
-                                    <span className="comment-time">{formatRelativeTime(comment.createdAt)}</span>
-                                  </div>
-                                  <p className="comment-text">{comment.content}</p>
-                                  <div className="comment-actions">
-                                    <button className="comment-action">
-                                      <FaThumbsUp size={12} /> Thích
-                                    </button>
-                                    <button className="comment-action">
-                                      <FaReply size={12} /> Trả lời
-                                    </button>
-                                  </div>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
-                      {isAuthenticated && (
-                        <div className="add-comment">
-                          {user?.avatar ? (
-                            <img 
-                              src={user.avatar} 
-                              alt="User" 
-                              className="comment-avatar" 
-                              onError={(e) => {
-                                e.target.style.display = 'none';
-                              }}
-                            />
-                          ) : (
-                            <img src="upload/images/avatar-default.jpg" alt="User" className="comment-avatar" onError={(e) => { e.target.style.display = 'none'; }}></img>
-                          )}
-                          <input 
-                            type="text" 
-                            className="comment-input" 
-                            placeholder="Thêm bình luận..." 
-                            onKeyPress={(e) => {
-                              if (e.key === 'Enter') {
-                                handleAddComment(post.id, e.target.value);
-                                e.target.value = '';
-                              }
-                            }}
-                          />
-                          <button 
-                            className="comment-submit"
-                            onClick={(e) => {
-                              const input = e.target.previousSibling;
-                              if (input.value.trim()) {
-                                handleAddComment(post.id, input.value);
-                                input.value = '';
-                              }
-                            }}
-                          >
-                            <IoMdSend />
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  );
-                })
-              )}
-            </div>
+                {/* Reels Section */}
+                {reels.length > 0 && (
+                  <div className="reels-container">
+                    <h2 className="section-title">Reels</h2>
+                    <ReelsSection
+                      reels={reels}
+                      onLike={handleReelLike}
+                      onComment={handleReelComment}
+                      onShare={handleReelShare}
+                      onMenuClick={handleReelMenuClick}
+                      formatRelativeTime={formatRelativeTime}
+                    />
+                  </div>
+                )}
+              </>
+            )}
           </div>
         </div>
       </div>
