@@ -10,17 +10,24 @@ const FriendsPage = () => {
   const [friends, setFriends] = useState([
     {
       id: 'friend-1',
-      fullName: 'Phạm Văn D',
-      username: 'phamvand',
-      avatar: null,
-      bio: 'Bạn từ thời đại học'
+      fullName: 'Nguyễn Xuân Hải',
+      username: 'xuanhai0913',
+      avatar: 'https://www.nxhai0913.me/static/media/profile.14372afd9cb0f5b2e012.png',
+      bio: 'Software Developer | Coffee Lover ☕'
     },
     {
       id: 'friend-2',
       fullName: 'Hoàng Thị E',
       username: 'hoangthie',
-      avatar: null,
-      bio: 'Đồng nghiệp cũ'
+      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Lily&backgroundColor=ffdfbf',
+      bio: 'Digital Artist 🎨 | Cat Person 🐱'
+    },
+    {
+      id: 'friend-3',
+      fullName: 'Trần Minh F',
+      username: 'tranminhf',
+      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Max&backgroundColor=c0aede',
+      bio: 'Travel Enthusiast ✈️ | Photographer 📸'
     }
   ]);
   const [pendingRequests, setPendingRequests] = useState([
@@ -28,9 +35,9 @@ const FriendsPage = () => {
       id: 'request-1',
       requester: {
         id: 'requester-1',
-        fullName: 'Đỗ Văn F',
-        username: 'dovanf',
-        avatar: null
+        fullName: 'Đỗ Văn G',
+        username: 'dovang',
+        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Charlie&backgroundColor=b6e3f4',
       },
       createdAt: new Date().toISOString()
     },
@@ -38,29 +45,43 @@ const FriendsPage = () => {
       id: 'request-2',
       requester: {
         id: 'requester-2',
-        fullName: 'Vũ Thị G',
-        username: 'vuthig',
-        avatar: null
+        fullName: 'Vũ Thị H',
+        username: 'vuthih',
+        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sophie&backgroundColor=ffdfbf',
       },
-      createdAt: new Date(Date.now() - 86400000).toISOString() // 1 ngày trước
+      createdAt: new Date(Date.now() - 86400000).toISOString()
     }
   ]);
   const [followers, setFollowers] = useState([
     {
       id: 'follower-1',
-      fullName: 'Ngô Văn H',
-      username: 'ngovanh',
-      avatar: null,
-      bio: 'Người theo dõi nhiệt tình'
+      fullName: 'Ngô Văn I',
+      username: 'ngovani',
+      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Oliver&backgroundColor=c0aede',
+      bio: 'Music Producer 🎵 | Guitar Player 🎸'
+    },
+    {
+      id: 'follower-2',
+      fullName: 'Lê Thị K',
+      username: 'lethik',
+      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Luna&backgroundColor=ffdfbf',
+      bio: 'Food Blogger 🍜 | Chef 👩‍🍳'
     }
   ]);
   const [following, setFollowing] = useState([
     {
       id: 'following-1',
-      fullName: 'Trịnh Thị I',
-      username: 'trinhthii',
-      avatar: null,
-      bio: 'Blogger nổi tiếng'
+      fullName: 'Trịnh Thị L',
+      username: 'trinhthi',
+      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Emma&backgroundColor=b6e3f4',
+      bio: 'Fashion Designer 👗 | Travel Lover ✈️'
+    },
+    {
+      id: 'following-2',
+      fullName: 'Đặng Văn M',
+      username: 'dangvanm',
+      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Lucas&backgroundColor=c0aede',
+      bio: 'Tech Enthusiast 💻 | Gamer 🎮'
     }
   ]);
   const [loading, setLoading] = useState(false);
@@ -69,25 +90,25 @@ const FriendsPage = () => {
   const [message, setMessage] = useState(null);
   const [suggestedUsers, setSuggestedUsers] = useState([
     {
-      id: 'test-user-1',
-      fullName: 'Nguyễn Văn A',
-      username: 'nguyenvana',
-      avatar: null,
-      bio: 'Xin chào! Tôi là Nguyễn Văn A'
+      id: 'suggested-1',
+      fullName: 'Nguyễn Văn N',
+      username: 'nguyenvann',
+      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Jack&backgroundColor=b6e3f4',
+      bio: 'Startup Founder 🚀 | AI Researcher 🤖'
     },
     {
-      id: 'test-user-2', 
-      fullName: 'Trần Thị B',
-      username: 'tranthib',
-      avatar: null,
-      bio: 'Rất vui được làm quen!'
+      id: 'suggested-2',
+      fullName: 'Trần Thị P',
+      username: 'tranthip',
+      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Mia&backgroundColor=ffdfbf',
+      bio: 'Yoga Instructor 🧘‍♀️ | Wellness Coach 💪'
     },
     {
-      id: 'test-user-3',
-      fullName: 'Lê Văn C',
-      username: 'levanc',
-      avatar: null,
-      bio: 'Tôi thích đọc sách và du lịch'
+      id: 'suggested-3',
+      fullName: 'Lê Văn Q',
+      username: 'levanq',
+      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Noah&backgroundColor=c0aede',
+      bio: 'Environmental Scientist 🌱 | Nature Photographer 📸'
     }
   ]);
 

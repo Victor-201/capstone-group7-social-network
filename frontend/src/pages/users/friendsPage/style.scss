@@ -1,7 +1,7 @@
 @import '../../../styles/pages/theme';
 
 .friends-page {
-  padding: 2rem 0;
+  padding: 5rem 0 2rem;
   
   .container {
     max-width: 1200px;
@@ -12,8 +12,48 @@
   .page-title {
     color: get-theme-color("text-primary");
     font-size: 1.75rem;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
     font-weight: $font-weight-semibold;
+  }
+
+  .search-container {
+    margin-bottom: 1.5rem;
+
+    .search-box {
+      position: relative;
+      max-width: 600px;
+      margin: 0 auto;
+
+      .search-icon {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: get-theme-color("text-secondary");
+        font-size: 1rem;
+      }
+
+      input {
+        width: 100%;
+        padding: 0.75rem 1rem 0.75rem 2.5rem;
+        border-radius: 8px;
+        border: 1px solid get-theme-color("tertiary-color");
+        background-color: get-theme-color("primary-color");
+        color: get-theme-color("text-primary");
+        font-size: 0.875rem;
+        transition: all 0.2s ease;
+
+        &::placeholder {
+          color: get-theme-color("text-secondary");
+        }
+
+        &:focus {
+          outline: none;
+          border-color: get-theme-color("secondary-color");
+          box-shadow: 0 0 0 2px rgba(get-theme-color("secondary-color"), 0.1);
+        }
+      }
+    }
   }
 
   .message {
@@ -93,6 +133,10 @@
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
       gap: 1rem;
       padding: 0.5rem 0;
+
+      @media (max-width: 640px) {
+        grid-template-columns: 1fr;
+      }
     }
   }
 
