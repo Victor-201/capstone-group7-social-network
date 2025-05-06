@@ -39,22 +39,35 @@
 
   .tabs {
     display: flex;
-    gap: 1rem;
+    gap: 0.5rem;
     margin-bottom: 2rem;
     border-bottom: 1px solid get-theme-color("tertiary-color");
     padding-bottom: 0.5rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
 
     .tab-button {
       display: flex;
       align-items: center;
       gap: 0.5rem;
-      padding: 0.75rem 1.25rem;
-      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      border-radius: 6px;
       border: none;
       background: none;
       color: get-theme-color("text-secondary");
       cursor: pointer;
       transition: all 0.2s ease;
+      white-space: nowrap;
+      font-size: 0.875rem;
+
+      .tab-icon {
+        font-size: 1.25rem;
+      }
 
       &:hover {
         background-color: get-theme-color("background-color-light");
@@ -64,133 +77,22 @@
         background-color: get-theme-color("tertiary-color");
         color: get-theme-color("text-quaternary");
       }
-
-      .tab-icon {
-        font-size: 1.25rem;
-      }
     }
   }
 
-  .user-cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 1.5rem;
-    padding: 1rem 0;
-  }
-
-  .user-card {
-    background-color: get-theme-color("primary-color");
-    border-radius: 12px;
-    padding: 1.5rem;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    border: 1px solid get-theme-color("tertiary-color");
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-
-    &:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-    }
-
-    .user-avatar {
-      width: 100px;
-      height: 100px;
-      border-radius: 50%;
+  .content {
+    h2 {
+      color: get-theme-color("text-primary");
+      font-size: 1.25rem;
       margin-bottom: 1rem;
-      overflow: hidden;
-      
-      img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-      }
+      font-weight: $font-weight-semibold;
     }
 
-    .user-info {
-      text-align: center;
-      margin-bottom: 1.5rem;
-
-      h3 {
-        color: get-theme-color("text-primary");
-        font-size: 1.25rem;
-        font-weight: $font-weight-semibold;
-        margin-bottom: 0.25rem;
-      }
-
-      .username {
-        color: get-theme-color("text-secondary");
-        font-size: 0.875rem;
-        margin-bottom: 0.5rem;
-      }
-
-      .bio {
-        color: get-theme-color("text-secondary");
-        font-size: 0.875rem;
-        line-height: 1.4;
-      }
-    }
-
-    .user-actions {
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-
-      .action-button {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.5rem;
-        padding: 0.75rem;
-        border-radius: 8px;
-        border: none;
-        cursor: pointer;
-        font-weight: $font-weight-medium;
-        transition: all 0.2s ease;
-
-        .action-icon {
-          font-size: 1.25rem;
-        }
-
-        &.add-button {
-          background-color: get-theme-color("tertiary-color");
-          color: get-theme-color("text-quaternary");
-
-          &:hover {
-            background-color: darken(get-theme-color("tertiary-color"), 5%);
-          }
-        }
-
-        &.remove-button {
-          background-color: get-theme-color("red-color");
-          color: get-theme-color("text-quaternary");
-
-          &:hover {
-            background-color: darken(get-theme-color("red-color"), 5%);
-          }
-        }
-
-        &.follow-button {
-          background-color: get-theme-color("secondary-color");
-          color: get-theme-color("text-quaternary");
-
-          &:hover {
-            background-color: darken(get-theme-color("secondary-color"), 5%);
-          }
-        }
-
-        &.unfollow-button {
-          background-color: get-theme-color("background-color-light");
-          color: get-theme-color("text-primary");
-
-          &:hover {
-            background-color: darken(get-theme-color("background-color-light"), 5%);
-          }
-        }
-
-        &:disabled {
-          opacity: 0.7;
-          cursor: not-allowed;
-        }
-      }
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1rem;
+      padding: 0.5rem 0;
     }
   }
 
@@ -198,9 +100,12 @@
     text-align: center;
     padding: 3rem 1rem;
     color: get-theme-color("text-secondary");
+    background-color: get-theme-color("primary-color");
+    border-radius: 8px;
+    border: 1px solid get-theme-color("tertiary-color");
     
     p {
-      font-size: 1rem;
+      font-size: 0.875rem;
       margin-bottom: 1rem;
     }
   }
@@ -217,6 +122,10 @@
       animation: spin 1s linear infinite;
       font-size: 2rem;
       margin-bottom: 1rem;
+    }
+
+    p {
+      font-size: 0.875rem;
     }
   }
 }

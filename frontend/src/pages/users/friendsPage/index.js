@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../../contexts/AuthContext';
-import { FaUser, FaUserPlus, FaUserMinus, FaUsers, FaUserCheck, FaUserTimes, FaSpinner, FaExclamationTriangle } from 'react-icons/fa';
+import { FaUsers, FaUserPlus, FaUser, FaSpinner, FaExclamationTriangle } from 'react-icons/fa';
+import FriendCard from '../../../components/friendCard';
 import './style.scss';
 
 const FriendsPage = () => {
@@ -153,7 +154,7 @@ const FriendsPage = () => {
 
   // Handle sending a friend request
   const handleSendRequest = async (userId) => {
-    setActionLoading(prev => ({ ...prev, [`request_${userId}`]: true }));
+    setActionLoading(prev => ({ ...prev, [`add_${userId}`]: true }));
     
     try {
       const result = await sendFriendRequest(userId);
@@ -167,7 +168,7 @@ const FriendsPage = () => {
     } catch (err) {
       setError('Đã xảy ra lỗi. Vui lòng thử lại sau.');
     } finally {
-      setActionLoading(prev => ({ ...prev, [`request_${userId}`]: false }));
+      setActionLoading(prev => ({ ...prev, [`add_${userId}`]: false }));
       
       // Clear message after 3 seconds
       setTimeout(() => {
@@ -178,7 +179,7 @@ const FriendsPage = () => {
 
   // Handle accepting/declining a friend request
   const handleRequestResponse = async (requesterId, action) => {
-    setActionLoading(prev => ({ ...prev, [`respond_${requesterId}_${action}`]: true }));
+    setActionLoading(prev => ({ ...prev, [`${action}_${requesterId}`]: true }));
     
     try {
       const result = await respondToFriendRequest(requesterId, action);
@@ -192,7 +193,7 @@ const FriendsPage = () => {
     } catch (err) {
       setError('Đã xảy ra lỗi. Vui lòng thử lại sau.');
     } finally {
-      setActionLoading(prev => ({ ...prev, [`respond_${requesterId}_${action}`]: false }));
+      setActionLoading(prev => ({ ...prev, [`${action}_${requesterId}`]: false }));
       
       // Clear message after 3 seconds
       setTimeout(() => {
@@ -286,9 +287,7 @@ const FriendsPage = () => {
         <h1 className="page-title">Bạn bè & Người theo dõi</h1>
         
         {message && (
-          <div className="message success-message">
-            {message}
-          </div>
+          <div className="message success-message">{message}</div>
         )}
         
         {error && (
@@ -338,7 +337,6 @@ const FriendsPage = () => {
             </div>
           ) : (
             <>
-              {/* Friends Tab */}
               {activeTab === 'friends' && (
                 <div className="friends-list">
                   <h2>Danh sách bạn bè ({friends.length})</h2>
@@ -347,71 +345,27 @@ const FriendsPage = () => {
                       <p>Bạn chưa có người bạn nào. Hãy tìm và kết bạn với mọi người!</p>
                     </div>
                   ) : (
-                    <div className="user-cards">
+                    <div className="cards-grid">
                       {friends.map(friend => (
-                        <div key={friend.id} className="user-card">
-                          <div className="user-avatar">
-                            {friend.avatar ? (
-                              <img src={friend.avatar} alt={friend.fullName} />
-                            ) : (
-                              <image src='upload/images/default-avatar.jpg' alt={friend.fullName}></image>
-                            )}
-                          </div>
-                          <div className="user-info">
-                            <h3>{friend.fullName}</h3>
-                            <p className="username">@{friend.username}</p>
-                            {friend.bio && <p className="bio">{friend.bio}</p>}
-                          </div>
-                          <div className="user-actions">
-                            <button 
-                              className="action-button remove-button"
-                              onClick={() => handleRemoveFriend(friend.id)}
-                              disabled={actionLoading[`remove_${friend.id}`]}
-                            >
-                              {actionLoading[`remove_${friend.id}`] ? (
-                                <FaSpinner className="spinner" />
-                              ) : (
-                                <FaUserMinus className="action-icon" />
-                              )}
-                              Hủy kết bạn
-                            </button>
-                            
-                            {!isUserFollowed(friend.id) ? (
-                              <button 
-                                className="action-button follow-button"
-                                onClick={() => handleFollowToggle(friend.id, false)}
-                                disabled={actionLoading[`follow_${friend.id}`]}
-                              >
-                                {actionLoading[`follow_${friend.id}`] ? (
-                                  <FaSpinner className="spinner" />
-                                ) : (
-                                  <FaUser className="action-icon" />
-                                )}
-                                Theo dõi
-                              </button>
-                            ) : (
-                              <button 
-                                className="action-button unfollow-button"
-                                onClick={() => handleFollowToggle(friend.id, true)}
-                                disabled={actionLoading[`follow_${friend.id}`]}
-                              >
-                                {actionLoading[`follow_${friend.id}`] ? (
-                                  <FaSpinner className="spinner" />
-                                ) : (
-                                  <FaUserTimes className="action-icon" />
-                                )}
-                                Bỏ theo dõi
-                              </button>
-                            )}
-                          </div>
-                        </div>
+                        <FriendCard
+                          key={friend.id}
+                          user={friend}
+                          type="friend"
+                          isFollowing={isUserFollowed(friend.id)}
+                          onRemove={() => handleRemoveFriend(friend.id)}
+                          onFollow={() => handleFollowToggle(friend.id, false)}
+                          onUnfollow={() => handleFollowToggle(friend.id, true)}
+                          loading={{
+                            remove: actionLoading[`remove_${friend.id}`],
+                            follow: actionLoading[`follow_${friend.id}`]
+                          }}
+                        />
                       ))}
                     </div>
                   )}
                 </div>
               )}
-              
-              {/* Friend Requests Tab */}
+
               {activeTab === 'requests' && (
                 <div className="requests-list">
                   <h2>Lời mời kết bạn ({pendingRequests.length})</h2>
@@ -420,55 +374,28 @@ const FriendsPage = () => {
                       <p>Không có lời mời kết bạn nào.</p>
                     </div>
                   ) : (
-                    <div className="user-cards">
+                    <div className="cards-grid">
                       {pendingRequests.map(request => (
-                        <div key={request.id} className="user-card">
-                          <div className="user-avatar">
-                            {request.requester.avatar ? (
-                              <img src={request.requester.avatar} alt={request.requester.fullName} />
-                            ) : (
-                              <image src='upload/images/default-avatar.jpg' alt={request.requester.fullName}></image>
-                            )}
-                          </div>
-                          <div className="user-info">
-                            <h3>{request.requester.fullName}</h3>
-                            <p className="username">@{request.requester.username}</p>
-                            <p className="request-time">Đã gửi lời mời: {new Date(request.createdAt).toLocaleDateString()}</p>
-                          </div>
-                          <div className="user-actions">
-                            <button 
-                              className="action-button accept-button"
-                              onClick={() => handleRequestResponse(request.requester.id, 'accept')}
-                              disabled={actionLoading[`respond_${request.requester.id}_accept`]}
-                            >
-                              {actionLoading[`respond_${request.requester.id}_accept`] ? (
-                                <FaSpinner className="spinner" />
-                              ) : (
-                                <FaUserCheck className="action-icon" />
-                              )}
-                              Chấp nhận
-                            </button>
-                            <button 
-                              className="action-button reject-button"
-                              onClick={() => handleRequestResponse(request.requester.id, 'decline')}
-                              disabled={actionLoading[`respond_${request.requester.id}_decline`]}
-                            >
-                              {actionLoading[`respond_${request.requester.id}_decline`] ? (
-                                <FaSpinner className="spinner" />
-                              ) : (
-                                <FaUserTimes className="action-icon" />
-                              )}
-                              Từ chối
-                            </button>
-                          </div>
-                        </div>
+                        <FriendCard
+                          key={request.id}
+                          user={{
+                            ...request.requester,
+                            createdAt: request.createdAt
+                          }}
+                          type="request"
+                          onAccept={() => handleRequestResponse(request.requester.id, 'accept')}
+                          onReject={() => handleRequestResponse(request.requester.id, 'reject')}
+                          loading={{
+                            accept: actionLoading[`accept_${request.requester.id}`],
+                            reject: actionLoading[`reject_${request.requester.id}`]
+                          }}
+                        />
                       ))}
                     </div>
                   )}
                 </div>
               )}
-              
-              {/* Followers Tab */}
+
               {activeTab === 'followers' && (
                 <div className="followers-list">
                   <h2>Người theo dõi ({followers.length})</h2>
@@ -477,73 +404,27 @@ const FriendsPage = () => {
                       <p>Chưa có ai theo dõi bạn.</p>
                     </div>
                   ) : (
-                    <div className="user-cards">
+                    <div className="cards-grid">
                       {followers.map(follower => (
-                        <div key={follower.id} className="user-card">
-                          <div className="user-avatar">
-                            {follower.avatar ? (
-                              <img src={follower.avatar} alt={follower.fullName} />
-                            ) : (
-                              <image src='upload/images/default-avatar.jpg' alt={follower.fullName}></image>
-                            )}
-                          </div>
-                          <div className="user-info">
-                            <h3>{follower.fullName}</h3>
-                            <p className="username">@{follower.username}</p>
-                            {follower.bio && <p className="bio">{follower.bio}</p>}
-                          </div>
-                          <div className="user-actions">
-                            {!isUserFriend(follower.id) && (
-                              <button 
-                                className="action-button add-button"
-                                onClick={() => handleSendRequest(follower.id)}
-                                disabled={actionLoading[`request_${follower.id}`]}
-                              >
-                                {actionLoading[`request_${follower.id}`] ? (
-                                  <FaSpinner className="spinner" />
-                                ) : (
-                                  <FaUserPlus className="action-icon" />
-                                )}
-                                Kết bạn
-                              </button>
-                            )}
-                            
-                            {!isUserFollowed(follower.id) ? (
-                              <button 
-                                className="action-button follow-button"
-                                onClick={() => handleFollowToggle(follower.id, false)}
-                                disabled={actionLoading[`follow_${follower.id}`]}
-                              >
-                                {actionLoading[`follow_${follower.id}`] ? (
-                                  <FaSpinner className="spinner" />
-                                ) : (
-                                  <FaUser className="action-icon" />
-                                )}
-                                Theo dõi lại
-                              </button>
-                            ) : (
-                              <button 
-                                className="action-button unfollow-button"
-                                onClick={() => handleFollowToggle(follower.id, true)}
-                                disabled={actionLoading[`follow_${follower.id}`]}
-                              >
-                                {actionLoading[`follow_${follower.id}`] ? (
-                                  <FaSpinner className="spinner" />
-                                ) : (
-                                  <FaUserTimes className="action-icon" />
-                                )}
-                                Bỏ theo dõi
-                              </button>
-                            )}
-                          </div>
-                        </div>
+                        <FriendCard
+                          key={follower.id}
+                          user={follower}
+                          type="follower"
+                          isFollowing={isUserFollowed(follower.id)}
+                          onAdd={() => handleSendRequest(follower.id)}
+                          onFollow={() => handleFollowToggle(follower.id, false)}
+                          onUnfollow={() => handleFollowToggle(follower.id, true)}
+                          loading={{
+                            add: actionLoading[`add_${follower.id}`],
+                            follow: actionLoading[`follow_${follower.id}`]
+                          }}
+                        />
                       ))}
                     </div>
                   )}
                 </div>
               )}
-              
-              {/* Following Tab */}
+
               {activeTab === 'following' && (
                 <div className="following-list">
                   <h2>Đang theo dõi ({following.length})</h2>
@@ -552,59 +433,25 @@ const FriendsPage = () => {
                       <p>Bạn chưa theo dõi ai.</p>
                     </div>
                   ) : (
-                    <div className="user-cards">
+                    <div className="cards-grid">
                       {following.map(followedUser => (
-                        <div key={followedUser.id} className="user-card">
-                          <div className="user-avatar">
-                            {followedUser.avatar ? (
-                              <img src={followedUser.avatar} alt={followedUser.fullName} />
-                            ) : (
-                              <image src='upload/images/default-avatar.jpg' alt={followUser.fullName}></image>
-
-                            )}
-                          </div>
-                          <div className="user-info">
-                            <h3>{followedUser.fullName}</h3>
-                            <p className="username">@{followedUser.username}</p>
-                            {followedUser.bio && <p className="bio">{followedUser.bio}</p>}
-                          </div>
-                          <div className="user-actions">
-                            {!isUserFriend(followedUser.id) && (
-                              <button 
-                                className="action-button add-button"
-                                onClick={() => handleSendRequest(followedUser.id)}
-                                disabled={actionLoading[`request_${followedUser.id}`]}
-                              >
-                                {actionLoading[`request_${followedUser.id}`] ? (
-                                  <FaSpinner className="spinner" />
-                                ) : (
-                                  <FaUserPlus className="action-icon" />
-                                )}
-                                Kết bạn
-                              </button>
-                            )}
-                            
-                            <button 
-                              className="action-button unfollow-button"
-                              onClick={() => handleFollowToggle(followedUser.id, true)}
-                              disabled={actionLoading[`follow_${followedUser.id}`]}
-                            >
-                              {actionLoading[`follow_${followedUser.id}`] ? (
-                                <FaSpinner className="spinner" />
-                              ) : (
-                                <FaUserTimes className="action-icon" />
-                              )}
-                              Bỏ theo dõi
-                            </button>
-                          </div>
-                        </div>
+                        <FriendCard
+                          key={followedUser.id}
+                          user={followedUser}
+                          type="following"
+                          onAdd={() => handleSendRequest(followedUser.id)}
+                          onUnfollow={() => handleFollowToggle(followedUser.id, true)}
+                          loading={{
+                            add: actionLoading[`add_${followedUser.id}`],
+                            follow: actionLoading[`follow_${followedUser.id}`]
+                          }}
+                        />
                       ))}
                     </div>
                   )}
                 </div>
               )}
-              
-              {/* Suggestions Tab */}
+
               {activeTab === 'suggestions' && (
                 <div className="suggestions-list">
                   <h2>Gợi ý kết bạn</h2>
@@ -613,65 +460,21 @@ const FriendsPage = () => {
                       <p>Không có gợi ý kết bạn nào.</p>
                     </div>
                   ) : (
-                    <div className="user-cards">
+                    <div className="cards-grid">
                       {suggestedUsers.map(suggestedUser => (
-                        <div key={suggestedUser.id} className="user-card">
-                          <div className="user-avatar">
-                            {suggestedUser.avatar ? (
-                              <img src={suggestedUser.avatar} alt={suggestedUser.fullName} />
-                            ) : (
-                              <image src='upload/images/default-avatar.jpg' alt={suggestedUser.fullName}></image>
-                              
-                            )}
-                          </div>
-                          <div className="user-info">
-                            <h3>{suggestedUser.fullName}</h3>
-                            <p className="username">@{suggestedUser.username}</p>
-                            {suggestedUser.bio && <p className="bio">{suggestedUser.bio}</p>}
-                          </div>
-                          <div className="user-actions">
-                            <button 
-                              className="action-button add-button"
-                              onClick={() => handleSendRequest(suggestedUser.id)}
-                              disabled={actionLoading[`request_${suggestedUser.id}`]}
-                            >
-                              {actionLoading[`request_${suggestedUser.id}`] ? (
-                                  <FaSpinner className="spinner" />
-                                ) : (
-                                  <FaUserPlus className="action-icon" />
-                                )}
-                                Kết bạn
-                            </button>
-                            
-                            {!isUserFollowed(suggestedUser.id) ? (
-                              <button 
-                                className="action-button follow-button"
-                                onClick={() => handleFollowToggle(suggestedUser.id, false)}
-                                disabled={actionLoading[`follow_${suggestedUser.id}`]}
-                              >
-                                {actionLoading[`follow_${suggestedUser.id}`] ? (
-                                  <FaSpinner className="spinner" />
-                                ) : (
-                                  <FaUser className="action-icon" />
-                                )}
-                                Theo dõi
-                              </button>
-                            ) : (
-                              <button 
-                                className="action-button unfollow-button"
-                                onClick={() => handleFollowToggle(suggestedUser.id, true)}
-                                disabled={actionLoading[`follow_${suggestedUser.id}`]}
-                              >
-                                {actionLoading[`follow_${suggestedUser.id}`] ? (
-                                  <FaSpinner className="spinner" />
-                                ) : (
-                                  <FaUserTimes className="action-icon" />
-                                )}
-                                Bỏ theo dõi
-                              </button>
-                            )}
-                          </div>
-                        </div>
+                        <FriendCard
+                          key={suggestedUser.id}
+                          user={suggestedUser}
+                          type="suggestion"
+                          isFollowing={isUserFollowed(suggestedUser.id)}
+                          onAdd={() => handleSendRequest(suggestedUser.id)}
+                          onFollow={() => handleFollowToggle(suggestedUser.id, false)}
+                          onUnfollow={() => handleFollowToggle(suggestedUser.id, true)}
+                          loading={{
+                            add: actionLoading[`add_${suggestedUser.id}`],
+                            follow: actionLoading[`follow_${suggestedUser.id}`]
+                          }}
+                        />
                       ))}
                     </div>
                   )}
