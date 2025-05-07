@@ -12,21 +12,21 @@ const FriendsPage = () => {
       id: 'friend-1',
       fullName: 'Nguyễn Xuân Hải',
       username: 'xuanhai0913',
-      avatar: 'https://www.nxhai0913.me/static/media/profile.14372afd9cb0f5b2e012.png',
+      avatar: 'https://lh3.googleusercontent.com/pw/AP1GczPYLM35-ZSx0_Nu8IY_rIUa7plL7-5CIWK4cbMoaqRzdtVMeJ5tWVs3yJa8YZj9bncEtQBf9QNsHWCN9jgG6LN1edeEr2U9TRdX9HFKXjxJbkMbrjC0kXuh200DyFSOdlJf1TcndEP467Pm99bY34k6=w1262-h1682-s-no-gm?authuser=0',
       bio: 'Software Developer | Coffee Lover ☕'
     },
     {
       id: 'friend-2',
-      fullName: 'Hoàng Thị E',
+      fullName: 'Nguyễn Ngọc Trung',
       username: 'hoangthie',
-      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Lily&backgroundColor=ffdfbf',
+      avatar: 'https://lh3.googleusercontent.com/pw/AP1GczNiBVMccIzFJxP23SjuvBqgQg5z-5rjkeSz4PqICKJzVFjNJRdIcPgQI9XUyqmgMoQs9na274IHABeis59DGl6OygXkJGFynzT3bO8opuBPnzZTWz0fj0hb7GxxU_7GQrtwJvNoOpU2AJK8wymNfIAO=w1122-h1682-s-no-gm?authuser=0',
       bio: 'Digital Artist 🎨 | Cat Person 🐱'
     },
     {
       id: 'friend-3',
-      fullName: 'Trần Minh F',
+      fullName: 'Nguyễn Văn Thắng',
       username: 'tranminhf',
-      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Max&backgroundColor=c0aede',
+      avatar: 'https://lh3.googleusercontent.com/pw/AP1GczP8ZcGcyaU4nIrL6gaPWLU0UC-bykGJELJ2M8Kho1b1-jaHqh1Pxxm12zACPlfJrrNJAdPwZM03j-xDpDsWEiYcYdT0xMTlUwL1ufVjUlmX82H9N0BN44uYpV7JmF_LjG8daHoJKnbglPEteIBZ07MK=w1122-h1682-s-no-gm?authuser=0',
       bio: 'Travel Enthusiast ✈️ | Photographer 📸'
     }
   ]);

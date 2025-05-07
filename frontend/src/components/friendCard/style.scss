@@ -4,24 +4,28 @@
 
 .friend-card {
   background-color: get-theme-color("primary-color");
-  border-radius: 8px;
+  border-radius: 10px;
   padding: 1rem;
   display: flex;
-  gap: 1rem;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.75rem;
   border: 1px solid get-theme-color("tertiary-color");
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  aspect-ratio: 1/1;
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   }
 
   .avatar {
-    flex-shrink: 0;
-    width: 60px;
-    height: 60px;
+    width: 90px;
+    height: 90px;
     border-radius: 50%;
     overflow: hidden;
+    border: 2px solid get-theme-color("tertiary-color");
 
     img {
       width: 100%;
@@ -33,6 +37,10 @@
   .info {
     flex: 1;
     min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 
     h3 {
       color: get-theme-color("text-primary");
@@ -42,23 +50,26 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      max-width: 100%;
     }
 
     .username {
       color: get-theme-color("text-secondary");
-      font-size: 0.875rem;
-      margin-bottom: 0.25rem;
+      font-size: 0.8125rem;
+      margin-bottom: 0.375rem;
     }
 
     .bio {
       color: get-theme-color("text-secondary");
       font-size: 0.75rem;
-      line-height: 1.4;
+      line-height: 1.3;
       display: -webkit-box;
       -webkit-line-clamp: 2;
       line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
+      max-width: 100%;
+      margin-bottom: 0.375rem;
     }
 
     .request-time {
@@ -69,26 +80,28 @@
   }
 
   .actions {
+    width: 100%;
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
-    justify-content: center;
+    gap: 0.375rem;
+    margin-top: auto;
 
     .action-button {
       display: flex;
       align-items: center;
-      gap: 0.25rem;
+      justify-content: center;
+      gap: 0.375rem;
       padding: 0.5rem;
       border-radius: 6px;
       border: none;
       cursor: pointer;
-      font-size: 0.875rem;
+      font-size: 0.8125rem;
       font-weight: $font-weight-medium;
       transition: all 0.2s ease;
-      white-space: nowrap;
+      width: 100%;
 
       svg {
-        font-size: 1rem;
+        font-size: 0.875rem;
       }
 
       &.add-button {
@@ -121,6 +134,7 @@
       &.unfollow-button {
         background-color: get-theme-color("background-color-light");
         color: get-theme-color("text-primary");
+        border: 1px solid get-theme-color("tertiary-color");
 
         &:hover:not(:disabled) {
           background-color: darken(get-theme-color("background-color-light"), 5%);
