@@ -9,10 +9,11 @@ import { IoNotifications } from "react-icons/io5";
 import { TbMessageCircleFilled } from "react-icons/tb";
 import './style.scss';
 import HeaderPopup from './modals/PopupUser';
+import AvatarUser from '../../components/avatarUser';
 
 const Header = () => {
     const [activePopup, setActivePopup] = useState(null); // 'user', 'noti', 'mess'
-    const [user, setUser] = useState({ userName: 'Văn Thắng', avatar: null });
+    const [user, setUser] = useState({ userName: 'Văn Thắng', avatar: 'cld-sample-5.jpg' });
     const [menus, setMenus] = useState([]);
     const iconGroupRef = useRef(null);
     const role = sessionStorage.getItem('role');
@@ -111,15 +112,11 @@ const Header = () => {
                         </div>
                         <div className="header__icon" onClick={() => setActivePopup(activePopup === 'user' ? null : 'user')}>
                             <div className="header__avatar">
-                                <img
-                                    src={user.avatar || '/Uploads/images/default_avatar.png'}
-                                    alt="Avatar"
-                                    className="header__avatar-image"
-                                />
-                                <span className="header__icon-badge header__avatar-badge">
-                                    {activePopup === 'user' ? <FaCaretUp /> : <FaCaretDown />}
-                                </span>
+                                <AvatarUser user={user} />
                             </div>
+                            <span className="header__icon-badge header__avatar-badge">
+                                {activePopup === 'user' ? <FaCaretUp /> : <FaCaretDown />}
+                            </span>
                         </div>
                         {activePopup && (
                             <HeaderPopup type={activePopup} user={user} onClose={() => setActivePopup(null)} />

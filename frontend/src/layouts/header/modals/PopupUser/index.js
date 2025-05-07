@@ -11,6 +11,7 @@ import { Link } from 'react-router-dom';
 import useLogout from '../../../../hooks/useLogout';
 import { ROUTERS } from '../../../../utils/router';
 import './style.scss';
+import AvatarUser from '../../../../components/avatarUser';
 
 export const HeaderPopup = ({ type, user, onClose }) => {
     const logout = useLogout();
@@ -19,22 +20,22 @@ export const HeaderPopup = ({ type, user, onClose }) => {
         {
             icon: <FaCog />,
             label: 'Cài đặt & quyền riêng tư',
-            onClick: () => {},
+            onClick: () => { },
         },
         {
             icon: <FaQuestionCircle />,
             label: 'Trợ giúp & hỗ trợ',
-            onClick: () => {},
+            onClick: () => { },
         },
         {
             icon: <FaMoon />,
             label: 'Màn hình & trợ năng',
-            onClick: () => {},
+            onClick: () => { },
         },
         {
             icon: <FaCommentDots />,
             label: 'Đóng góp ý kiến',
-            onClick: () => {},
+            onClick: () => { },
         },
         {
             icon: <FaSignOutAlt />,
@@ -56,11 +57,9 @@ export const HeaderPopup = ({ type, user, onClose }) => {
                             className="header-popup__user-info"
                             onClick={onClose}
                         >
-                            <img
-                                src={user.avatar || '/Uploads/images/default_avatar.png'}
-                                alt="Avatar"
-                                className="header-popup__avatar"
-                            />
+                            <div className="header-popup__avatar">
+                                <AvatarUser user={user} />
+                            </div>
                             <span className="header-popup__username">{user.userName}</span>
                         </Link>
                     </header>

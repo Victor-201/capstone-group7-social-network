@@ -7,11 +7,16 @@ import AddFriendCard, { AddFriendSuggestion } from '../../../components/addFrien
 import './style.scss';
 
 const HomePage = () => {
-  return{
+  return (
     //làm các thẻ div chứa các compoent
     //1 thẻ div chứa compoent createpost
     //2 thẻ div chuas list compoent post (ở trong list post chứa list addFriendCard random trong 10 bài viết đầu tiên sẽ xuất hiệnhiện)
-  }
+    <div className="container">
+      <div className='home-page'>
+        
+      </div>
+    </div>
+  );
 };
 
 export default HomePage;
