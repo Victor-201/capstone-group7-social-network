@@ -3,9 +3,16 @@ import cloudinary from '../config/cloudinaryConfig.js';
 export const removeMedia = async (req, res) => {
     const id = req.params.id;
     try {
-      const results = await cloudinary.uploader.destroy(`uploads/${id}`);
+      let results = await cloudinary.uploader.destroy(`uploads/${id}`,{
+        resource_type: 'image',
+      });
       if (results.result === 'not found') {
-        throw new Error('Delete failed: Media not found');
+        results = await cloudinary.uploader.destroy(`uploads/${id}`,{
+          resource_type: 'video'
+        });
+      }
+      if (results.result !== 'ok') {
+        throw new Error('Media not found');
       }
       return res.status(200).json({ message: 'Deleted successfully', public_id: id});
     } catch (error) {
