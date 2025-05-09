@@ -1,12 +1,12 @@
 import { useState } from "react";
-import CreatePost from "../../../../../components/createPost"; 
+import CreatePost from "../../../../../components/createPost";
 import PostCard from "../../../../../components/postCard";
 import photo1Image from "../../../../../assets/images/logo192.png";
 import photo2Image from "../../../../../assets/images/logo192.png";
 import friend1Image from "../../../../../assets/images/logo192.png";
-import { FaBriefcase, FaHome as FaHomeAddress, FaHeart } from "react-icons/fa";  
-import { IoIosSchool, IoIosLocate } from "react-icons/io"; 
-
+import { FaBriefcase, FaHome as FaHomeAddress, FaHeart } from "react-icons/fa";
+import { IoIosSchool, IoIosLocate } from "react-icons/io";
+import { FiX, FiPlus, FiEdit2 } from "react-icons/fi";
 import "./style.scss";
 
 const PostsTab = () => {
@@ -46,6 +46,8 @@ const PostsTab = () => {
     },
   ]);
 
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
   const handleLike = (postId) => {
     setPosts((prevPosts) =>
       prevPosts.map((post) =>
@@ -61,7 +63,16 @@ const PostsTab = () => {
   };
 
   const handleEditAction = (action) => {
-    alert(`Tính năng ${action} đang được phát triển!`);
+    if (action === "chỉnh sửa chi tiết") {
+      setIsEditModalOpen(true);
+    } else {
+      alert(`Tính năng ${action} đang được phát triển!`);
+    }
+  };
+
+  const handleSaveDetails = () => {
+    setIsEditModalOpen(false);
+    alert("Tính năng chỉnh sửa trang cá nhân đang được phát triển!");
   };
 
   const friendImages = [friend1Image];
@@ -147,6 +158,125 @@ const PostsTab = () => {
           </div>
         </div>
       </div>
+
+      {isEditModalOpen && (
+        <div className="edit-details-modal">
+          <div className="edit-details-modal__content">
+            <div className="edit-details-modal__header">
+              <h2>Chỉnh sửa chi tiết</h2>
+              <button
+                className="edit-details-modal__close"
+                onClick={() => setIsEditModalOpen(false)}
+              >
+                <FiX />
+              </button>
+            </div>
+            <div className="edit-details-modal__body">
+              <div className="edit-details-modal__section">
+                <div className="edit-details-modal__category">
+                  <span>Công việc</span>
+                  <div className="edit-details-modal__category-actions">
+                    <button className="edit-details-modal__add-btn">
+                      <FiPlus />
+                    </button>
+                  </div>
+                </div>
+                <div className="edit-details-modal__item">
+                  <label className="switch">
+                    <input type="checkbox" defaultChecked />
+                    <span className="slider"></span>
+                  </label>
+                  <span>Làm việc tại Trường THPT Hàm Nghi</span>
+                  <button className="edit-details-modal__edit-btn">
+                    <FiEdit2 />
+                  </button>
+                </div>
+              </div>
+              <div className="edit-details-modal__section">
+                <div className="edit-details-modal__category">
+                  <span>Học vấn</span>
+                  <div className="edit-details-modal__category-actions">
+                    <button className="edit-details-modal__add-btn">
+                      <FiPlus />
+                    </button>
+                  </div>
+                </div>
+                <div className="edit-details-modal__item">
+                  <label className="switch">
+                    <input type="checkbox" />
+                    <span className="slider"></span>
+                  </label>
+                  <span>Làm việc tại Trường THPT Hàm Nghi</span>
+                  <button className="edit-details-modal__edit-btn">
+                    <FiEdit2 />
+                  </button>
+                </div>
+              </div>
+              <div className="edit-details-modal__section">
+                <div className="edit-details-modal__category">
+                  <span>Hiện tại</span>
+                  <div className="edit-details-modal__category-actions">
+                    <button className="edit-details-modal__add-btn">
+                      <FiPlus />
+                    </button>
+                  </div>
+                </div>
+                <div className="edit-details-modal__item">
+                  <label className="switch">
+                    <input type="checkbox" defaultChecked />
+                    <span className="slider"></span>
+                  </label>
+                  <span>Đang ở tại Trường THPT Hàm Nghi</span>
+                  <button className="edit-details-modal__edit-btn">
+                    <FiEdit2 />
+                  </button>
+                </div>
+                <div className="edit-details-modal__item">
+                  <label className="switch">
+                    <input type="checkbox" />
+                    <span className="slider"></span>
+                  </label>
+                  <span>Thêm trường học</span>
+                  <button className="edit-details-modal__edit-btn">
+                    <FiEdit2 />
+                  </button>
+                </div>
+              </div>
+              <div className="edit-details-modal__section">
+                <div className="edit-details-modal__category">
+                  <span>Thông tin bổ sung</span>
+                  <div className="edit-details-modal__category-actions">
+                    <button className="edit-details-modal__add-btn">
+                      <FiPlus />
+                    </button>
+                  </div>
+                </div>
+                <div className="edit-details-modal__item">
+                  <label className="switch">
+                    <input type="checkbox" />
+                    <span className="slider"></span>
+                  </label>
+                  <span>Đang làm việc tại Hà Nội</span>
+                  <button className="edit-details-modal__edit-btn">
+                    <FiEdit2 />
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div className="edit-details-modal__footer">
+              <button
+                className="btn btn--secondary"
+                onClick={() => setIsEditModalOpen(false)}
+              >
+                Hủy
+              </button>
+              <button className="btn btn--primary" onClick={handleSaveDetails}>
+                Lưu
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 };
