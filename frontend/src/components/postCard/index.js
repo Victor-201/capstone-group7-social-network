@@ -8,7 +8,7 @@ import { ImAttachment } from "react-icons/im"; // Đúng thư viện 'im'
 import { HiOutlineDocumentText } from "react-icons/hi"; // Đúng thư viện 'hi'
 import "./style.scss";
 
-const Post = ({ post, handleLike,user }) => {
+const Post = ({ post, handleLike, user }) => {
   
   return (
     <div className="post">

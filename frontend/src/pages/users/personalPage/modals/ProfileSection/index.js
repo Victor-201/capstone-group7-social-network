@@ -6,8 +6,8 @@ import coverImage from "../../../../../assets/images/logo192.png";
 import friend1Image from "../../../../../assets/images/logo192.png";
 import "./style.scss";
 
-const ProfileSection = ({ tabsRef, activeTab, handleTabClick,user }) => {
-  
+const ProfileSection = ({ tabsRef, activeTab, handleTabClick, user }) => {
+
   const handleEditAction = (action) => {
     alert(`Tính năng ${action} đang được phát triển!`);
   };
@@ -52,7 +52,9 @@ const ProfileSection = ({ tabsRef, activeTab, handleTabClick,user }) => {
             <span>1.5K bạn bè</span>
             <div className="profile__friends-avatars">
               {friendImages.map((friendImage, index) => (
-                <img key={index} src={friendImage} alt="Friend" />
+                <div key={index} className="avatar-image">
+                  <AvatarUser user={user} />
+                </div>
               ))}
             </div>
           </div>

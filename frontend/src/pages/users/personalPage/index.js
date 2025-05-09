@@ -5,7 +5,14 @@ import AboutTab from "./modals/AboutTab";
 import "./style.scss";
 
 const PersonalPage = () => {
-  const [user, setUser] = useState({ userName: 'Văn Thắng', avatar: 'cld-sample-5.jpg' });
+  const user = {
+    userName: "Văn Thắng",
+    avatar: "cld-sample-5.jpg",
+    cover: "cld-sample-4.jpg",
+    friends: 100,
+    followers: 200,
+    following: 300,
+  };
   const [activeTab, setActiveTab] = useState("posts");
   const tabsRef = useRef(null);
 

@@ -4,12 +4,20 @@ import { useCloudinaryFile } from "../../hooks/useCloudinaryFile";
 
 
 export const AvatarUser = ({ user }) => {
-  const fileUrl = `https://res.cloudinary.com/victor201/image/upload/${user.avatar}`;
+  const fileUrl = user?.avatar
+    ? `https://res.cloudinary.com/victor201/image/upload/${user.avatar}`
+    : null;
+
   const BlobUrl = useCloudinaryFile(fileUrl);
 
   return (
-    <img src={BlobUrl || avatarDefault} alt="avatar" className="avatar-user"/>
+    <img
+      src={BlobUrl || avatarDefault}
+      alt="avatar"
+      className="avatar-user"
+    />
   );
 };
 
 export default AvatarUser;
+

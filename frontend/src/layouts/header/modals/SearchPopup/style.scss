@@ -1,0 +1,16 @@
+@import "../../../../styles/pages/theme.scss";
+
+.popup__search {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  width: 400px;
+  height: 300px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  padding: 15px;
+  box-sizing: border-box;
+  z-index: 1000;
+}
