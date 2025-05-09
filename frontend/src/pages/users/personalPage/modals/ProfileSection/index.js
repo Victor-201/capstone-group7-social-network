@@ -1,11 +1,13 @@
+import React, { useState } from "react";
 import { FiPlus, FiUsers, FiEdit, FiCheckCircle, FiMoreHorizontal } from "react-icons/fi";
 import { BsCameraFill } from "react-icons/bs";
-import avatarImage from "../../../../../assets/images/logo192.png";
+import AvatarUser from "../../../../../components/avatarUser";
 import coverImage from "../../../../../assets/images/logo192.png";
 import friend1Image from "../../../../../assets/images/logo192.png";
 import "./style.scss";
 
-const ProfileSection = ({ tabsRef, activeTab, handleTabClick }) => {
+const ProfileSection = ({ tabsRef, activeTab, handleTabClick,user }) => {
+  
   const handleEditAction = (action) => {
     alert(`Tính năng ${action} đang được phát triển!`);
   };
@@ -27,7 +29,9 @@ const ProfileSection = ({ tabsRef, activeTab, handleTabClick }) => {
       <div className="profile__main">
         <div className="profile__avatar-container">
           <div className="profile__avatar-wrapper">
-            <img src={avatarImage} alt="Avatar" className="profile__avatar" />
+            <div className="profile__avatar-image">
+              <AvatarUser user={user} />
+            </div>
             <div
               className="profile__edit-avatar-overlay"
               onClick={() => handleEditAction("thay đổi ảnh đại diện")}
@@ -70,7 +74,7 @@ const ProfileSection = ({ tabsRef, activeTab, handleTabClick }) => {
           </div>
         </div>
       </div>
-      <div className="tabs" ref={tabsRef}> 
+      <div className="tabs" ref={tabsRef}>
         <nav className="tabs__nav">
           <ul>
             {[

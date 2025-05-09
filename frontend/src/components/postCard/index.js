@@ -1,5 +1,6 @@
-import avatarImage from "../../assets/images/logo192.png";
+
 import { AiFillLike, AiOutlineLike, AiFillHeart } from "react-icons/ai"; // Đúng thư viện 'ai'
+import AvatarUser from "../avatarUser";
 import { BiComment, BiShare, BiSmile } from "react-icons/bi"; // Đúng thư viện 'bi'
 import { BsThreeDots, BsCameraFill } from "react-icons/bs"; // Đúng thư viện 'bs'
 import { FaGlobe } from "react-icons/fa"; // Đúng thư viện 'fa'
@@ -7,12 +8,15 @@ import { ImAttachment } from "react-icons/im"; // Đúng thư viện 'im'
 import { HiOutlineDocumentText } from "react-icons/hi"; // Đúng thư viện 'hi'
 import "./style.scss";
 
-const Post = ({ post, handleLike }) => {
+const Post = ({ post, handleLike,user }) => {
+  
   return (
     <div className="post">
       <div className="post__header">
         <div className="post__author">
-          <img src={avatarImage} alt="Author" className="post__avatar" />
+         <div className="post__avatar">
+            <AvatarUser user={user} />
+          </div>
           <div className="post__info">
             <h4 className="post__author-name">{post.author}</h4>
             <div className="post__meta">
@@ -69,7 +73,9 @@ const Post = ({ post, handleLike }) => {
       </div>
       <div className="post__comments">
         <div className="comment">
-          <img src={avatarImage} alt="Avatar" className="comment__avatar" />
+          <div className="comment__avatar">
+            <AvatarUser user={user} />
+          </div>
           <div className="comment__box">
             <input type="text" placeholder="Viết bình luận..." />
             <div className="comment__actions">

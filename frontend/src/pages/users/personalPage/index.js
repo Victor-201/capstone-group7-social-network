@@ -5,8 +5,10 @@ import AboutTab from "./modals/AboutTab";
 import "./style.scss";
 
 const PersonalPage = () => {
+  const [user, setUser] = useState({ userName: 'Văn Thắng', avatar: 'cld-sample-5.jpg' });
   const [activeTab, setActiveTab] = useState("posts");
   const tabsRef = useRef(null);
+
 
   const handleTabClick = (tabId) => {
     setActiveTab(tabId);
@@ -33,10 +35,10 @@ const PersonalPage = () => {
     <div className="container">
       <article className="personal-page">
         <main className="main">
-          <ProfileSection tabsRef={tabsRef} activeTab={activeTab} handleTabClick={handleTabClick} />
+          <ProfileSection tabsRef={tabsRef} activeTab={activeTab} handleTabClick={handleTabClick} user={user} />
           <div className="tab-contents">
-            {activeTab === "posts" && <PostsTab />}
-            {activeTab === "about" && <AboutTab />}
+            {activeTab === "posts" && <PostsTab user={user}/>}
+            {activeTab === "about" && <AboutTab  />}
           </div>
         </main>
       </article>

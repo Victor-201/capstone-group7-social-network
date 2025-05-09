@@ -69,22 +69,27 @@
     height: 100%;
   }
 
-  &__avatar {
+  &__avatar-image {
     width: 100%;
     height: 100%;
     border-radius: 50%;
-    border: 4px solid #fdfdfd; // primary-color
-    object-fit: cover;
+    overflow: hidden;
+    display: block;
+
+
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   }
 
   &__edit-avatar-overlay {
     position: absolute;
+    width: 20px;
+    height: 20px;
     bottom: 8px;
     right: 8px;
     background-color: #91bea0; // secondary-color
     border-radius: 50%;
     padding: 10px;
+    aspect-ratio: 1/1;
     cursor: pointer;
     border: 2px solid #fdfdfd; // primary-color
     transition: background-color 0.2s ease;
@@ -317,3 +322,4 @@
     }
   }
 }
+ 

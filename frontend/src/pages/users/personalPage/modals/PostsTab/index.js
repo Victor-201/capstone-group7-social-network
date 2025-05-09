@@ -9,7 +9,7 @@ import { IoIosSchool, IoIosLocate } from "react-icons/io";
 import { FiX, FiPlus, FiEdit2 } from "react-icons/fi";
 import "./style.scss";
 
-const PostsTab = () => {
+const PostsTab = ({user}) => {
   const [posts, setPosts] = useState([
     {
       id: 1,
@@ -146,13 +146,13 @@ const PostsTab = () => {
         </div>
 
         <div className="content__main">
-          <CreatePost />
+          <CreatePost user={user} />
           <div className="posts">
             {posts.length === 0 ? (
               <p>Chưa có bài đăng nào</p>
             ) : (
               posts.map((post) => (
-                <PostCard key={post.id} post={post} handleLike={handleLike} />
+                <PostCard key={post.id} post={post} handleLike={handleLike} user={user}/>
               ))
             )}
           </div>
