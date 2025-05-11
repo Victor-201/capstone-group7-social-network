@@ -1,5 +1,6 @@
 import React from 'react';
 import { FaSpinner, FaEllipsisH } from 'react-icons/fa';
+import AvatarUser from '../avatarUser';
 import "./style.scss";
 
 // Themed icon component for FriendCard
@@ -104,11 +105,7 @@ const FriendCard = ({
   return (
     <div className="friend-card">
       <div className="avatar">
-        {user.avatar ? (
-          <img src={user.avatar} alt={user.fullName} />
-        ) : (
-          <img src="upload/images/default-avatar.jpg" alt={user.fullName} />
-        )}
+        <AvatarUser user={user} />
       </div>
       <div className="info">
         <h3>{user.fullName}</h3>

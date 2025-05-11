@@ -19,21 +19,21 @@ const FriendsPage = () => {
       id: 'friend-1',
       fullName: 'Nguyễn Xuân Hải',
       username: 'xuanhai0913',
-      avatar: 'https://lh3.googleusercontent.com/pw/AP1GczPYLM35-ZSx0_Nu8IY_rIUa7plL7-5CIWK4cbMoaqRzdtVMeJ5tWVs3yJa8YZj9bncEtQBf9QNsHWCN9jgG6LN1edeEr2U9TRdX9HFKXjxJbkMbrjC0kXuh200DyFSOdlJf1TcndEP467Pm99bY34k6=w1262-h1682-s-no-gm?authuser=0',
+      avatar: 'v1652278394/user_avatars/friend_1.jpg',
       bio: 'Software Developer | Coffee Lover ☕'
     },
     {
       id: 'friend-2',
       fullName: 'Nguyễn Ngọc Trung',
       username: 'hoangthie',
-      avatar: 'https://lh3.googleusercontent.com/pw/AP1GczNiBVMccIzFJxP23SjuvBqgQg5z-5rjkeSz4PqICKJzVFjNJRdIcPgQI9XUyqmgMoQs9na274IHABeis59DGl6OygXkJGFynzT3bO8opuBPnzZTWz0fj0hb7GxxU_7GQrtwJvNoOpU2AJK8wymNfIAO=w1122-h1682-s-no-gm?authuser=0',
+      avatar: 'v1652278394/user_avatars/friend_2.jpg',
       bio: 'Digital Artist 🎨 | Cat Person 🐱'
     },
     {
       id: 'friend-3',
       fullName: 'Nguyễn Văn Thắng',
       username: 'tranminhf',
-      avatar: 'https://lh3.googleusercontent.com/pw/AP1GczP8ZcGcyaU4nIrL6gaPWLU0UC-bykGJELJ2M8Kho1b1-jaHqh1Pxxm12zACPlfJrrNJAdPwZM03j-xDpDsWEiYcYdT0xMTlUwL1ufVjUlmX82H9N0BN44uYpV7JmF_LjG8daHoJKnbglPEteIBZ07MK=w1122-h1682-s-no-gm?authuser=0',
+      avatar: 'v1652278394/user_avatars/friend_3.jpg',
       bio: 'Travel Enthusiast ✈️ | Photographer 📸'
     }
   ]);
@@ -44,7 +44,7 @@ const FriendsPage = () => {
         id: 'requester-1',
         fullName: 'Đỗ Văn G',
         username: 'dovang',
-        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Charlie&backgroundColor=b6e3f4',
+        avatar: 'v1652278394/user_avatars/requester_1.jpg',
       },
       createdAt: new Date().toISOString()
     },
@@ -54,7 +54,7 @@ const FriendsPage = () => {
         id: 'requester-2',
         fullName: 'Vũ Thị H',
         username: 'vuthih',
-        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sophie&backgroundColor=ffdfbf',
+        avatar: 'v1652278394/user_avatars/requester_2.jpg',
       },
       createdAt: new Date(Date.now() - 86400000).toISOString()
     }
@@ -64,14 +64,14 @@ const FriendsPage = () => {
       id: 'follower-1',
       fullName: 'Ngô Văn I',
       username: 'ngovani',
-      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Oliver&backgroundColor=c0aede',
+      avatar: 'v1652278394/user_avatars/follower_1.jpg',
       bio: 'Music Producer 🎵 | Guitar Player 🎸'
     },
     {
       id: 'follower-2',
       fullName: 'Lê Thị K',
       username: 'lethik',
-      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Luna&backgroundColor=ffdfbf',
+      avatar: 'v1652278394/user_avatars/follower_2.jpg',
       bio: 'Food Blogger 🍜 | Chef 👩‍🍳'
     }
   ]);
@@ -80,14 +80,14 @@ const FriendsPage = () => {
       id: 'following-1',
       fullName: 'Trịnh Thị L',
       username: 'trinhthi',
-      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Emma&backgroundColor=b6e3f4',
+      avatar: 'v1652278394/user_avatars/following_1.jpg',
       bio: 'Fashion Designer 👗 | Travel Lover ✈️'
     },
     {
       id: 'following-2',
       fullName: 'Đặng Văn M',
       username: 'dangvanm',
-      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Lucas&backgroundColor=c0aede',
+      avatar: 'v1652278394/user_avatars/following_2.jpg',
       bio: 'Tech Enthusiast 💻 | Gamer 🎮'
     }
   ]);
