@@ -1,0 +1,85 @@
+@import '../../../../../styles/pages/theme';
+
+.friends-sidebar {
+  width: 100%;
+  border-radius: 8px;
+  background-color: get-theme-color("primary-color");
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  padding: 8px 0; /* Giảm padding từ 12px xuống 8px */
+
+  .sidebar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 12px 12px;
+    margin-bottom: 2px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+
+    h3 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: get-theme-color("text-primary");
+      margin: 0;
+    }
+
+    .settings-button {
+      background: get-theme-color("background-color-light");
+      border: none;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: get-theme-color("text-primary");
+      transition: background 0.2s ease;
+
+      &:hover {
+        background: darken(get-theme-color("background-color-light"), 5%);
+      }
+    }
+  }
+
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    li {
+      padding: 6px 12px; /* Giảm padding để nén sidebar lại */
+      cursor: pointer;
+      border-radius: 6px;
+      margin: 2px 8px;
+      color: get-theme-color("text-primary");
+      font-weight: 500;
+      font-size: 0.95rem;
+      transition: background 0.2s ease;
+      display: flex;
+      align-items: center;
+
+      .icon {
+        margin-right: 12px;
+        color: get-theme-color("tertiary-color");
+        display: flex;
+        align-items: center;
+        font-size: 1.2rem;
+      }
+
+      &.active {
+        background-color: rgba(get-theme-color("tertiary-color"), 0.1);
+        color: get-theme-color("tertiary-color");
+        font-weight: 600;
+
+        .icon {
+          color: get-theme-color("tertiary-color");
+        }
+      }
+
+      &:hover:not(.active) {
+        background-color: get-theme-color("background-color-light");
+      }
+    }
+  }
+}

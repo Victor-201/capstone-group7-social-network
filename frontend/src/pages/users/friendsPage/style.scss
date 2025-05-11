@@ -1,88 +1,123 @@
 @import '../../../styles/pages/theme';
 
 .friends-page {
-  padding: 5rem 0 2rem;
+  padding-top: calc(60px + 0.5rem); /* Giảm padding top */
+  padding-bottom: 2rem;
+  background-color: get-theme-color("background-color-light");
+  min-height: 100vh;
+  width: 100%;
+  overflow-x: hidden; /* Ngăn scroll ngang không cần thiết */
   
   .container {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 0 1rem;
+    padding: 0 0.5rem; /* Giảm padding xuống */
+    position: relative; /* Thêm để đảm bảo vị trí chính xác của các phần tử con */
+  }
+
+  .friends-wrapper {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px; /* Giảm khoảng cách giữa sidebar và main content */
+    margin-top: 0.25rem; /* Giảm margin trên đầu */
+    position: relative; /* Đảm bảo có vị trí chính xác */
+    z-index: 1; /* Đảm bảo hiển thị trên các phần tử khác */
+
+    .friends-sidebar {
+      width: 320px; /* Giảm độ rộng sidebar xuống */
+      flex-shrink: 0;
+      position: sticky;
+      top: calc(60px + 5px); /* Header height + độ lề nhỏ hơn */
+      max-height: calc(100vh - 60px - 5px); /* 100vh - header height - độ lề */
+      overflow-y: auto;
+    }
+
+    .friends-main {
+      flex: 1;
+      background-color: get-theme-color("primary-color");
+      border-radius: 8px;
+      padding: 0.5rem;
+      min-height: 400px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    }
   }
 
   .page-title {
     color: get-theme-color("text-primary");
-    font-size: 1.75rem;
-    margin-bottom: 1rem;
-    font-weight: $font-weight-semibold;
+    font-size: 1.4rem;
+    margin-bottom: 0.25rem;
+    font-weight: 700;
   }
 
-  .search-container {
-    margin-bottom: 1.5rem;
+  .search-friends {
+    margin-bottom: 1rem;
+    position: relative;
+    
+    .search-input {
+      width: 100%;
+      max-width: 300px;
+      padding: 6px 36px 6px 36px;
+      border-radius: 20px;
+      border: none;
+      background-color: get-theme-color("background-color-light");
+      color: get-theme-color("text-primary");
+      font-size: 0.875rem;
+      transition: all 0.2s ease;
 
-    .search-box {
-      position: relative;
-      max-width: 600px;
-      margin: 0 auto;
-
-      .search-icon {
-        position: absolute;
-        left: 1rem;
-        top: 50%;
-        transform: translateY(-50%);
+      &::placeholder {
         color: get-theme-color("text-secondary");
-        font-size: 1rem;
       }
 
-      input {
-        width: 100%;
-        padding: 0.75rem 1rem 0.75rem 2.5rem;
-        border-radius: 8px;
-        border: 1px solid get-theme-color("tertiary-color");
-        background-color: get-theme-color("primary-color");
-        color: get-theme-color("text-primary");
-        font-size: 0.875rem;
-        transition: all 0.2s ease;
-
-        &::placeholder {
-          color: get-theme-color("text-secondary");
-        }
-
-        &:focus {
-          outline: none;
-          border-color: get-theme-color("secondary-color");
-          box-shadow: 0 0 0 2px rgba(get-theme-color("secondary-color"), 0.1);
-        }
+      &:focus {
+        outline: none;
+        background-color: darken(get-theme-color("background-color-light"), 5%);
       }
+    }
+    
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: get-theme-color("text-secondary");
+      font-size: 0.9rem;
     }
   }
 
   .message {
-    padding: 1rem;
+    padding: 6px 10px;
     border-radius: 8px;
-    margin-bottom: 1rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
     
     &.success-message {
-      background-color: get-theme-color("secondary-color");
-      color: get-theme-color("text-quaternary");
-      border: 1px solid get-theme-color("tertiary-color");
+      background-color: rgba(get-theme-color("secondary-color"), 0.2);
+      color: get-theme-color("tertiary-color");
+      border: none;
     }
     
     &.error-message {
-      background-color: get-theme-color("red-color");
-      color: get-theme-color("text-quaternary");
-      border: 1px solid get-theme-color("red-color");
+      background-color: rgba(get-theme-color("red-color"), 0.1);
+      color: get-theme-color("red-color");
+      border: none;
       display: flex;
       align-items: center;
       gap: 0.5rem;
+      
+      .error-icon {
+        font-size: 1rem;
+      }
     }
   }
 
   .tabs {
     display: flex;
-    gap: 0.5rem;
-    margin-bottom: 2rem;
+    gap: 0.25rem;
+    margin-bottom: 1rem;
     border-bottom: 1px solid get-theme-color("tertiary-color");
-    padding-bottom: 0.5rem;
+    padding-bottom: 0.25rem;
     overflow-x: auto;
     scrollbar-width: none;
     -ms-overflow-style: none;
@@ -94,8 +129,8 @@
     .tab-button {
       display: flex;
       align-items: center;
-      gap: 0.5rem;
-      padding: 0.75rem 1rem;
+      gap: 0.25rem;
+      padding: 0.6rem 0.8rem;
       border-radius: 6px;
       border: none;
       background: none;
@@ -124,35 +159,72 @@
     h2 {
       color: get-theme-color("text-primary");
       font-size: 1.25rem;
-      margin-bottom: 1rem;
-      font-weight: $font-weight-semibold;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      
+      .section-actions {
+        display: flex;
+        gap: 6px;
+        
+        .action-btn {
+          background-color: get-theme-color("background-color-light");
+          border: none;
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          color: get-theme-color("text-primary");
+          font-size: 0.9rem;
+          transition: background 0.2s ease;
+          
+          &:hover {
+            background-color: darken(get-theme-color("background-color-light"), 5%);
+          }
+        }
+      }
     }
 
     .cards-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 1rem;
-      padding: 0.5rem 0;
-
-      @media (max-width: 640px) {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px; /* Tăng khoảng cách giữa các card */
+      padding: 8px 0;
+      
+      @media (min-width: 500px) {
         grid-template-columns: repeat(2, 1fr);
-        gap: 0.75rem;
+        gap: 18px; /* Tăng khoảng cách cho màn hình lớn hơn */
       }
 
-      @media (max-width: 480px) {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 0.75rem;
+      @media (min-width: 768px) {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px; /* Tăng khoảng cách cho màn hình trung bình */
+      }
+
+      @media (min-width: 992px) {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px; /* Tăng khoảng cách cho màn hình lớn */
+      }
+
+      @media (min-width: 1200px) {
+        grid-template-columns: repeat(5, 1fr);
+        gap: 8px;
       }
     }
   }
 
   .empty-state {
     text-align: center;
-    padding: 3rem 1rem;
+    padding: 1.5rem 1rem;
     color: get-theme-color("text-secondary");
     background-color: get-theme-color("primary-color");
     border-radius: 8px;
-    border: 1px solid get-theme-color("tertiary-color");
+    border: none;
     
     p {
       font-size: 0.875rem;
@@ -165,18 +237,31 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 3rem 1rem;
+    padding: 1.5rem 1rem;
     color: get-theme-color("text-secondary");
 
     .spinner {
       animation: spin 1s linear infinite;
-      font-size: 2rem;
-      margin-bottom: 1rem;
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+      color: get-theme-color("tertiary-color");
     }
 
     p {
       font-size: 0.875rem;
     }
+  }
+}
+
+.themed-icon {
+  color: get-theme-color("tertiary-color");
+  
+  &.error-icon {
+    color: get-theme-color("red-color");
+  }
+  
+  &.spinner {
+    color: get-theme-color("tertiary-color");
   }
 }
 
