@@ -5,12 +5,14 @@
 .friend-card {
   background-color: get-theme-color("primary-color");
   border-radius: 8px;
-  padding: 10px;
+  padding: 8px;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: 8px;
+  gap: 3px;
+  transition: background-color 0.2s ease;
+  gap: 4px;
   transition: background-color 0.2s ease;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
   overflow: hidden;
@@ -45,13 +47,13 @@
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    padding: 0 4px;
+    padding: 0 2px;
 
     h3 {
       color: get-theme-color("text-primary");
       font-size: 0.95rem;
       font-weight: $font-weight-semibold;
-      margin-bottom: 3px;
+      margin-bottom: 2px;
       overflow: hidden;
       text-overflow: ellipsis;
       max-width: 100%;
@@ -83,7 +85,7 @@
     .mutual-friends {
       color: get-theme-color("text-secondary");
       font-size: 0.8rem;
-      margin-bottom: 5px;
+      margin-bottom: 3px;
       text-align: left;
       width: 100%;
     }
@@ -100,22 +102,22 @@
     width: 100%;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     margin-top: auto; /* Đảm bảo actions luôn nằm dưới cùng của card */
 
     .action-button {
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 5px;
-      padding: 6px;
+      gap: 4px;
+      padding: 4px;
       border-radius: 6px;
       border: none;
       cursor: pointer;
       font-size: 0.8rem;
       font-weight: $font-weight-medium;
       transition: all 0.2s ease;
-      height: 32px;
+      height: 28px;
 
       &:first-child {
         flex: 1;
@@ -190,9 +192,9 @@
       &.more-options-button {
         background-color: get-theme-color("background-color-light");
         color: get-theme-color("text-primary");
-        width: 35px;
-        min-width: 35px;
-        height: 32px;
+        width: 32px;
+        min-width: 32px;
+        height: 28px;
         border-radius: 6px;
         padding: 0;
         display: flex;
