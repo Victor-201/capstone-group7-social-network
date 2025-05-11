@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../../contexts/AuthContext';
 import { FaSpinner, FaExclamationTriangle } from 'react-icons/fa';
 import FriendCard from '../../../components/friendCard';
-import SearchBox from '../../../components/searchBox';
 import Sidebar from './modals/Sidebar';
 import './style.scss';
 
@@ -310,7 +309,13 @@ const FriendsPage = () => {
         <h1 className="page-title">Bạn bè</h1>
         {message && (<div className="message success-message">{message}</div>)}
         {error && (<div className="message error-message"><FaExclamationTriangle className="error-icon" /> {error}</div>)}
-        <SearchBox placeholder="Tìm kiếm bạn bè" />
+        <div className="search-friends">
+          <input 
+            type="text" 
+            placeholder="Tìm kiếm bạn bè" 
+            className="search-input"
+          />
+        </div>
         <div className="friends-wrapper">
           <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
           <div className="friends-main">

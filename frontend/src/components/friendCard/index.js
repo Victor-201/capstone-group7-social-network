@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaUserPlus, FaUserMinus, FaUser, FaUserCheck, FaUserTimes, FaSpinner } from 'react-icons/fa';
+import { FaUserPlus, FaUserMinus, FaUser, FaUserCheck, FaUserTimes, FaSpinner, FaEllipsisH } from 'react-icons/fa';
 import "./style.scss";
 
 const FriendCard = ({ 
@@ -76,32 +76,16 @@ const FriendCard = ({
         return (
           <>
             <button 
-              className="action-button remove-button"
+              className="action-button primary-button"
               onClick={onRemove}
               disabled={loading.remove}
             >
-              {loading.remove ? <FaSpinner className="spinner" /> : <FaUserMinus />}
-              Hủy kết bạn
+              {loading.remove ? <FaSpinner className="spinner" /> : <FaUserCheck />}
+              Bạn bè
             </button>
-            {isFollowing ? (
-              <button 
-                className="action-button unfollow-button"
-                onClick={onUnfollow}
-                disabled={loading.follow}
-              >
-                {loading.follow ? <FaSpinner className="spinner" /> : <FaUserTimes />}
-                Bỏ theo dõi
-              </button>
-            ) : (
-              <button 
-                className="action-button follow-button"
-                onClick={onFollow}
-                disabled={loading.follow}
-              >
-                {loading.follow ? <FaSpinner className="spinner" /> : <FaUser />}
-                Theo dõi
-              </button>
-            )}
+            <button className="action-button more-options-button">
+              <FaEllipsisH />
+            </button>
           </>
         );
 

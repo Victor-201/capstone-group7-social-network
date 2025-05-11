@@ -83,13 +83,11 @@
       font-size: 0.75rem;
       margin-top: 0.25rem;
     }
-  }
-
-  .actions {
+  }  .actions {
     width: 100%;
     display: flex;
-    flex-direction: column;
-    gap: 0.375rem;
+    align-items: center;
+    gap: 0.5rem;
     margin-top: auto;
 
     .action-button {
@@ -104,12 +102,14 @@
       font-size: 0.8125rem;
       font-weight: $font-weight-medium;
       transition: all 0.2s ease;
-      width: 100%;
+
+      &:first-child {
+        flex: 1;
+      }
 
       svg {
         font-size: 0.875rem;
       }
-
       &.add-button {
         background-color: get-theme-color("tertiary-color");
         color: get-theme-color("text-quaternary");
@@ -162,6 +162,32 @@
 
         &:hover:not(:disabled) {
           background-color: darken(get-theme-color("red-color"), 5%);
+        }
+      }
+
+      &.primary-button {
+        background-color: get-theme-color("tertiary-color");
+        color: get-theme-color("text-quaternary");
+        border-radius: 6px;
+        font-weight: 500;
+
+        &:hover:not(:disabled) {
+          background-color: darken(get-theme-color("tertiary-color"), 5%);
+        }
+      }
+
+      &.more-options-button {
+        background-color: get-theme-color("background-color-light");
+        color: get-theme-color("text-primary");
+        width: 36px;
+        border-radius: 50%;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        &:hover:not(:disabled) {
+          background-color: darken(get-theme-color("background-color-light"), 5%);
         }
       }
 

@@ -4,6 +4,7 @@ import './style.scss';
 const Sidebar = ({ activeTab, onTabChange }) => {
   const tabs = [
     { key: 'friends', label: 'Tất cả bạn bè' },
+    { key: 'requests', label: 'Lời mời kết bạn' },
     { key: 'recent', label: 'Gần đây' },
     { key: 'birthdays', label: 'Sinh nhật' },
     { key: 'custom', label: 'Danh sách tùy chỉnh' }
