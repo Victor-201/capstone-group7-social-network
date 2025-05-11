@@ -17,7 +17,7 @@
     &__section {
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 8px;
     }
 
     &__user-header {
@@ -100,7 +100,7 @@
       &:hover {
         &::after {
           display: block;
-        };
+        }
         .popup__menu-arrow {
           transform: scale(1.4);
           color: get-theme-color("quaternary-color");
@@ -173,19 +173,43 @@
     &__notification-list,
     &__message-list {
       list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
       margin: 0;
-      padding: 0 16px;
+      padding: 0;
     }
 
-    &__notification-item,
-    &__message-item {
-      padding: 10px 0;
-    }
+    &__notification {
+      &-filter {
+        display: flex;
+        align-items: center;
+        justify-content: start;
+        gap: 8px;
 
-    &__notification-text,
-    &__message-text {
-      font-size: 14px;
-      color: #333;
+        .filter-btn {
+          background: none;
+          border: none;
+          padding: 6px 10px;
+          border-radius: 25px;
+          cursor: pointer;
+          font-size: 14px;
+          font-weight: 600;
+          color: get-theme-color("text-primary");
+          transition: color 0.2s;
+
+          &--active {
+            border: 1px solid rgba(get-theme-color("tertiary-color"), 0.2);
+            color: get-theme-color("text-secondary");
+          }
+
+          &:hover {
+            &:not(.filter-btn--active) {
+              background-color: get-theme-color("secondary-color");
+            }
+          }
+        }
+      }
     }
   }
 }
