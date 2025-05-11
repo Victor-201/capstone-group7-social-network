@@ -1,6 +1,5 @@
 import { memo } from 'react';
 import Header from '../header';
-import Footer from '../footer';
 
 const Masterlayout = ({children, ...props}) => {
     
@@ -8,7 +7,6 @@ const Masterlayout = ({children, ...props}) => {
         <div {...props}>
             <Header />
             {children}
-            <Footer />
         </div>
     );
 };

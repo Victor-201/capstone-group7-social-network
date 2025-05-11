@@ -20,41 +20,41 @@ const GroupsPage = () => {
         setIsLoading(false);
         return;
       }
-      
+
       setIsLoading(true);
       setError(null);
-      
+
       try {
         const token = localStorage.getItem('token');
-        
+
         // Fetch user's groups
         const userGroupsResponse = await fetch(`${API_URL}/api/groups/my-groups`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
         });
-        
+
         if (!userGroupsResponse.ok) {
           throw new Error(`HTTP error! Status: ${userGroupsResponse.status}`);
         }
-        
+
         const userGroupsData = await userGroupsResponse.json();
         setUserGroups(userGroupsData || []);
-        
+
         // Fetch recommended groups
         const recommendedResponse = await fetch(`${API_URL}/api/groups/recommended`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
         });
-        
+
         if (!recommendedResponse.ok) {
           throw new Error(`HTTP error! Status: ${recommendedResponse.status}`);
         }
-        
+
         const recommendedData = await recommendedResponse.json();
         setRecommendedGroups(recommendedData || []);
-        
+
       } catch (err) {
         console.error("Failed to fetch groups:", err);
         setError("Không thể tải thông tin nhóm. Vui lòng thử lại sau.");
@@ -62,14 +62,14 @@ const GroupsPage = () => {
         setIsLoading(false);
       }
     };
-    
+
     fetchGroups();
   }, [isAuthenticated, API_URL]);
 
   // Handle joining a group
   const handleJoinGroup = async (groupId) => {
     if (!isAuthenticated) return;
-    
+
     try {
       const token = localStorage.getItem('token');
       const response = await fetch(`${API_URL}/api/groups/${groupId}/join`, {
@@ -79,32 +79,32 @@ const GroupsPage = () => {
           'Content-Type': 'application/json'
         }
       });
-      
+
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
-      
+
       const result = await response.json();
-      
+
       // Update local state
-      setRecommendedGroups(prevGroups => 
+      setRecommendedGroups(prevGroups =>
         prevGroups.filter(group => group.id !== groupId)
       );
-      
+
       // Refresh user groups
       const userGroupsResponse = await fetch(`${API_URL}/api/groups/my-groups`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
       });
-      
+
       if (!userGroupsResponse.ok) {
         throw new Error(`HTTP error! Status: ${userGroupsResponse.status}`);
       }
-      
+
       const userGroupsData = await userGroupsResponse.json();
       setUserGroups(userGroupsData || []);
-      
+
     } catch (err) {
       console.error("Failed to join group:", err);
       setError("Không thể tham gia nhóm. Vui lòng thử lại sau.");
@@ -114,7 +114,7 @@ const GroupsPage = () => {
   // Handle leaving a group
   const handleLeaveGroup = async (groupId) => {
     if (!isAuthenticated) return;
-    
+
     try {
       const token = localStorage.getItem('token');
       const response = await fetch(`${API_URL}/api/groups/${groupId}/leave`, {
@@ -124,30 +124,30 @@ const GroupsPage = () => {
           'Content-Type': 'application/json'
         }
       });
-      
+
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
-      
+
       // Update local state
-      setUserGroups(prevGroups => 
+      setUserGroups(prevGroups =>
         prevGroups.filter(group => group.id !== groupId)
       );
-      
+
       // Refresh recommended groups
       const recommendedResponse = await fetch(`${API_URL}/api/groups/recommended`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
       });
-      
+
       if (!recommendedResponse.ok) {
         throw new Error(`HTTP error! Status: ${recommendedResponse.status}`);
       }
-      
+
       const recommendedData = await recommendedResponse.json();
       setRecommendedGroups(recommendedData || []);
-      
+
     } catch (err) {
       console.error("Failed to leave group:", err);
       setError("Không thể rời khỏi nhóm. Vui lòng thử lại sau.");
@@ -161,41 +161,29 @@ const GroupsPage = () => {
   };
 
   // Filter groups by search term
-  const filteredUserGroups = userGroups.filter(group => 
+  const filteredUserGroups = userGroups.filter(group =>
     group.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
-  
-  const filteredRecommendedGroups = recommendedGroups.filter(group => 
+
+  const filteredRecommendedGroups = recommendedGroups.filter(group =>
     group.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
-    <div className="groups-page">
-      <div className="groups-container">
-        <div className="groups-header">
-          <h1>Nhóm</h1>
-          <div className="groups-search">
-            <FaSearch className="search-icon" />
-            <input 
-              type="text" 
-              placeholder="Tìm kiếm nhóm" 
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-          <button className="create-group-btn" onClick={handleCreateGroup}>
-            <FaPlus className="btn-icon" /> Tạo nhóm mới
-          </button>
-        </div>
+    <div className="container">
+      <div className="groups-page">
+        <button className="create-group-btn" onClick={handleCreateGroup}>
+          <FaPlus/>
+        </button>
 
         <div className="groups-tabs">
-          <button 
+          <button
             className={`tab-btn ${activeTab === 'yourGroups' ? 'active' : ''}`}
             onClick={() => setActiveTab('yourGroups')}
           >
             Nhóm của bạn
           </button>
-          <button 
+          <button
             className={`tab-btn ${activeTab === 'discover' ? 'active' : ''}`}
             onClick={() => setActiveTab('discover')}
           >
@@ -221,7 +209,7 @@ const GroupsPage = () => {
                     <FaUsers className="empty-icon" />
                     <h3>Bạn chưa tham gia nhóm nào</h3>
                     <p>Hãy khám phá và tham gia các nhóm phù hợp với sở thích của bạn</p>
-                    <button 
+                    <button
                       className="discover-btn"
                       onClick={() => setActiveTab('discover')}
                     >
@@ -252,7 +240,7 @@ const GroupsPage = () => {
                             </div>
                           )}
                           {!group.isAdmin && (
-                            <button 
+                            <button
                               className="leave-btn"
                               onClick={() => handleLeaveGroup(group.id)}
                             >
@@ -264,11 +252,11 @@ const GroupsPage = () => {
                     ))}
                   </div>
                 )}
-                
+
                 {filteredUserGroups.length > 0 && filteredRecommendedGroups.length > 0 && (
                   <div className="section-divider"></div>
                 )}
-                
+
                 {filteredRecommendedGroups.length > 0 && (
                   <div className="groups-section">
                     <h2>Nhóm đề xuất cho bạn</h2>
@@ -289,7 +277,7 @@ const GroupsPage = () => {
                             <p className="group-meta">
                               {group.memberCount?.toLocaleString() || '0'} thành viên • {group.privacy === 'public' ? 'Công khai' : 'Riêng tư'}
                             </p>
-                            <button 
+                            <button
                               className="join-btn"
                               onClick={() => handleJoinGroup(group.id)}
                             >
@@ -303,7 +291,7 @@ const GroupsPage = () => {
                 )}
               </>
             )}
-            
+
             {activeTab === 'discover' && (
               <div className="discover-groups">
                 {filteredRecommendedGroups.length === 0 ? (
@@ -330,7 +318,7 @@ const GroupsPage = () => {
                           <p className="group-meta">
                             {group.memberCount?.toLocaleString() || '0'} thành viên • {group.privacy === 'public' ? 'Công khai' : 'Riêng tư'}
                           </p>
-                          <button 
+                          <button
                             className="join-btn"
                             onClick={() => handleJoinGroup(group.id)}
                           >

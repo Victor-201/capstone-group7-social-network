@@ -3,14 +3,8 @@ export const ROUTERS = {
         HOME: "/",
         FRIENDS: "/friends",
         WATCH: "/watch",
-        MARKETPLACE: "/marketplace",
         GROUPS: "/groups",
-        ABOUT: "/about",
-        HELP: "/help",
-        PRIVACY: "/privacy",
-        TERMS: "/terms",
-        CAREERS: "/careers",
-        PROFILE: "/user/:id" // Thêm route cho trang cá nhân người dùng khác
+        PROFILE: "/user/:id"
     },
     AUTH: {
         LOGIN: "/login",

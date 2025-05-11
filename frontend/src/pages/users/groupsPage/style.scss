@@ -1,76 +1,52 @@
-/* Groups Page Styles */
-.groups-page {
-  padding: 20px;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-.groups-container {
-  width: 100%;
-}
-
-.groups-header {
+.group-page {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 24px;
-  flex-wrap: wrap;
-  gap: 16px;
-
-  h1 {
-    font-size: 24px;
-    font-weight: 700;
-    margin: 0;
-  }
+  flex-direction: column;
+  padding: 24px;
+  background-color: var(--bg-color, #f0f2f5);
+  min-height: 100vh;
 }
-
-.groups-search {
-  display: flex;
-  align-items: center;
-  background-color: var(--bg-light, #f0f2f5);
-  border-radius: 20px;
-  padding: 8px 16px;
-  flex: 1;
-  max-width: 400px;
-  position: relative;
-  
-  .search-icon {
-    color: var(--text-secondary, #65676b);
-    margin-right: 8px;
-  }
-  
-  input {
-    border: none;
-    background: transparent;
-    width: 100%;
-    outline: none;
-    
-    &::placeholder {
-      color: var(--text-secondary, #65676b);
-    }
-  }
-}
-
 .create-group-btn {
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  width: auto;
+  min-width: 50px;
+  height: 50px;
   background-color: var(--primary-color, #1877f2);
   color: white;
   border-radius: 20px;
   padding: 8px 16px;
-  font-weight: 600;
+  font-size: 20px;
   border: none;
   display: flex;
   align-items: center;
+  justify-content: center;
   cursor: pointer;
-  transition: background-color 0.2s;
-  
+  transition: background-color 0.2s ease-in-out;
+
+  &::after {
+    content: 'Tạo nhóm';
+    display: inline-block;
+    font-size: 16px;
+    max-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    opacity: 0;
+    margin-left: 0;
+    transition: max-width 0.3s ease, opacity 0.3s ease, margin-left 0.3s ease;
+  }
+
   &:hover {
     background-color: darken(#1877f2, 5%);
-  }
-  
-  .btn-icon {
-    margin-right: 8px;
+    
+    &::after {
+      max-width: 100px;
+      opacity: 1;
+      margin-left: 8px;
+    }
   }
 }
+
 
 .groups-tabs {
   display: flex;

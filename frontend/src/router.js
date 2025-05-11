@@ -1,7 +1,6 @@
 import HomePage from './pages/users/homePage';
 import PersonalPage from './pages/users/personalPage';
 import WatchPage from './pages/users/watchPage';
-import MarketplacePage from './pages/users/marketplacePage';
 import LoginPage from './pages/users/loginPage';
 import RegisterPage from './pages/users/registerPage';
 import FriendsPage from './pages/users/friendsPage';
@@ -23,10 +22,6 @@ const renderUserRouter = () => {
     {
       path: ROUTERS.USER.WATCH,
       Component: <WatchPage />,
-    },
-    {
-      path: ROUTERS.USER.MARKETPLACE,
-      Component: <MarketplacePage />,
     },
     {
       path: ROUTERS.USER.GROUPS,
