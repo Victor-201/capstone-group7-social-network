@@ -108,7 +108,7 @@ const FriendCard = ({
         <AvatarUser user={user} />
       </div>
       <div className="info">
-        <h3>{user.fullName}</h3>
+        <h1>{user.fullName}</h1>
         <p className="mutual-friends">{Math.floor(Math.random() * 15) + 1} bạn chung</p>
         {type === 'request' && user.createdAt && (
           <p className="request-time">

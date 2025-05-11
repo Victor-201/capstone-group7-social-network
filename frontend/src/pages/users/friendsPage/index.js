@@ -20,21 +20,18 @@ const FriendsPage = () => {
       fullName: 'Nguyễn Xuân Hải',
       username: 'xuanhai0913',
       avatar: 'v1652278394/user_avatars/friend_1.jpg',
-      bio: 'Software Developer | Coffee Lover ☕'
     },
     {
       id: 'friend-2',
       fullName: 'Nguyễn Ngọc Trung',
       username: 'hoangthie',
       avatar: 'v1652278394/user_avatars/friend_2.jpg',
-      bio: 'Digital Artist 🎨 | Cat Person 🐱'
     },
     {
       id: 'friend-3',
       fullName: 'Nguyễn Văn Thắng',
       username: 'tranminhf',
       avatar: 'v1652278394/user_avatars/friend_3.jpg',
-      bio: 'Travel Enthusiast ✈️ | Photographer 📸'
     }
   ]);
   const [pendingRequests, setPendingRequests] = useState([
@@ -46,7 +43,6 @@ const FriendsPage = () => {
         username: 'dovang',
         avatar: 'v1652278394/user_avatars/requester_1.jpg',
       },
-      createdAt: new Date().toISOString()
     },
     {
       id: 'request-2',
@@ -56,7 +52,6 @@ const FriendsPage = () => {
         username: 'vuthih',
         avatar: 'v1652278394/user_avatars/requester_2.jpg',
       },
-      createdAt: new Date(Date.now() - 86400000).toISOString()
     }
   ]);
   const [followers, setFollowers] = useState([
@@ -65,14 +60,12 @@ const FriendsPage = () => {
       fullName: 'Ngô Văn I',
       username: 'ngovani',
       avatar: 'v1652278394/user_avatars/follower_1.jpg',
-      bio: 'Music Producer 🎵 | Guitar Player 🎸'
     },
     {
       id: 'follower-2',
       fullName: 'Lê Thị K',
       username: 'lethik',
       avatar: 'v1652278394/user_avatars/follower_2.jpg',
-      bio: 'Food Blogger 🍜 | Chef 👩‍🍳'
     }
   ]);
   const [following, setFollowing] = useState([
@@ -81,14 +74,12 @@ const FriendsPage = () => {
       fullName: 'Trịnh Thị L',
       username: 'trinhthi',
       avatar: 'v1652278394/user_avatars/following_1.jpg',
-      bio: 'Fashion Designer 👗 | Travel Lover ✈️'
     },
     {
       id: 'following-2',
       fullName: 'Đặng Văn M',
       username: 'dangvanm',
       avatar: 'v1652278394/user_avatars/following_2.jpg',
-      bio: 'Tech Enthusiast 💻 | Gamer 🎮'
     }
   ]);
   const [loading, setLoading] = useState(false);
