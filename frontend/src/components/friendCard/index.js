@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaUserPlus, FaUserMinus, FaUser, FaUserCheck, FaUserTimes, FaSpinner, FaEllipsisH } from 'react-icons/fa';
+import { FaSpinner, FaEllipsisH } from 'react-icons/fa';
 import "./style.scss";
 
 // Themed icon component for FriendCard

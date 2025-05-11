@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../../../contexts/AuthContext';
 import { FaSpinner, FaExclamationTriangle, FaSearch, FaFilter, FaEllipsisH } from 'react-icons/fa';
 import FriendCard from '../../../components/friendCard';
@@ -12,7 +12,7 @@ const ThemedIcon = ({ icon: Icon, className }) => {
 };
 
 const FriendsPage = () => {
-  const { user, isAuthenticated, getFriendsList, getPendingFriendRequests, getFollowers, getFollowing, sendFriendRequest, respondToFriendRequest, removeFriend, followUser, unfollowUser, checkFollowStatus } = useAuth();
+  const { getFriendsList, getPendingFriendRequests, getFollowers, getFollowing, sendFriendRequest, respondToFriendRequest, removeFriend, followUser, unfollowUser } = useAuth();
   const [activeTab, setActiveTab] = useState('friends');
   const [friends, setFriends] = useState([
     {
@@ -95,29 +95,6 @@ const FriendsPage = () => {
   const [error, setError] = useState(null);
   const [actionLoading, setActionLoading] = useState({});
   const [message, setMessage] = useState(null);
-  const [suggestedUsers, setSuggestedUsers] = useState([
-    {
-      id: 'suggested-1',
-      fullName: 'Nguyễn Văn N',
-      username: 'nguyenvann',
-      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Jack&backgroundColor=b6e3f4',
-      bio: 'Startup Founder 🚀 | AI Researcher 🤖'
-    },
-    {
-      id: 'suggested-2',
-      fullName: 'Trần Thị P',
-      username: 'tranthip',
-      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Mia&backgroundColor=ffdfbf',
-      bio: 'Yoga Instructor 🧘‍♀️ | Wellness Coach 💪'
-    },
-    {
-      id: 'suggested-3',
-      fullName: 'Lê Văn Q',
-      username: 'levanq',
-      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Noah&backgroundColor=c0aede',
-      bio: 'Environmental Scientist 🌱 | Nature Photographer 📸'
-    }
-  ]);
 
   // Comment out useEffect temporarily for testing
   /*useEffect(() => {
@@ -163,14 +140,6 @@ const FriendsPage = () => {
       } else {
         console.error('Error fetching following:', followingResult.message);
       }
-      
-      // Fetch suggested users (this would typically come from an API endpoint)
-      // For now, we'll mock some data
-      setSuggestedUsers([
-        { id: 1001, username: 'suggested_user1', fullName: 'Suggested User 1', avatar: null },
-        { id: 1002, username: 'suggested_user2', fullName: 'Suggested User 2', avatar: null },
-        { id: 1003, username: 'suggested_user3', fullName: 'Suggested User 3', avatar: null }
-      ]);
       
     } catch (err) {
       setError('Không thể tải dữ liệu. Vui lòng thử lại sau.');
@@ -304,15 +273,9 @@ const FriendsPage = () => {
     return following.some(user => user.id === userId);
   };
 
-  // Check if a user is already a friend
-  const isUserFriend = (userId) => {
-    return friends.some(friend => friend.id === userId);
-  };
-
   return (
-  <div className="container">
-
     <div className="friends-page">
+      <div className="container">
         {message && (<div className="message success-message">{message}</div>)}
         {error && (<div className="message error-message"><ThemedIcon icon={FaExclamationTriangle} className="error-icon" /> {error}</div>)}
         
