@@ -1,9 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../../contexts/AuthContext';
-import { FaSpinner, FaExclamationTriangle } from 'react-icons/fa';
+import { FaSpinner, FaExclamationTriangle, FaSearch, FaFilter, FaEllipsisH } from 'react-icons/fa';
 import FriendCard from '../../../components/friendCard';
 import Sidebar from './modals/Sidebar';
 import './style.scss';
+
+// Custom styled icon component
+const ThemedIcon = ({ icon: Icon, className }) => {
+  const themeClass = `themed-icon ${className || ''}`;
+  return <Icon className={themeClass} />;
+};
 
 const FriendsPage = () => {
   const { user, isAuthenticated, getFriendsList, getPendingFriendRequests, getFollowers, getFollowing, sendFriendRequest, respondToFriendRequest, removeFriend, followUser, unfollowUser, checkFollowStatus } = useAuth();
@@ -304,32 +310,47 @@ const FriendsPage = () => {
   };
 
   return (
+  <div className="container">
+
     <div className="friends-page">
-      <div className="container">
-        <h1 className="page-title">Bạn bè</h1>
         {message && (<div className="message success-message">{message}</div>)}
-        {error && (<div className="message error-message"><FaExclamationTriangle className="error-icon" /> {error}</div>)}
-        <div className="search-friends">
-          <input 
-            type="text" 
-            placeholder="Tìm kiếm bạn bè" 
-            className="search-input"
-          />
-        </div>
+        {error && (<div className="message error-message"><ThemedIcon icon={FaExclamationTriangle} className="error-icon" /> {error}</div>)}
+        
         <div className="friends-wrapper">
           <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
           <div className="friends-main">
             <div className="content">
+              <div className="search-friends">
+                <input 
+                  type="text" 
+                  placeholder="Tìm kiếm bạn bè" 
+                  className="search-input"
+                />
+                <div className="search-icon">
+                  <ThemedIcon icon={FaSearch} />
+                </div>
+              </div>
+              
               {loading ? (
                 <div className="loading-container">
-                  <FaSpinner className="spinner" />
+                  <ThemedIcon icon={FaSpinner} className="spinner" />
                   <p>Đang tải...</p>
                 </div>
               ) : (
                 <>
                   {activeTab === 'friends' && (
                     <div className="friends-list">
-                      <h2>Danh sách bạn bè ({friends.length})</h2>
+                      <h2>
+                        Danh sách bạn bè ({friends.length})
+                        <div className="section-actions">
+                          <button className="action-btn">
+                            <ThemedIcon icon={FaFilter} />
+                          </button>
+                          <button className="action-btn">
+                            <ThemedIcon icon={FaEllipsisH} />
+                          </button>
+                        </div>
+                      </h2>
                       {friends.length === 0 ? (
                         <div className="empty-state">
                           <p>Bạn chưa có người bạn nào. Hãy tìm và kết bạn với mọi người!</p>
@@ -358,7 +379,14 @@ const FriendsPage = () => {
 
                   {activeTab === 'requests' && (
                     <div className="requests-list">
-                      <h2>Lời mời kết bạn ({pendingRequests.length})</h2>
+                      <h2>
+                        Lời mời kết bạn ({pendingRequests.length})
+                        <div className="section-actions">
+                          <button className="action-btn">
+                            <ThemedIcon icon={FaEllipsisH} />
+                          </button>
+                        </div>
+                      </h2>
                       {pendingRequests.length === 0 ? (
                         <div className="empty-state">
                           <p>Không có lời mời kết bạn nào.</p>
@@ -388,7 +416,12 @@ const FriendsPage = () => {
 
                   {activeTab === 'followers' && (
                     <div className="followers-list">
-                      <h2>Người theo dõi ({followers.length})</h2>
+                      <h2>Người theo dõi ({followers.length})
+                        <div className="section-actions">
+                          <button className="action-btn">
+                            <ThemedIcon icon={FaEllipsisH} />
+                          </button>
+                        </div></h2>
                       {followers.length === 0 ? (
                         <div className="empty-state">
                           <p>Chưa có ai theo dõi bạn.</p>
@@ -417,7 +450,12 @@ const FriendsPage = () => {
 
                   {activeTab === 'following' && (
                     <div className="following-list">
-                      <h2>Đang theo dõi ({following.length})</h2>
+                      <h2>Đang theo dõi ({following.length})
+                        <div className="section-actions">
+                          <button className="action-btn">
+                            <ThemedIcon icon={FaEllipsisH} />
+                          </button>
+                        </div></h2>
                       {following.length === 0 ? (
                         <div className="empty-state">
                           <p>Bạn chưa theo dõi ai.</p>
@@ -442,32 +480,51 @@ const FriendsPage = () => {
                     </div>
                   )}
 
-                  {activeTab === 'suggestions' && (
-                    <div className="suggestions-list">
-                      <h2>Gợi ý kết bạn</h2>
-                      {suggestedUsers.length === 0 ? (
-                        <div className="empty-state">
-                          <p>Không có gợi ý kết bạn nào.</p>
+                  {activeTab === 'recent' && (
+                    <div className="recent-list">
+                      <h2>
+                        Bạn bè gần đây
+                        <div className="section-actions">
+                          <button className="action-btn">
+                            <ThemedIcon icon={FaEllipsisH} />
+                          </button>
                         </div>
-                      ) : (
-                        <div className="cards-grid">
-                          {suggestedUsers.map(suggestedUser => (
-                            <FriendCard
-                              key={suggestedUser.id}
-                              user={suggestedUser}
-                              type="suggestion"
-                              isFollowing={isUserFollowed(suggestedUser.id)}
-                              onAdd={() => handleSendRequest(suggestedUser.id)}
-                              onFollow={() => handleFollowToggle(suggestedUser.id, false)}
-                              onUnfollow={() => handleFollowToggle(suggestedUser.id, true)}
-                              loading={{
-                                add: actionLoading[`add_${suggestedUser.id}`],
-                                follow: actionLoading[`follow_${suggestedUser.id}`]
-                              }}
-                            />
-                          ))}
+                      </h2>
+                      <div className="empty-state">
+                        <p>Chưa có hoạt động gần đây với bạn bè.</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {activeTab === 'birthdays' && (
+                    <div className="birthdays-list">
+                      <h2>
+                        Sinh nhật bạn bè
+                        <div className="section-actions">
+                          <button className="action-btn">
+                            <ThemedIcon icon={FaEllipsisH} />
+                          </button>
                         </div>
-                      )}
+                      </h2>
+                      <div className="empty-state">
+                        <p>Không có sinh nhật bạn bè trong thời gian tới.</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {activeTab === 'custom' && (
+                    <div className="custom-list">
+                      <h2>
+                        Danh sách tùy chỉnh
+                        <div className="section-actions">
+                          <button className="action-btn">
+                            <ThemedIcon icon={FaEllipsisH} />
+                          </button>
+                        </div>
+                      </h2>
+                      <div className="empty-state">
+                        <p>Bạn chưa tạo danh sách tùy chỉnh nào.</p>
+                      </div>
                     </div>
                   )}
                 </>

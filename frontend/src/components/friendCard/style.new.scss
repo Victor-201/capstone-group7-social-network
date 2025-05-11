@@ -101,7 +101,9 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    margin-top: auto; /* Đảm bảo actions luôn nằm dưới cùng của card */
+    margin-top: 4px;
+    /* Đảm bảo actions luôn nằm dưới cùng của card */
+    margin-top: auto; 
 
     .action-button {
       display: flex;
@@ -124,7 +126,6 @@
       svg {
         font-size: 1rem;
       }
-
       &.add-button,
       &.accept-button {
         background-color: get-theme-color("tertiary-color");

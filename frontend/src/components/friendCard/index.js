@@ -2,6 +2,12 @@ import React from 'react';
 import { FaUserPlus, FaUserMinus, FaUser, FaUserCheck, FaUserTimes, FaSpinner, FaEllipsisH } from 'react-icons/fa';
 import "./style.scss";
 
+// Themed icon component for FriendCard
+const FriendCardIcon = ({ icon: Icon, className }) => {
+  const themeClass = `friend-card-icon ${className || ''}`;
+  return <Icon className={themeClass} />;
+};
+
 const FriendCard = ({ 
   user, 
   type = 'friend', // friend, request, suggestion, follower, following
@@ -24,16 +30,16 @@ const FriendCard = ({
               onClick={onAccept}
               disabled={loading.accept}
             >
-              {loading.accept ? <FaSpinner className="spinner" /> : <FaUserCheck />}
-              Chấp nhận
+              {loading.accept ? <FriendCardIcon icon={FaSpinner} className="spinner" /> : null}
+              Xác nhận
             </button>
             <button 
               className="action-button reject-button"
               onClick={onReject}
               disabled={loading.reject}
             >
-              {loading.reject ? <FaSpinner className="spinner" /> : <FaUserTimes />}
-              Từ chối
+              {loading.reject ? <FriendCardIcon icon={FaSpinner} className="spinner" /> : null}
+              Xóa
             </button>
           </>
         );
@@ -47,28 +53,12 @@ const FriendCard = ({
               onClick={onAdd}
               disabled={loading.add}
             >
-              {loading.add ? <FaSpinner className="spinner" /> : <FaUserPlus />}
-              Kết bạn
+              {loading.add ? <FriendCardIcon icon={FaSpinner} className="spinner" /> : null}
+              Thêm bạn bè
             </button>
-            {isFollowing ? (
-              <button 
-                className="action-button unfollow-button"
-                onClick={onUnfollow}
-                disabled={loading.follow}
-              >
-                {loading.follow ? <FaSpinner className="spinner" /> : <FaUserTimes />}
-                Bỏ theo dõi
-              </button>
-            ) : (
-              <button 
-                className="action-button follow-button"
-                onClick={onFollow}
-                disabled={loading.follow}
-              >
-                {loading.follow ? <FaSpinner className="spinner" /> : <FaUser />}
-                Theo dõi
-              </button>
-            )}
+            <button className="action-button more-options-button">
+              <FriendCardIcon icon={FaEllipsisH} />
+            </button>
           </>
         );
 
@@ -80,11 +70,11 @@ const FriendCard = ({
               onClick={onRemove}
               disabled={loading.remove}
             >
-              {loading.remove ? <FaSpinner className="spinner" /> : <FaUserCheck />}
-              Bạn bè
+              {loading.remove ? <FriendCardIcon icon={FaSpinner} className="spinner" /> : null}
+              Xác nhận
             </button>
             <button className="action-button more-options-button">
-              <FaEllipsisH />
+              <FriendCardIcon icon={FaEllipsisH} />
             </button>
           </>
         );
@@ -97,16 +87,11 @@ const FriendCard = ({
               onClick={onAdd}
               disabled={loading.add}
             >
-              {loading.add ? <FaSpinner className="spinner" /> : <FaUserPlus />}
-              Kết bạn
+              {loading.add ? <FriendCardIcon icon={FaSpinner} className="spinner" /> : null}
+              Thêm bạn bè
             </button>
-            <button 
-              className="action-button unfollow-button"
-              onClick={onUnfollow}
-              disabled={loading.follow}
-            >
-              {loading.follow ? <FaSpinner className="spinner" /> : <FaUserTimes />}
-              Bỏ theo dõi
+            <button className="action-button more-options-button">
+              <FriendCardIcon icon={FaEllipsisH} />
             </button>
           </>
         );

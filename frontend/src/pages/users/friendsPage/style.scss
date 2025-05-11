@@ -2,6 +2,8 @@
 
 .friends-page {
   padding: 5rem 0 2rem;
+  background-color: get-theme-color("background-color-light");
+  min-height: 100vh;
   
   .container {
     max-width: 1200px;
@@ -12,15 +14,16 @@
   .friends-wrapper {
     display: flex;
     align-items: flex-start;
-    gap: 1rem;
+    gap: 16px;
     margin-top: 1rem;
 
     .friends-sidebar {
       width: 360px;
-      border-radius: 8px;
-      background-color: get-theme-color("primary-color");
-      overflow: hidden;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+      flex-shrink: 0;
+      position: sticky;
+      top: 70px;
+      max-height: calc(100vh - 70px);
+      overflow-y: auto;
     }
 
     .friends-main {
@@ -35,60 +38,21 @@
 
   .page-title {
     color: get-theme-color("text-primary");
-    font-size: 1.75rem;
+    font-size: 1.5rem;
     margin-bottom: 1rem;
-    font-weight: $font-weight-semibold;
-  }
-
-  .search-container {
-    margin-bottom: 1.5rem;
-
-    .search-box {
-      position: relative;
-      max-width: 600px;
-      margin: 0 auto;
-
-      .search-icon {
-        position: absolute;
-        left: 1rem;
-        top: 50%;
-        transform: translateY(-50%);
-        color: get-theme-color("text-secondary");
-        font-size: 1rem;
-      }
-
-      input {
-        width: 100%;
-        padding: 0.75rem 1rem 0.75rem 2.5rem;
-        border-radius: 8px;
-        border: 1px solid get-theme-color("tertiary-color");
-        background-color: get-theme-color("primary-color");
-        color: get-theme-color("text-primary");
-        font-size: 0.875rem;
-        transition: all 0.2s ease;
-
-        &::placeholder {
-          color: get-theme-color("text-secondary");
-        }
-
-        &:focus {
-          outline: none;
-          border-color: get-theme-color("secondary-color");
-          box-shadow: 0 0 0 2px rgba(get-theme-color("secondary-color"), 0.1);
-        }
-      }
-    }
+    font-weight: 700;
   }
 
   .search-friends {
     margin-bottom: 1.5rem;
+    position: relative;
     
     .search-input {
       width: 100%;
-      max-width: 360px;
-      padding: 0.75rem 1rem;
+      max-width: 300px;
+      padding: 8px 36px 8px 36px;
       border-radius: 20px;
-      border: 1px solid get-theme-color("tertiary-color");
+      border: none;
       background-color: get-theme-color("background-color-light");
       color: get-theme-color("text-primary");
       font-size: 0.875rem;
@@ -100,30 +64,45 @@
 
       &:focus {
         outline: none;
-        border-color: get-theme-color("secondary-color");
-        box-shadow: 0 0 0 2px rgba(get-theme-color("secondary-color"), 0.1);
+        background-color: darken(get-theme-color("background-color-light"), 5%);
       }
+    }
+    
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: get-theme-color("text-secondary");
+      font-size: 0.9rem;
     }
   }
 
   .message {
-    padding: 1rem;
+    padding: 10px 16px;
     border-radius: 8px;
     margin-bottom: 1rem;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
     
     &.success-message {
-      background-color: get-theme-color("secondary-color");
-      color: get-theme-color("text-quaternary");
-      border: 1px solid get-theme-color("tertiary-color");
+      background-color: rgba(get-theme-color("secondary-color"), 0.2);
+      color: get-theme-color("tertiary-color");
+      border: none;
     }
     
     &.error-message {
-      background-color: get-theme-color("red-color");
-      color: get-theme-color("text-quaternary");
-      border: 1px solid get-theme-color("red-color");
+      background-color: rgba(get-theme-color("red-color"), 0.1);
+      color: get-theme-color("red-color");
+      border: none;
       display: flex;
       align-items: center;
       gap: 0.5rem;
+      
+      .error-icon {
+        font-size: 1rem;
+      }
     }
   }
 
@@ -175,32 +154,71 @@
       color: get-theme-color("text-primary");
       font-size: 1.25rem;
       margin-bottom: 1rem;
-      font-weight: $font-weight-semibold;
+      font-weight: 600;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      
+      .section-actions {
+        display: flex;
+        gap: 8px;
+        
+        .action-btn {
+          background-color: get-theme-color("background-color-light");
+          border: none;
+          width: 36px;
+          height: 36px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          color: get-theme-color("text-primary");
+          font-size: 0.9rem;
+          transition: background 0.2s ease;
+          
+          &:hover {
+            background-color: darken(get-theme-color("background-color-light"), 5%);
+          }
+        }
+      }
     }
 
     .cards-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 1rem;
-      padding: 0.5rem 0;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      padding: 12px 0;
+      
+      @media (min-width: 500px) {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+      }
 
       @media (min-width: 768px) {
-        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+      }
+
+      @media (min-width: 992px) {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
       }
 
       @media (min-width: 1200px) {
-        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        grid-template-columns: repeat(5, 1fr);
+        gap: 16px;
       }
     }
   }
 
   .empty-state {
     text-align: center;
-    padding: 3rem 1rem;
+    padding: 2rem 1rem;
     color: get-theme-color("text-secondary");
     background-color: get-theme-color("primary-color");
     border-radius: 8px;
-    border: 1px solid get-theme-color("tertiary-color");
+    border: none;
     
     p {
       font-size: 0.875rem;
@@ -213,18 +231,31 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 3rem 1rem;
+    padding: 2rem 1rem;
     color: get-theme-color("text-secondary");
 
     .spinner {
       animation: spin 1s linear infinite;
-      font-size: 2rem;
-      margin-bottom: 1rem;
+      font-size: 1.5rem;
+      margin-bottom: 0.75rem;
+      color: get-theme-color("tertiary-color");
     }
 
     p {
       font-size: 0.875rem;
     }
+  }
+}
+
+.themed-icon {
+  color: get-theme-color("tertiary-color");
+  
+  &.error-icon {
+    color: get-theme-color("red-color");
+  }
+  
+  &.spinner {
+    color: get-theme-color("tertiary-color");
   }
 }
 
