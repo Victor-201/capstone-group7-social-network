@@ -143,8 +143,7 @@ const FriendCard = ({
       </div>
       <div className="info">
         <h3>{user.fullName}</h3>
-        <p className="username">@{user.username}</p>
-        {user.bio && <p className="bio">{user.bio}</p>}
+        <p className="mutual-friends">{Math.floor(Math.random() * 15) + 1} bạn chung</p>
         {type === 'request' && user.createdAt && (
           <p className="request-time">
             Đã gửi lời mời: {new Date(user.createdAt).toLocaleDateString()}

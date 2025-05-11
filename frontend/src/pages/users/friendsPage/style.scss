@@ -9,6 +9,21 @@
     padding: 0 1rem;
   }
 
+  .friends-wrapper {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-top: 1rem;
+
+    .friends-sidebar {
+      width: 250px;
+    }
+
+    .friends-main {
+      flex: 1;
+    }
+  }
+
   .page-title {
     color: get-theme-color("text-primary");
     font-size: 1.75rem;

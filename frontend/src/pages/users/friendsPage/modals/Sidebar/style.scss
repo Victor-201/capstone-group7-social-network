@@ -1,0 +1,32 @@
+@import '../../../../../styles/pages/theme';
+
+.friends-sidebar {
+  background-color: get-theme-color("primary-color");
+  border: 1px solid get-theme-color("tertiary-color");
+  border-radius: 8px;
+  padding: 1rem;
+  width: 100%;
+
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    li {
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      border-radius: 4px;
+      color: get-theme-color("text-secondary");
+      transition: background 0.2s ease;
+
+      &.active {
+        background-color: get-theme-color("tertiary-color");
+        color: get-theme-color("text-primary");
+      }
+
+      &:hover {
+        background-color: get-theme-color("background-color-light");
+      }
+    }
+  }
+}
