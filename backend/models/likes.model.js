@@ -1,7 +1,7 @@
-const { DataTypes } = require('sequelize');
+import { DataTypes } from 'sequelize';
 
-module.exports = (sequelize) => {
-  const Like = sequelize.define('Like', {
+const Like = (sequelize) => {
+  const model = sequelize.define('Like', {
     id: {
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
@@ -27,10 +27,11 @@ module.exports = (sequelize) => {
     ]    
   });
 
-  Like.associate = (models) => {
-    Like.belongsTo(models.UserInfo, { foreignKey: 'user_id' });
-    Like.belongsTo(models.Post, { foreignKey: 'post_id' });
+  model.associate = (models) => {
+    model.belongsTo(models.UserInfo, { foreignKey: 'user_id' });
+    model.belongsTo(models.Post, { foreignKey: 'post_id' });
   };
 
-  return Like;
+  return model;
 };
+export default Like;

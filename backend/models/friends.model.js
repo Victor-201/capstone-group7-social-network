@@ -1,7 +1,7 @@
-const { DataTypes } = require('sequelize');
+import { DataTypes } from 'sequelize';
 
-module.exports = (sequelize) => {
-  const Friends = sequelize.define('Friends', {
+const Friend = (sequelize) => {
+  const model = sequelize.define('Friend', {
     id: {
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
@@ -24,10 +24,11 @@ module.exports = (sequelize) => {
     timestamps: false,
   });
 
-  Friends.associate = (models) => {
-    Friends.belongsTo(models.UserInfo, { foreignKey: 'user_id', as: 'Requester' });
-    Friends.belongsTo(models.UserInfo, { foreignKey: 'friend_id', as: 'Recipient' });
+  model.associate = (models) => {
+    model.belongsTo(models.UserInfo, { foreignKey: 'user_id', as: 'Requester' });
+    model.belongsTo(models.UserInfo, { foreignKey: 'friend_id', as: 'Recipient' });
   };
 
-  return Friends;
+  return model;
 };
+export default Friend;

@@ -1,48 +1,55 @@
-const { DataTypes } = require('sequelize');
+import { DataTypes } from 'sequelize';
 
-module.exports = (sequelize) => {
-  const UsersAccount = sequelize.define('UserAccount', {
-    user_id: {
+const UserAccount = (sequelize) => {
+  const model = sequelize.define('UserAccount', {
+    id: {
       type: DataTypes.UUID,
       primaryKey: true,
-      references: {
-        model: 'user_infos',
-        key: 'id'
-      }
+      allowNull: false,
     },
-    username: {
+    phone_number: {
       type: DataTypes.STRING,
       unique: true,
-      allowNull: false
+      allowNull: false,
+    },
+    user_name: {
+      type: DataTypes.STRING,
+      unique: true,
+      allowNull: false,
+    },
+    roll : {
+      type: DataTypes.ENUM('admin', 'user'),
+      defaultValue: 'user',
     },
     email: {
       type: DataTypes.STRING,
       unique: true,
-      allowNull: false
+      allowNull: false,
     },
-    password_hash: {
+    password: {
       type: DataTypes.STRING,
-      allowNull: false
-    },
-    created_at: {
-      type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW,
+      allowNull: false,
     },
     status: {
-      type: DataTypes.ENUM('active', 'deleting', 'prohibited'),
+      type: DataTypes.ENUM('active','suspended', 'deleted'),
       defaultValue: 'active',
     },
     status_update_at: {
       type: DataTypes.DATE,
+    },
+    created_at: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
     }
   }, {
     tableName: 'user_account',
     timestamps: false,
   });
 
-  UsersAccount.associate = (models) => {
-    UsersAccount.belongsTo(models.UserInfo, { foreignKey: 'user_id' });
+  model.associate = (models) => {
+    model.belongsTo(models.UserInfo, { foreignKey: 'id' });
   };
-
-  return UsersAccount;
+    return model;
 };
+
+export default UserAccount;

@@ -1,7 +1,7 @@
-const { DataTypes } = require('sequelize');
+import { DataTypes } from 'sequelize';
 
-module.exports = (sequelize) => {
-  const Post = sequelize.define('Post', {
+const Post = (sequelize) => {
+  const model = sequelize.define('Post', {
     id: {
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
@@ -9,10 +9,7 @@ module.exports = (sequelize) => {
     },
     user_id: {
       type: DataTypes.UUID,
-      references: {
-        model: 'user_infos',
-        key: 'id'
-      }
+      allowNull: false,
     },
     content: {
       type: DataTypes.STRING(3000),
@@ -26,10 +23,6 @@ module.exports = (sequelize) => {
     },
     shared_post_id: {
       type: DataTypes.UUID,
-      references: {
-        model: 'posts',
-        key: 'id'
-      },
       allowNull: true,
     },
     created_at: {
@@ -41,13 +34,15 @@ module.exports = (sequelize) => {
     timestamps: false,
   });
 
-  Post.associate = (models) => {
-    Post.belongsTo(models.UserInfos, { foreignKey: 'user_id' });
-    Post.belongsTo(models.Post, { foreignKey: 'shared_post_id' });
-    Post.hasMany(models.PostMedia, { foreignKey: 'post_id' });
-    Post.hasMany(models.Comment, { foreignKey: 'post_id' });
-    Post.hasMany(models.Like, { foreignKey: 'post_id' });
+  model.associate = (models) => {
+    model.belongsTo(models.UserInfo, { foreignKey: 'user_id' });
+    model.belongsTo(models.Post, { foreignKey: 'shared_post_id' });
+    model.hasMany(models.PostMedia, { foreignKey: 'post_id' });
+    model.hasMany(models.Comment, { foreignKey: 'post_id' });
+    model.hasMany(models.Like, { foreignKey: 'post_id' });
   };
 
-  return Post;
+  return model;
 };
+
+export default Post;

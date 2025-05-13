@@ -1,7 +1,7 @@
-const { DataTypes } = require('sequelize');
+import { DataTypes } from 'sequelize';
 
-module.exports = (sequelize) => {
-    const PostMedia = sequelize.define('PostMedia',
+const PostMedia = (sequelize) => {
+    const model = sequelize.define('PostMedia',
         {
             id: {
                 type: DataTypes.UUID,
@@ -10,10 +10,7 @@ module.exports = (sequelize) => {
             },
             post_id: {
                 type: DataTypes.UUID,
-                references: {
-                    model: 'posts',
-                    key: 'id'
-                }
+                allowNull: false,
             },
             media_url: {
                 type: DataTypes.TEXT,
@@ -32,7 +29,10 @@ module.exports = (sequelize) => {
             timestamps: false,
         }
     )
-    PostMedia.associate = (models) => {
-        PostMedia.belongsTo(models.Post, { foreignKey: 'post_id' });
+    model.associate = (models) => {
+        model.belongsTo(models.Post, { foreignKey: 'post_id' });
     };
+    return model;
 }
+
+export default PostMedia;

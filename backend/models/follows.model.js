@@ -1,6 +1,6 @@
-const { DataTypes } = require('sequelize');
-module.exports = (sequelize) => {
-  const Follow = sequelize.define('Follow', {
+import { DataTypes } from 'sequelize';
+const Follow = (sequelize) => {
+  const model = sequelize.define('Follow', {
     follower_id: {
       type: DataTypes.UUID,
       allowNull: false,
@@ -16,7 +16,7 @@ module.exports = (sequelize) => {
       defaultValue: DataTypes.NOW
     }
   }, {
-    tableName: 'Follows',
+    tableName: 'follows',
     timestamps: false,
     indexes: [
       {
@@ -26,16 +26,17 @@ module.exports = (sequelize) => {
     ]
   });
 
-  Follow.associate = function(models) {
-    Follow.belongsTo(models.UserInfo, {
+  model.associate = function(models) {
+    model.belongsTo(models.UserInfo, {
       foreignKey: 'follower_id',
       as: 'Follower'
     });
-    Follow.belongsTo(models.UserInfo, {
+    model.belongsTo(models.UserInfo, {
       foreignKey: 'following_id',
       as: 'Following'
     });
   };
 
-  return Follow;
+  return model;
 };
+export default Follow;

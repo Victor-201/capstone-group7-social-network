@@ -1,27 +1,28 @@
-const { DataTypes } = require('sequelize');
+import { DataTypes } from 'sequelize';
 
-module.exports = (sequelize) => {
-  const ChatParticipant = sequelize.define('ChatParticipant', {
+const ChatParticipant = (sequelize) => {
+  const model = sequelize.define('ChatParticipant', {
     chat_id: {
       type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4,
       allowNull: false,
-      primaryKey: true
+      primaryKey: true,  
     },
     user_id: {
-      type: DataTypes.CHAR(36),
+      type: DataTypes.UUID,
       allowNull: false,
-      primaryKey: true
+      primaryKey: true,  
     }
   }, {
-    tableName: 'ChatParticipants',
-    timestamps: false
+    tableName: 'chatParticipants',
+    timestamps: false, 
   });
 
-  ChatParticipant.associate = function(models) {
-    ChatParticipant.belongsTo(models.Chat, { foreignKey: 'chat_id' });
-    ChatParticipant.belongsTo(models.UserInfo, { foreignKey: 'user_id' });
+  model.associate = function(models) {
+    model.belongsTo(models.Chat, { foreignKey: 'chat_id' });
+    model.belongsTo(models.UserInfo, { foreignKey: 'user_id' });
   };
 
-  return ChatParticipant;
+  return model;
 };
+
+export default ChatParticipant;

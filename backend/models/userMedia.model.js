@@ -1,25 +1,23 @@
-const { DataTypes } = require('sequelize');
+import { DataTypes } from 'sequelize';
 
-module.exports = (sequelize) => {
-  const UserMedia = sequelize.define('UserMedia', {
-    id: {
+const UserMedia = (sequelize) => {
+  const model = sequelize.define('UserMedia', {
+    media_id: {
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
       primaryKey: true
     },
     user_id: {
       type: DataTypes.UUID,
-      references: {
-        model: 'user_infos',
-        key: 'id'
-      }
-    },
-    media_url: {
-      type: DataTypes.TEXT,
-      allowNull: false
+      allowNull: false,
     },
     media_type: {
-      type: DataTypes.STRING,
+      type: DataTypes.ENUM('image', 'video'),
+      allowNull: false,
+    },
+    image_type:{
+      type: DataTypes.ENUM('cover', 'avatar'),
+      allowNull: false,
     },
     created_at: {
       type: DataTypes.DATE,
@@ -30,9 +28,11 @@ module.exports = (sequelize) => {
     timestamps: false,
   });
 
-  UserMedia.associate = (models) => {
-    UserMedia.belongsTo(models.UserInfo, { foreignKey: 'user_id' });
+  model.associate = (models) => {
+    model.belongsTo(models.UserInfo, { foreignKey: 'user_id' });
   };
 
-  return UserMedia;
+  return model;
 };
+
+export default UserMedia;

@@ -1,7 +1,7 @@
-const { DataTypes } = require('sequelize');
+import { DataTypes } from 'sequelize';
 
-module.exports = (sequelize) => {
-  const Comment = sequelize.define('Comments', {
+const Comment = (sequelize) => {
+  const model = sequelize.define('Comment', {
     id: {
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
@@ -34,19 +34,20 @@ module.exports = (sequelize) => {
     timestamps: false,
   });
 
-  Comment.associate = (models) => {
-    Comment.belongsTo(models.UserInfo, { foreignKey: 'user_id' });
-    Comment.belongsTo(models.Post, { foreignKey: 'post_id' });
+  model.associate = (models) => {
+    model.belongsTo(models.UserInfo, { foreignKey: 'user_id' });
+    model.belongsTo(models.Post, { foreignKey: 'post_id' });
   
-    Comment.belongsTo(models.Comment, {
+    model.belongsTo(models.Comment, {
       foreignKey: 'parent_comment_id',
       as: 'ParentComment'
     });
   
-    Comment.hasMany(models.Comment, {
+    model.hasMany(models.Comment, {
       foreignKey: 'parent_comment_id',
       as: 'Replies'
     });
   };
-  return Comment;
+  return model;
 }
+export default Comment;

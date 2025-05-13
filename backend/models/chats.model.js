@@ -1,10 +1,9 @@
-const { DataTypes } = require('sequelize');
+import { DataTypes } from 'sequelize';
 
-module.exports = (sequelize) => {
-  const Chat = sequelize.define('Chat', {
+const Chat = (sequelize) => {
+  const model = sequelize.define('Chat', {
     id: {
       type: DataTypes.UUID,
-      allowNull: false,
       primaryKey: true,
       defaultValue: DataTypes.UUIDV4
     },
@@ -21,17 +20,18 @@ module.exports = (sequelize) => {
     timestamps: false
   });
 
-  Chat.associate = function(models) {
-    Chat.hasMany(models.ChatParticipant, {
+  model.associate = function(models) {
+    model.hasMany(models.ChatParticipant, {
       foreignKey: 'chat_id',
       as: 'Participants'
     });
 
-    Chat.hasMany(models.Message, {
+    model.hasMany(models.Message, {
       foreignKey: 'chat_id',
       as: 'Messages'
     });
   };
 
-  return Chat;
+  return model;
 };
+export default Chat;

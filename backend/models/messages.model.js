@@ -1,7 +1,7 @@
-const { DataTypes } = require('sequelize');
+import { DataTypes } from 'sequelize';
 
-module.exports = (sequelize) => {
-  const Message = sequelize.define('Message', {
+const Message = (sequelize) => {
+  const model = sequelize.define('Message', {
     id: {
       type: DataTypes.UUID,
       allowNull: false,
@@ -29,16 +29,18 @@ module.exports = (sequelize) => {
     timestamps: false
   });
 
-  Message.associate = function(models) {
-    Message.belongsTo(models.Chat, {
+  model.associate = function(models) {
+    model.belongsTo(models.Chat, {
       foreignKey: 'chat_id',
       as: 'Chat'
     });
-    Message.belongsTo(models.UserInfo, {
+    model.belongsTo(models.UserInfo, {
       foreignKey: 'sender_id',
       as: 'Sender'
     });
   };
 
-  return Message;
+  return model;
 };
+
+export default Message;

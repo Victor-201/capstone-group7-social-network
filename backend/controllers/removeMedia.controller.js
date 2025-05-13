@@ -1,4 +1,4 @@
-import cloudinary from '../config/cloudinaryConfig.js';
+import cloudinary from '../configs/cloudinary.config.js';
 
 export const removeMedia = async (req, res) => {
     const id = req.params.id;
