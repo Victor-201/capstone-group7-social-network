@@ -1,129 +1,174 @@
--- Table: UserInfos
-CREATE TABLE UserInfos (
-    id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
+-- Table: User_Infos
+CREATE TABLE User_Infos (
+    id CHAR(36) PRIMARY KEY,
     full_name VARCHAR(255),
     bio TEXT,
-    birthdate DATE,
     gender VARCHAR(50),
-    favourite VARCHAR(300),
+    birth_date DATE,
+    location VARCHAR(255),
+    hometown VARCHAR(255),
+    avatar CHAR(36) DEFAULT NULL,
+    cover CHAR(36) DEFAULT NULL,
+    isOnline BOOLEAN DEFAULT FALSE,
     interestedUser VARCHAR(256)
 );
 
--- Table: UsersAccount
-CREATE TABLE UserAccount (
-    user_id CHAR(36) PRIMARY KEY REFERENCES UserInfos(id),
-    username VARCHAR(255) UNIQUE NOT NULL,
+
+-- Table: User_Account
+CREATE TABLE User_Account (
+    id CHAR(36) PRIMARY KEY NOT NULL,
+    phone_number VARCHAR(20) UNIQUE NOT NULL,
+    user_name VARCHAR(255) UNIQUE NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
-    password_hash VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    roll ENUM('user', 'admin') DEFAULT 'user',
+    status ENUM('active', 'suspended', 'deleted') DEFAULT 'active',
+    status_update_at TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    status ENUM('active', 'deleting', 'prohibited') DEFAULT 'active',
-    status_update_at TIMESTAMP
+    FOREIGN KEY (id) REFERENCES User_Infos(id)
 );
 
--- Table: UserMedia
-CREATE TABLE UserMedia (
-    id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
-    user_id CHAR(36) REFERENCES UserInfos(id),
-    media_url TEXT NOT NULL,
-    media_type VARCHAR(50), -- avatar, cover, etc.
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+-- Table: Resfresh_Tokens
+CREATE TABLE Refresh_Tokens (
+    id CHAR(36) PRIMARY KEY,
+    user_id CHAR(36) NOT NULL,
+    token TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    expires_at TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES User_Account(id)
 );
+
+-- Table: User_Media
+CREATE TABLE User_Media (
+    media_id CHAR(36) PRIMARY KEY,
+    user_id CHAR(36) NOT NULL,
+    media_type ENUM ('image', 'video') NOT NULL,
+    image_type ENUM ('cover', 'avatar') NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES User_Infos(id)
+);
+
+-- Add foregin key in user_info
+ALTER TABLE User_Infos
+    ADD FOREIGN KEY (avatar) REFERENCES User_Media(media_id),
+    ADD FOREIGN KEY (cover) REFERENCES User_Media(media_id);
 
 -- Table: Posts
 CREATE TABLE Posts (
-    id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
-    user_id CHAR(36) REFERENCES UserInfos(id),
+    id CHAR(36) PRIMARY KEY,
+    user_id CHAR(36) NOT NULL,
     content VARCHAR(3000),
     access_modifier ENUM('public', 'private', 'friends'),
     like_count INT DEFAULT 0,
-    shared_post_id CHAR(36) REFERENCES Posts(id),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    shared_post_id CHAR(36),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES User_Infos(id),
+    FOREIGN KEY (shared_post_id) REFERENCES Posts(id)
 );
 
--- Table: PostMedia
-CREATE TABLE PostMedia (
-    id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
-    post_id CHAR(36) REFERENCES Posts(id),
+-- Table: Post_Media
+CREATE TABLE Post_Media (
+    id CHAR(36) PRIMARY KEY,
+    post_id CHAR(36) NOT NULL,
     media_url TEXT,
-    media_type VARCHAR(50), -- image, video, etc.
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    media_type VARCHAR(50),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (post_id) REFERENCES Posts(id)
 );
 
 -- Table: Comments
 CREATE TABLE Comments (
-    id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
-    post_id CHAR(36) REFERENCES Posts(id),
-    user_id CHAR(36) REFERENCES UserInfos(id),
+    id CHAR(36) PRIMARY KEY,
+    post_id CHAR(36) NOT NULL,
+    user_id CHAR(36) NOT NULL,
     content TEXT,
-    like_count INT,
-    parent_comment_id CHAR(36) REFERENCES Comments(id),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    like_count INT DEFAULT 0,
+    parent_comment_id CHAR(36),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (post_id) REFERENCES Posts(id),
+    FOREIGN KEY (user_id) REFERENCES User_Infos(id),
+    FOREIGN KEY (parent_comment_id) REFERENCES Comments(id)
 );
 
 -- Table: Likes
 CREATE TABLE Likes (
-    id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
-    post_id CHAR(36) REFERENCES Posts(id),
-    user_id CHAR(36) REFERENCES UserInfos(id)
+    id CHAR(36) PRIMARY KEY,
+    post_id CHAR(36) NOT NULL,
+    user_id CHAR(36) NOT NULL,
+    UNIQUE(post_id, user_id),
+    FOREIGN KEY (post_id) REFERENCES Posts(id),
+    FOREIGN KEY (user_id) REFERENCES User_Infos(id)
 );
 
 -- Table: Friends
 CREATE TABLE Friends (
-    user_id CHAR(36) REFERENCES UserInfos(id),
-    friend_id CHAR(36) REFERENCES UserInfos(id),
+    user_id CHAR(36) NOT NULL,
+    friend_id CHAR(36) NOT NULL,
     status ENUM('pending', 'accepted', 'rejected') NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY(user_id, friend_id)
+    PRIMARY KEY(user_id, friend_id),
+    FOREIGN KEY (user_id) REFERENCES User_Infos(id),
+    FOREIGN KEY (friend_id) REFERENCES User_Infos(id)
 );
 
 -- Table: Follows
 CREATE TABLE Follows (
-    follower_id CHAR(36) REFERENCES UserInfos(id),
-    following_id CHAR(36) REFERENCES UserInfos(id),
+    follower_id CHAR(36) NOT NULL,
+    following_id CHAR(36) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY(follower_id, following_id)
+    PRIMARY KEY(follower_id, following_id),
+    FOREIGN KEY (follower_id) REFERENCES User_Infos(id),
+    FOREIGN KEY (following_id) REFERENCES User_Infos(id)
 );
 
 -- Table: Chats
 CREATE TABLE Chats (
-    id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
+    id CHAR(36) PRIMARY KEY,
     is_group BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Table: ChatParticipants
-CREATE TABLE ChatParticipants (
-    chat_id CHAR(36) REFERENCES Chats(id),
-    user_id CHAR(36) REFERENCES UserInfos(id),
-    PRIMARY KEY(chat_id, user_id)
+-- Table: Chat_Participants
+CREATE TABLE Chat_Participants (
+    chat_id CHAR(36) NOT NULL,
+    user_id CHAR(36) NOT NULL,
+    PRIMARY KEY(chat_id, user_id),
+    FOREIGN KEY (chat_id) REFERENCES Chats(id),
+    FOREIGN KEY (user_id) REFERENCES User_Infos(id)
 );
 
 -- Table: Messages
 CREATE TABLE Messages (
-    id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
-    chat_id CHAR(36) REFERENCES Chats(id),
-    sender_id CHAR(36) REFERENCES UserInfos(id),
+    id CHAR(36) PRIMARY KEY,
+    chat_id CHAR(36) NOT NULL,
+    sender_id CHAR(36) NOT NULL,
     content TEXT,
-    sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (chat_id) REFERENCES Chats(id),
+    FOREIGN KEY (sender_id) REFERENCES User_Infos(id)
 );
 
 -- Table: Notifications
 CREATE TABLE Notifications (
-    id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
-    sender_id CHAR(36) REFERENCES UserInfos(id),
-    receiver_id CHAR(36) REFERENCES UserInfos(id),
-    action_type VARCHAR(50) NOT NULL,
-    action_id VARCHAR(36),
+    id CHAR(36) PRIMARY KEY,
+    sender_id CHAR(36) NOT NULL,
+    receiver_id CHAR(36) NOT NULL,
+    action_type ENUM ('post', 'comment', 'like', 'friend_request', 'message') NOT NULL,
+    action_id CHAR(36) NOT NULL,
     is_read BOOLEAN DEFAULT FALSE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (sender_id) REFERENCES User_Infos(id),
+    FOREIGN KEY (receiver_id) REFERENCES User_Infos(id)
 );
 
--- Table: PostTags
-CREATE TABLE PostTags (
-    id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
-    post_id CHAR(36) REFERENCES Posts(id),
-    user_id CHAR(36) REFERENCES UserInfos(id),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+-- Table: Post_Tags
+CREATE TABLE Post_Tags (
+    id CHAR(36) PRIMARY KEY,
+    post_id CHAR(36) NOT NULL,
+    user_id CHAR(36) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (post_id) REFERENCES Posts(id),
+    FOREIGN KEY (user_id) REFERENCES User_Infos(id)
 );
 
 -- Indexes
@@ -133,4 +178,20 @@ CREATE INDEX idx_posts_likecount_createdat ON Posts(like_count DESC, created_at 
 CREATE INDEX idx_posts_accessmodifier ON Posts(access_modifier);
 CREATE INDEX idx_posts_shared ON Posts(shared_post_id);
 CREATE INDEX idx_comments_postid_likecount ON Comments(post_id, like_count DESC);
+CREATE INDEX idx_comments_parent ON Comments(parent_comment_id);
 CREATE INDEX idx_notifications_receiver ON Notifications(receiver_id, is_read, created_at DESC);
+
+-- Envent Schedule
+SET GLOBAL event_scheduler = ON;
+
+-- Create an event to delete expired refresh tokens
+CREATE EVENT delete_expired_tokens
+
+ON SCHEDULE EVERY 1 DAY
+STARTS CURRENT_TIMESTAMP + INTERVAL 1 HOUR
+DO
+  DELETE FROM refresh_tokens
+  WHERE expires_at < NOW();
+
+-- Show all events
+SHOW EVENTS;
