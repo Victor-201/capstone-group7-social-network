@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { FaExclamationTriangle } from 'react-icons/fa';
 import CreatePost from '../../../components/createPost';
 import Post from '../../../components/postCard';
@@ -10,6 +10,7 @@ const HomePage = () => {
   const [posts, setPosts] = useState([]);
   // Tạo ref để giữ vị trí random, không bị random lại mỗi lần render
   const suggestionIndexRef = useRef(null);
+  const listRef = useRef(null);
 
   useEffect(() => {
     const mockPosts = [
@@ -132,68 +133,20 @@ const HomePage = () => {
     }
   }, []);
 
-  const friendSuggestions = [
-    {
-      id: 'friend-1',
-      fullName: 'Nguyễn Xuân Hải',
-      username: 'xuanhai0913',
-      avatar: 'v1652278394/user_avatars/friend_1.jpg',
-    },
-    {
-      id: 'friend-2',
-      fullName: 'Nguyễn Ngọc Trung',
-      username: 'hoangthie',
-      avatar: 'v1652278394/user_avatars/friend_2.jpg',
-    },
-    {
-      id: 'friend-3',
-      fullName: 'Nguyễn Văn Thắng',
-      username: 'tranminhf',
-      avatar: 'v1652278394/user_avatars/friend_3.jpg',
-    },
-    {
-      id: 'friend-4',
-      fullName: 'Trần Thị Mai',
-      username: 'maitran',
-      avatar: 'v1652278394/user_avatars/friend_4.jpg',
-    },
-    {
-      id: 'friend-5',
-      fullName: 'Lê Văn Hòa',
-      username: 'hoale',
-      avatar: 'v1652278394/user_avatars/friend_5.jpg',
-    },
-    {
-      id: 'friend-6',
-      fullName: 'Phạm Minh Tuấn',
-      username: 'minhtuan',
-      avatar: 'v1652278394/user_avatars/friend_6.jpg',
-    },
-    {
-      id: 'friend-7',
-      fullName: 'Ngô Thị Hạnh',
-      username: 'hanhngo',
-      avatar: 'v1652278394/user_avatars/friend_7.jpg',
-    },
-    {
-      id: 'friend-8',
-      fullName: 'Đỗ Quang Huy',
-      username: 'quanghuydo',
-      avatar: 'v1652278394/user_avatars/friend_8.jpg',
-    },
-    {
-      id: 'friend-9',
-      fullName: 'Vũ Thị Lan',
-      username: 'lanvu',
-      avatar: 'v1652278394/user_avatars/friend_9.jpg',
-    },
-    {
-      id: 'friend-10',
-      fullName: 'Nguyễn Văn Hùng',
-      username: 'hungnguyen',
-      avatar: 'v1652278394/user_avatars/friend_10.jpg',
-    },
-  ];
+  const friendSuggestions = useMemo(() => {
+    return [
+      { id: 'friend-1', fullName: 'Nguyễn Xuân Hải', username: 'xuanhai0913', avatar: 'v1652278394/user_avatars/friend_1.jpg' },
+      { id: 'friend-2', fullName: 'Nguyễn Ngọc Trung', username: 'hoangthie', avatar: 'v1652278394/user_avatars/friend_2.jpg' },
+      { id: 'friend-3', fullName: 'Nguyễn Văn Thắng', username: 'tranminhf', avatar: 'v1652278394/user_avatars/friend_3.jpg' },
+      { id: 'friend-4', fullName: 'Trần Thị Mai', username: 'maitran', avatar: 'v1652278394/user_avatars/friend_4.jpg' },
+      { id: 'friend-5', fullName: 'Lê Văn Hòa', username: 'hoale', avatar: 'v1652278394/user_avatars/friend_5.jpg' },
+      { id: 'friend-6', fullName: 'Phạm Minh Tuấn', username: 'minhtuan', avatar: 'v1652278394/user_avatars/friend_6.jpg' },
+      { id: 'friend-7', fullName: 'Ngô Thị Hạnh', username: 'hanhngo', avatar: 'v1652278394/user_avatars/friend_7.jpg' },
+      { id: 'friend-8', fullName: 'Đỗ Quang Huy', username: 'quanghuydo', avatar: 'v1652278394/user_avatars/friend_8.jpg' },
+      { id: 'friend-9', fullName: 'Vũ Thị Lan', username: 'lanvu', avatar: 'v1652278394/user_avatars/friend_9.jpg' },
+      { id: 'friend-10', fullName: 'Nguyễn Văn Hùng', username: 'hungnguyen', avatar: 'v1652278394/user_avatars/friend_10.jpg' },
+    ].sort(() => Math.random() - 0.5); // shuffle
+  }, []);
 
   const renderPostsWithSuggestions = () => {
     if (!posts.length) return null;
@@ -209,8 +162,8 @@ const HomePage = () => {
                 <span>Gợi ý kết bạn</span>
                 <span className="friend-suggestions-desc">Kết nối với những người bạn có thể biết</span>
               </div>
-              <div className="friend-suggestions-list">
-                {friendSuggestions.map(user => (
+              <div className="friend-suggestions-list" ref={listRef}>
+                {friendSuggestions.map((user, idx) => (
                   <FriendCard key={user.id} user={user} />
                 ))}
               </div>
