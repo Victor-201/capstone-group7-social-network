@@ -1,4 +1,3 @@
-import { ref } from 'joi';
 import { DataTypes } from 'sequelize';
 
 const UserAccount = (sequelize) => {

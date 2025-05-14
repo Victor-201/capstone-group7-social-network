@@ -13,7 +13,7 @@ const RefreshToken = (sequelize) => {
       allowNull: false,
     },
     token: {
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT,
       allowNull: false,
     },
     created_at: {

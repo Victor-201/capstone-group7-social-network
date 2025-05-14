@@ -92,8 +92,7 @@ export const signIn = async (req, res) => {
                 message: "Invalid password"
             });
         }
-        // Create payload and expiration date
-        const expiresAt = new Date(Date.now() + parseInt(process.env.REFRESH_TOKEN_EXPIRES_IN) * 1000);
+        // Create payload
         const payload = {
             id: user.id,
             userName: user.user_name,
@@ -103,7 +102,11 @@ export const signIn = async (req, res) => {
         // Create Access token
         const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, { expiresIn: process.env.ACCESS_TOKEN_EXPIRES_IN });
         // Create Refresh token
+        console.log("Refresh token expires at: ", process.env.REFRESH_TOKEN_EXPIRES_IN);
         const refreshToken = jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET, { expiresIn: process.env.REFRESH_TOKEN_EXPIRES_IN });
+        // Set refresh token expiration date
+        const decoded = jwt.decode(refreshToken);
+        const expiresAt = new Date(decoded.exp * 1000);
         // Save refresh token to database
         await RefreshToken.create({
             user_id: user.id,
@@ -126,3 +129,31 @@ export const signIn = async (req, res) => {
         });
     }
 }
+
+export const signOut = async (req, res) => {
+    try {
+        const token = req.body.refreshToken;
+        if (!token) {
+            return res.status(400).json({
+                name: "NoTokenProvided",
+                message: "No token provided"
+            });
+        }
+        const deleted = await RefreshToken.destroy({ where: { token: token } });
+        if (deleted === 0) {
+            return res.status(404).json({
+                name: "TokenNotFound",
+                message: "Token does not exist or already logged out"
+            });
+        }
+        return res.status(200).json({
+            name: "UserLoggedOut",
+            message: "User logged out successfully"
+        });
+    } catch (error) {
+        return res.status(500).json({
+            name: error.name,
+            message: error.message
+        });
+    }
+};
