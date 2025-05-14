@@ -13,6 +13,7 @@ import PostTag from "./postTag.model.js";
 import UserMedia from "./userMedia.model.js";
 import PostMedia from "./postMedia.model.js";
 import Friend from "./Friends.model.js";
+import RefreshToken from "./refreshTokens.modle.js";
 
 const models = {
   UserAccount: UserAccount(sequelize),
@@ -29,6 +30,7 @@ const models = {
   UserMedia: UserMedia(sequelize),
   PostMedia: PostMedia(sequelize),
   Friend: Friend(sequelize),
+  RefreshToken: RefreshToken(sequelize),
 };
 
 

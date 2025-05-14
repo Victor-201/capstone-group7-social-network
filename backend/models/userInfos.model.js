@@ -52,6 +52,11 @@ const UserInfo = (sequelize) => {
     model.hasMany(models.Post, { foreignKey: 'user_id' });
     model.hasMany(models.Comment, { foreignKey: 'user_id' });
     model.hasMany(models.Like, { foreignKey: 'user_id' });
+    model.hasMany(models.PostTag, { foreignKey: 'user_id' });
+    model.hasMany(models.Friend, { foreignKey: 'user_id' });
+    model.hasMany(models.Friend, { foreignKey: 'friend_id' });
+    model.hasMany(models.PostMedia, { foreignKey: 'user_id' });
+    model.hasMany(models.RefreshToken, { foreignKey: 'user_id' });
 
     model.hasMany(models.Notification, {
       foreignKey: 'sender_id',

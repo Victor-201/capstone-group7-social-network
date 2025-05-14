@@ -4,7 +4,7 @@ import models from "../models/index.js";
 import jwt from "jsonwebtoken";
 import bcryptjs from "bcryptjs";
 
-const { UserAccount, UserInfo} = models;
+const { UserAccount, UserInfo, RefreshToken} = models;
 
 export const signUp = async (req, res) => {
     try {
@@ -92,14 +92,31 @@ export const signIn = async (req, res) => {
                 message: "Invalid password"
             });
         }
-        // Create token
-        const accessToken = jwt.sign({ 'id': user.id, 'userName': user.userName, 'roll': user.roll, 'email': user.email }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1d' });
+        // Create payload and expiration date
+        const expiresAt = new Date(Date.now() + parseInt(process.env.REFRESH_TOKEN_EXPIRES_IN) * 1000);
+        const payload = {
+            id: user.id,
+            userName: user.user_name,
+            roll: user.roll,
+            email: user.email
+        };
+        // Create Access token
+        const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, { expiresIn: process.env.ACCESS_TOKEN_EXPIRES_IN });
+        // Create Refresh token
+        const refreshToken = jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET, { expiresIn: process.env.REFRESH_TOKEN_EXPIRES_IN });
+        // Save refresh token to database
+        await RefreshToken.create({
+            user_id: user.id,
+            token: refreshToken,
+            expires_at: expiresAt,
+        });
         // Remove password from response
         user.password = undefined;
         return res.status(200).json({
             name: "UserLoggedIn",
             message: "User logged in successfully",
-            Token: accessToken
+            accessToken: accessToken,
+            refreshToken: refreshToken,
         });
 
     } catch (error) {
