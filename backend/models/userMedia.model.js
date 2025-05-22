@@ -4,7 +4,6 @@ const UserMedia = (sequelize) => {
   const model = sequelize.define('UserMedia', {
     media_id: {
       type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4,
       primaryKey: true
     },
     user_id: {

@@ -77,7 +77,17 @@ export const signIn = async (req, res) => {
             });
         }
         // Check if user not exists
-        const user = await UserAccount.findOne({ where: { user_name: req.body.userName } });
+        const loginName = req.body.loginName.trim();
+        let clause = {};
+        if (/^\d{9,11}$/.test(loginName)) {
+            clause.phone_number = loginName;
+        }
+        else if (/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(loginName)){
+            clause.email = loginName;
+        } else {
+            clause.user_name = loginName;
+        }
+        const user = await UserAccount.findOne({where : clause});
         if (!user) {
             return res.status(400).json({
                 name: "UserNotFound",
@@ -96,13 +106,12 @@ export const signIn = async (req, res) => {
         const payload = {
             id: user.id,
             userName: user.user_name,
-            roll: user.roll,
+            role: user.role,
             email: user.email
         };
         // Create Access token
         const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, { expiresIn: process.env.ACCESS_TOKEN_EXPIRES_IN });
         // Create Refresh token
-        console.log("Refresh token expires at: ", process.env.REFRESH_TOKEN_EXPIRES_IN);
         const refreshToken = jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET, { expiresIn: process.env.REFRESH_TOKEN_EXPIRES_IN });
         // Set refresh token expiration date
         const decoded = jwt.decode(refreshToken);

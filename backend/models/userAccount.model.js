@@ -17,7 +17,13 @@ const UserAccount = (sequelize) => {
       unique: true,
       allowNull: false,
     },
-    roll : {
+    otp_code: {
+      type: DataTypes.STRING,
+    },
+    otp_expiry: {
+      type: DataTypes.DATE,
+    },
+    role : {
       type: DataTypes.ENUM('admin', 'user'),
       defaultValue: 'user',
     },

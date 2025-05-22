@@ -11,7 +11,7 @@ const PORT = process.env.PORT;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use('/', router);
+app.use('/api', router);
 
 (async () => {
     try {

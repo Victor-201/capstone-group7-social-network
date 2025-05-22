@@ -1,12 +1,12 @@
 import express from 'express';
 import multer from 'multer';
-import { uploadMedia } from '../controllers/uploadMedia.controller.js';
-import { mediaStorage } from '../middleware/multer.middleware.js';
+import { uploadAvatar } from '../controllers/Avatar.controller.js';
+import { mediaStorage } from '../helpers/multer.helper.js';
 
 const router = express.Router();
 
 const upload = multer({ storage: mediaStorage, limits: { fileSize: 50 * 1024 * 1024 } });
 
-router.post('/upload', upload.array('media'), uploadMedia);
+router.post('/avatar', upload.single('media'), uploadAvatar);
 
 export default router;
