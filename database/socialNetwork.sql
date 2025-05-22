@@ -20,8 +20,10 @@ CREATE TABLE User_Account (
     phone_number VARCHAR(20) UNIQUE NOT NULL,
     user_name VARCHAR(255) UNIQUE NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
+    otp_code VARCHAR(6),
+    otp_expiry TIMESTAMP,
     password VARCHAR(255) NOT NULL,
-    roll ENUM('user', 'admin') DEFAULT 'user',
+    role ENUM('user', 'admin') DEFAULT 'user',
     status ENUM('active', 'suspended', 'deleted') DEFAULT 'active',
     status_update_at TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -192,6 +194,14 @@ STARTS CURRENT_TIMESTAMP + INTERVAL 1 HOUR
 DO
   DELETE FROM refresh_tokens
   WHERE expires_at < NOW();
+
+-- Create an event to delete otp codes and otp expiry
+CREATE EVENT IF NOT EXISTS delete_expired_otp
+ON SCHEDULE EVERY 5 MINUTE
+DO
+  UPDATE UserAccounts
+  SET otp_code = NULL, otp_expiry = NULL
+  WHERE otp_expiry < NOW();
 
 -- Show all events
 SHOW EVENTS;
