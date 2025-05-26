@@ -30,8 +30,13 @@ const PostMedia = (sequelize) => {
         }
     )
     model.associate = (models) => {
-        model.belongsTo(models.Post, { foreignKey: 'post_id' });
+        model.belongsTo(models.Post, {
+            foreignKey: 'post_id',
+            onDelete: 'CASCADE',
+            onUpdate: 'CASCADE',
+        });
     };
+
     return model;
 }
 

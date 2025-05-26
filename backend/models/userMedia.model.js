@@ -16,7 +16,7 @@ const UserMedia = (sequelize) => {
     },
     image_type:{
       type: DataTypes.ENUM('cover', 'avatar'),
-      allowNull: false,
+      defaultValue: 'null',
     },
     created_at: {
       type: DataTypes.DATE,
@@ -28,7 +28,11 @@ const UserMedia = (sequelize) => {
   });
 
   model.associate = (models) => {
-    model.belongsTo(models.UserInfo, { foreignKey: 'user_id' });
+    model.belongsTo(models.UserInfo, {
+    foreignKey: 'user_id',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE'
+    });
   };
 
   return model;

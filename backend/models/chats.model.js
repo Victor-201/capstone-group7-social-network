@@ -23,14 +23,19 @@ const Chat = (sequelize) => {
   model.associate = function(models) {
     model.hasMany(models.ChatParticipant, {
       foreignKey: 'chat_id',
-      as: 'Participants'
+      as: 'Participants',
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE'
     });
 
     model.hasMany(models.Message, {
       foreignKey: 'chat_id',
-      as: 'Messages'
+      as: 'Messages',
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE'
     });
   };
+
 
   return model;
 };

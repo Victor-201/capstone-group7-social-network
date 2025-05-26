@@ -32,14 +32,18 @@ const Message = (sequelize) => {
   model.associate = function(models) {
     model.belongsTo(models.Chat, {
       foreignKey: 'chat_id',
-      as: 'Chat'
+      as: 'Chat',
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
     });
+
     model.belongsTo(models.UserInfo, {
       foreignKey: 'sender_id',
-      as: 'Sender'
+      as: 'Sender',
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
     });
   };
-
   return model;
 };
 

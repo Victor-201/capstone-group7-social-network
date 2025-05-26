@@ -53,8 +53,13 @@ const UserAccount = (sequelize) => {
   });
 
   model.associate = (models) => {
-    model.belongsTo(models.UserInfo, { foreignKey: 'id' });
+    model.belongsTo(models.UserInfo, {
+      foreignKey: 'id',
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+    });
   };
+
     return model;
 };
 

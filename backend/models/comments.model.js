@@ -35,17 +35,30 @@ const Comment = (sequelize) => {
   });
 
   model.associate = (models) => {
-    model.belongsTo(models.UserInfo, { foreignKey: 'user_id' });
-    model.belongsTo(models.Post, { foreignKey: 'post_id' });
-  
+    model.belongsTo(models.UserInfo, {
+      foreignKey: 'user_id',
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+    });
+
+    model.belongsTo(models.Post, {
+      foreignKey: 'post_id',
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+    });
+
     model.belongsTo(models.Comment, {
       foreignKey: 'parent_comment_id',
-      as: 'ParentComment'
+      as: 'ParentComment',
+      onDelete: 'SET NULL', // hoặc CASCADE nếu muốn xóa tất cả comment con
+      onUpdate: 'CASCADE',
     });
-  
+
     model.hasMany(models.Comment, {
       foreignKey: 'parent_comment_id',
-      as: 'Replies'
+      as: 'Replies',
+      onDelete: 'CASCADE', // đảm bảo nếu comment cha bị xóa thì reply cũng bị xóa
+      onUpdate: 'CASCADE',
     });
   };
   return model;

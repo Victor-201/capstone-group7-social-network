@@ -35,12 +35,38 @@ const Post = (sequelize) => {
   });
 
   model.associate = (models) => {
-    model.belongsTo(models.UserInfo, { foreignKey: 'user_id' });
-    model.belongsTo(models.Post, { foreignKey: 'shared_post_id' });
-    model.hasMany(models.PostMedia, { foreignKey: 'post_id' });
-    model.hasMany(models.Comment, { foreignKey: 'post_id' });
-    model.hasMany(models.Like, { foreignKey: 'post_id' });
-  };
+  model.belongsTo(models.UserInfo, {
+    foreignKey: 'user_id',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  });
+  model.belongsTo(models.Post, {
+    foreignKey: 'shared_post_id',
+    onDelete: 'SET NULL',
+    onUpdate: 'CASCADE',
+  });
+  model.hasMany(models.PostMedia, {
+    foreignKey: 'post_id',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  });
+  model.hasMany(models.Comment, {
+    foreignKey: 'post_id',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  });
+  model.hasMany(models.Like, {
+    foreignKey: 'post_id',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  });
+  model.hasMany(models.PostTag, {
+    foreignKey: 'post_id',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  });
+};
+
 
   return model;
 };

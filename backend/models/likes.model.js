@@ -28,10 +28,18 @@ const Like = (sequelize) => {
   });
 
   model.associate = (models) => {
-    model.belongsTo(models.UserInfo, { foreignKey: 'user_id' });
-    model.belongsTo(models.Post, { foreignKey: 'post_id' });
-  };
+    model.belongsTo(models.UserInfo, {
+      foreignKey: 'user_id',
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+    });
 
+    model.belongsTo(models.Post, {
+      foreignKey: 'post_id',
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+    });
+  };
   return model;
 };
 export default Like;

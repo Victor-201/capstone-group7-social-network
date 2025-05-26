@@ -28,9 +28,13 @@ const RefreshToken = (sequelize) => {
     tableName: 'refresh_tokens',
     timestamps: false,
   });
-    model.associate = (models) => {
-        model.belongsTo(models.UserInfo, { foreignKey: 'user_id' });
-    };
-    return model;
-}
+  model.associate = (models) => {
+    model.belongsTo(models.UserInfo, {
+      foreignKey: 'user_id',
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+    });
+  };
+  return model;
+};
 export default RefreshToken;

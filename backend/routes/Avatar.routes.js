@@ -1,5 +1,6 @@
 import express from 'express';
 import multer from 'multer';
+import { verifyToken } from '../middleware/authorization.middleware.js';
 import { uploadAvatar } from '../controllers/Avatar.controller.js';
 import { mediaStorage } from '../helpers/multer.helper.js';
 

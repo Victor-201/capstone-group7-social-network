@@ -25,19 +25,21 @@ const PostTag = (sequelize) => {
   });
 
   model.associate = (models) => {
-    // Mối quan hệ với Post
-    model.belongsTo(models.Post, {
-      foreignKey: 'post_id',
-      as: 'post',
-    });
 
-    // Mối quan hệ với UserInfo
-    model.belongsTo(models.UserInfo, {
-      foreignKey: 'user_id',
-      as: 'user',
-    });
-  };
+  model.belongsTo(models.Post, {
+    foreignKey: 'post_id',
+    as: 'post',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  });
 
+  model.belongsTo(models.UserInfo, {
+    foreignKey: 'user_id',
+    as: 'user',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  });
+};
   return model;
 };
 

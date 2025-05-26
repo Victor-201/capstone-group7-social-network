@@ -29,14 +29,18 @@ const Follow = (sequelize) => {
   model.associate = function(models) {
     model.belongsTo(models.UserInfo, {
       foreignKey: 'follower_id',
-      as: 'Follower'
+      as: 'Follower',
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
     });
+
     model.belongsTo(models.UserInfo, {
       foreignKey: 'following_id',
-      as: 'Following'
+      as: 'Following',
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
     });
   };
-
   return model;
 };
 export default Follow;

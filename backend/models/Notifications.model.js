@@ -40,14 +40,17 @@ const Notification = (sequelize) => {
     model.belongsTo(models.UserInfo, {
       foreignKey: 'sender_id',
       as: 'sender',
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
     });
 
     model.belongsTo(models.UserInfo, {
       foreignKey: 'receiver_id',
       as: 'receiver',
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
     });
   };
-
   return model;
 };
 
