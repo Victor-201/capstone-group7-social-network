@@ -13,7 +13,6 @@ CREATE TABLE User_Infos (
     interestedUser VARCHAR(256)
 );
 
-
 -- Table: User_Account
 CREATE TABLE User_Account (
     id CHAR(36) PRIMARY KEY NOT NULL,
@@ -27,17 +26,17 @@ CREATE TABLE User_Account (
     status ENUM('active', 'suspended', 'deleted') DEFAULT 'active',
     status_update_at TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (id) REFERENCES User_Infos(id)
+    FOREIGN KEY (id) REFERENCES User_Infos(id) ON DELETE CASCADE
 );
 
--- Table: Resfresh_Tokens
+-- Table: Refresh_Tokens
 CREATE TABLE Refresh_Tokens (
     id CHAR(36) PRIMARY KEY,
     user_id CHAR(36) NOT NULL,
     token TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     expires_at TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES User_Account(id)
+    FOREIGN KEY (user_id) REFERENCES User_Account(id) ON DELETE CASCADE
 );
 
 -- Table: User_Media
@@ -45,15 +44,14 @@ CREATE TABLE User_Media (
     media_id CHAR(36) PRIMARY KEY,
     user_id CHAR(36) NOT NULL,
     media_type ENUM ('image', 'video') NOT NULL,
-    image_type ENUM ('cover', 'avatar') NOT NULL,
+    image_type ENUM ('cover', 'avatar'),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES User_Infos(id)
+    FOREIGN KEY (user_id) REFERENCES User_Infos(id) ON DELETE CASCADE
 );
 
--- Add foregin key in user_info
 ALTER TABLE User_Infos
-    ADD FOREIGN KEY (avatar) REFERENCES User_Media(media_id),
-    ADD FOREIGN KEY (cover) REFERENCES User_Media(media_id);
+    ADD FOREIGN KEY (avatar) REFERENCES User_Media(media_id) ON DELETE SET NULL,
+    ADD FOREIGN KEY (cover) REFERENCES User_Media(media_id) ON DELETE SET NULL;
 
 -- Table: Posts
 CREATE TABLE Posts (
@@ -64,8 +62,8 @@ CREATE TABLE Posts (
     like_count INT DEFAULT 0,
     shared_post_id CHAR(36),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES User_Infos(id),
-    FOREIGN KEY (shared_post_id) REFERENCES Posts(id)
+    FOREIGN KEY (user_id) REFERENCES User_Infos(id) ON DELETE CASCADE,
+    FOREIGN KEY (shared_post_id) REFERENCES Posts(id) ON DELETE SET NULL
 );
 
 -- Table: Post_Media
@@ -75,7 +73,7 @@ CREATE TABLE Post_Media (
     media_url TEXT,
     media_type VARCHAR(50),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (post_id) REFERENCES Posts(id)
+    FOREIGN KEY (post_id) REFERENCES Posts(id) ON DELETE CASCADE
 );
 
 -- Table: Comments
@@ -87,9 +85,9 @@ CREATE TABLE Comments (
     like_count INT DEFAULT 0,
     parent_comment_id CHAR(36),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (post_id) REFERENCES Posts(id),
-    FOREIGN KEY (user_id) REFERENCES User_Infos(id),
-    FOREIGN KEY (parent_comment_id) REFERENCES Comments(id)
+    FOREIGN KEY (post_id) REFERENCES Posts(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES User_Infos(id) ON DELETE CASCADE,
+    FOREIGN KEY (parent_comment_id) REFERENCES Comments(id) ON DELETE CASCADE
 );
 
 -- Table: Likes
@@ -98,8 +96,8 @@ CREATE TABLE Likes (
     post_id CHAR(36) NOT NULL,
     user_id CHAR(36) NOT NULL,
     UNIQUE(post_id, user_id),
-    FOREIGN KEY (post_id) REFERENCES Posts(id),
-    FOREIGN KEY (user_id) REFERENCES User_Infos(id)
+    FOREIGN KEY (post_id) REFERENCES Posts(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES User_Infos(id) ON DELETE CASCADE
 );
 
 -- Table: Friends
@@ -109,8 +107,8 @@ CREATE TABLE Friends (
     status ENUM('pending', 'accepted', 'rejected') NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY(user_id, friend_id),
-    FOREIGN KEY (user_id) REFERENCES User_Infos(id),
-    FOREIGN KEY (friend_id) REFERENCES User_Infos(id)
+    FOREIGN KEY (user_id) REFERENCES User_Infos(id) ON DELETE CASCADE,
+    FOREIGN KEY (friend_id) REFERENCES User_Infos(id) ON DELETE CASCADE
 );
 
 -- Table: Follows
@@ -119,8 +117,8 @@ CREATE TABLE Follows (
     following_id CHAR(36) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY(follower_id, following_id),
-    FOREIGN KEY (follower_id) REFERENCES User_Infos(id),
-    FOREIGN KEY (following_id) REFERENCES User_Infos(id)
+    FOREIGN KEY (follower_id) REFERENCES User_Infos(id) ON DELETE CASCADE,
+    FOREIGN KEY (following_id) REFERENCES User_Infos(id) ON DELETE CASCADE
 );
 
 -- Table: Chats
@@ -135,8 +133,8 @@ CREATE TABLE Chat_Participants (
     chat_id CHAR(36) NOT NULL,
     user_id CHAR(36) NOT NULL,
     PRIMARY KEY(chat_id, user_id),
-    FOREIGN KEY (chat_id) REFERENCES Chats(id),
-    FOREIGN KEY (user_id) REFERENCES User_Infos(id)
+    FOREIGN KEY (chat_id) REFERENCES Chats(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES User_Infos(id) ON DELETE CASCADE
 );
 
 -- Table: Messages
@@ -146,8 +144,8 @@ CREATE TABLE Messages (
     sender_id CHAR(36) NOT NULL,
     content TEXT,
     sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (chat_id) REFERENCES Chats(id),
-    FOREIGN KEY (sender_id) REFERENCES User_Infos(id)
+    FOREIGN KEY (chat_id) REFERENCES Chats(id) ON DELETE CASCADE,
+    FOREIGN KEY (sender_id) REFERENCES User_Infos(id) ON DELETE CASCADE
 );
 
 -- Table: Notifications
@@ -159,8 +157,8 @@ CREATE TABLE Notifications (
     action_id CHAR(36) NOT NULL,
     is_read BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (sender_id) REFERENCES User_Infos(id),
-    FOREIGN KEY (receiver_id) REFERENCES User_Infos(id)
+    FOREIGN KEY (sender_id) REFERENCES User_Infos(id) ON DELETE CASCADE,
+    FOREIGN KEY (receiver_id) REFERENCES User_Infos(id) ON DELETE CASCADE
 );
 
 -- Table: Post_Tags
@@ -169,8 +167,8 @@ CREATE TABLE Post_Tags (
     post_id CHAR(36) NOT NULL,
     user_id CHAR(36) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (post_id) REFERENCES Posts(id),
-    FOREIGN KEY (user_id) REFERENCES User_Infos(id)
+    FOREIGN KEY (post_id) REFERENCES Posts(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES User_Infos(id) ON DELETE CASCADE
 );
 
 -- Indexes
@@ -188,7 +186,6 @@ SET GLOBAL event_scheduler = ON;
 
 -- Create an event to delete expired refresh tokens
 CREATE EVENT delete_expired_tokens
-
 ON SCHEDULE EVERY 1 DAY
 STARTS CURRENT_TIMESTAMP + INTERVAL 1 HOUR
 DO
@@ -199,7 +196,7 @@ DO
 CREATE EVENT IF NOT EXISTS delete_expired_otp
 ON SCHEDULE EVERY 5 MINUTE
 DO
-  UPDATE UserAccounts
+  UPDATE User_Account
   SET otp_code = NULL, otp_expiry = NULL
   WHERE otp_expiry < NOW();
 
