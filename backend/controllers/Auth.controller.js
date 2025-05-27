@@ -3,6 +3,7 @@ import signInValidate from "../validation/signIn.validation.js";
 import models from "../models/index.js";
 import jwt from "jsonwebtoken";
 import bcryptjs from "bcryptjs";
+import { Transaction } from "sequelize";
 
 const { UserAccount, UserInfo, RefreshToken} = models;
 
@@ -34,7 +35,7 @@ export const signUp = async (req, res) => {
             full_name: req.body.fullName,
             gender: req.body.gender,
             birth_date: req.body.birthdate
-        });
+        }, { transaction: t});
         // Create user
         const user = await UserAccount.create({
             id: userInfo.id,
@@ -42,18 +43,13 @@ export const signUp = async (req, res) => {
             user_name: req.body.userName,
             email: req.body.email,
             password: hashedPassword,
-        });
+        }, { transaction: t });
         // Remove password from response
         user.password = undefined;
 
         return res.status(201).json({
             name: "UserCreated",
-            message: "User created successfully",
-            user: {
-                id: user.id,
-                username: user.username,
-                email: user.email,
-            },
+            message: "User created successfully"
         });
 
     } catch (error) {

@@ -50,14 +50,14 @@ const Comment = (sequelize) => {
     model.belongsTo(models.Comment, {
       foreignKey: 'parent_comment_id',
       as: 'ParentComment',
-      onDelete: 'SET NULL', // hoặc CASCADE nếu muốn xóa tất cả comment con
+      onDelete: 'SET NULL',
       onUpdate: 'CASCADE',
     });
 
     model.hasMany(models.Comment, {
       foreignKey: 'parent_comment_id',
       as: 'Replies',
-      onDelete: 'CASCADE', // đảm bảo nếu comment cha bị xóa thì reply cũng bị xóa
+      onDelete: 'CASCADE',
       onUpdate: 'CASCADE',
     });
   };

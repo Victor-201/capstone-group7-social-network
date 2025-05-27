@@ -32,7 +32,7 @@ const Friend = (sequelize) => {
       onUpdate: 'CASCADE',
     });
 
-    model.belongsTo(models.Post, {
+    model.belongsTo(models.UserInfo, {
       foreignKey: 'friend_id',
       as: 'Recipient',
       onDelete: 'CASCADE',
