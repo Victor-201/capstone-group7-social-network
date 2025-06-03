@@ -26,15 +26,26 @@ export const uploadMedia = (file) => {
 };
 
 export const uploadMultipleMedia = (files) => {
-  if (!Array.isArray(files)) {
-    throw new Error('Invalid files array');
-  }
+  if (!Array.isArray(files)) return [];
 
-  return files.map(file => ({
-    url: file.path,
-    public_id: file.filename.split('/')[1]
-  }));
+  return files.map(file => {
+    let media_type = 'other';
+
+    if (file.mimetype.startsWith('image/')) {
+      media_type = 'image';
+    } else if (file.mimetype.startsWith('video/')) {
+      media_type = 'video';
+    }
+
+    return {
+      url: file.path,
+      public_id: file.filename,
+      media_type,
+    };
+  });
 };
+
+
 
 export const removeMedia = async (req, res) => {
   let result = await cloudinary.uploader.destroy(`uploads/${publicId}`, {

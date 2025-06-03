@@ -47,6 +47,7 @@ const Post = (sequelize) => {
   });
   model.hasMany(models.PostMedia, {
     foreignKey: 'post_id',
+    as: 'media',
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
   });

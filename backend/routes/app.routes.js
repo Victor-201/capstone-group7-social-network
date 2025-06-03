@@ -6,7 +6,8 @@ import routerAuth from './Auth.routes.js';
 import routerUserInfo from './userInfo.routes.js';
 import routerUserMedia from './userMedia.routes.js';
 import routeFriend from './Friend.routes.js';
-
+import routerFollow from './Follow.routes.js';
+import routerPost from './Post.routes.js';
 
 const router = express.Router();
 
@@ -17,6 +18,8 @@ router.use("/user",verifyToken,routerCover);
 router.use("/user",verifyToken,routerUserInfo);
 router.use("/user",verifyToken,routerUserMedia);
 router.use("/user",verifyToken,routeFriend);
+router.use('/user', verifyToken, routerFollow);
+router.use('/user', verifyToken, routerPost);
 
 
 export default router;
