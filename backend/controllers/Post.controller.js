@@ -26,7 +26,7 @@ export const CreatePost = async (req, res) => {
             const mediaRecords = mediaResults.map((file) => ({
                 post_id: post.id,
                 media_url: file.public_id,
-                media_type: file.media_type || null, // fallback nếu không có type
+                media_type: file.media_type || null,
             }));
 
             await PostMedia.bulkCreate(mediaRecords);
