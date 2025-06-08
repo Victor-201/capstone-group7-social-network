@@ -8,6 +8,7 @@ import routerUserMedia from './userMedia.routes.js';
 import routeFriend from './Friend.routes.js';
 import routerFollow from './Follow.routes.js';
 import routerPost from './Post.routes.js';
+import routerComment from './Comment.routes.js';
 
 const router = express.Router();
 
@@ -20,6 +21,7 @@ router.use("/user",verifyToken,routerUserMedia);
 router.use("/user",verifyToken,routeFriend);
 router.use('/user', verifyToken, routerFollow);
 router.use('/user', verifyToken, routerPost);
+router.use('/user', verifyToken, routerComment);
 
 
 export default router;
