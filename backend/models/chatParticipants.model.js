@@ -13,7 +13,7 @@ const ChatParticipant = (sequelize) => {
       primaryKey: true,  
     }
   }, {
-    tableName: 'chatParticipants',
+    tableName: 'chat_participants',
     timestamps: false, 
   });
 
