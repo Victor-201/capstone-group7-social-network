@@ -1,49 +1,22 @@
-import models from '../models/index.js';
-import { Op } from 'sequelize';
-
-const { Message, Chat, UserInfo } = models;
+import { createMessage } from "../services/createMessage.service.js";
 
 export const sendMessage = async (req, res) => {
   const { content } = req.body;
   const senderId = req.user.id;
   const chatId = req.params.id;
 
-  if (!chatId || !content) {
-    return res.status(400).json({ error: 'Chat ID and content are required.' });
-  }
-
   try {
-    const chat = await Chat.findByPk(chatId);
-    if (!chat) {
-      return res.status(404).json({ error: 'Chat not found.' });
-    }
-
-    const participant = await models.ChatParticipant.findOne({
-      where: {
-        chat_id: chatId,
-        user_id: senderId
-      }
-    });
-
-    if (!participant) {
-      return res.status(403).json({ error: 'You are not a participant of this chat.' });
-    }
-
-    const message = await Message.create({
-      chat_id: chatId,
-      sender_id: senderId,
-      content
-    });
+    const message = await createMessage({ chatId, senderId, content });
 
     return res.status(201).json({
       message: 'Message sent successfully',
       data: message
     });
   } catch (err) {
-    console.error('Error sending message:', err);
-    return res.status(500).json({ error: 'Internal server error' });
+    console.error('Error in sendMessage:', err);
+    return res.status(400).json({ error: err.message });
   }
-}
+};
 
 export const getMessagesByChat = async (req, res) => {
   const chat_id = req.params.chat_id;

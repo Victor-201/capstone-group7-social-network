@@ -32,3 +32,17 @@ export const verifyToken = (req, res, next) => {
         next();
     });
 }
+
+export const socketVerifyToken = (socket, next) => {
+    const token = socket.handshake.auth.token;
+    if (!token) {
+        return next(new Error('Authentication token missing'));
+    }
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, data) => {
+        if (err) {
+            return next(new Error('Invalid token'));
+        }
+        socket.user = data;
+        next();
+    });
+}

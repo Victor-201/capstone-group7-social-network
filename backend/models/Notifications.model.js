@@ -19,6 +19,10 @@ const Notification = (sequelize) => {
       type: DataTypes.STRING(50),
       allowNull: false,
     },
+    content: {
+      type: DataTypes.STRING(255),
+      allowNull: false,
+    },
     action_id: {
       type: DataTypes.UUID,
       allowNull: true,
