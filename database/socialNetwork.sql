@@ -156,6 +156,7 @@ CREATE TABLE Notifications (
     action_type ENUM ('post', 'comment', 'like', 'friend_request', 'message') NOT NULL,
     action_id CHAR(36) NOT NULL,
     is_read BOOLEAN DEFAULT FALSE,
+    content VARCHAR(255) DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (sender_id) REFERENCES User_Infos(id) ON DELETE CASCADE,
     FOREIGN KEY (receiver_id) REFERENCES User_Infos(id) ON DELETE CASCADE
