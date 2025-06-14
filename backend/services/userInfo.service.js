@@ -2,10 +2,10 @@ import models from "../models/index.js";
 const { UserInfo } = models;
 
 export default {
-  async getUserInfo(userId) {
+  async getUserInfo(user_id) {
     try {
       const user = await UserInfo.findOne({
-        where: { id: userId },
+        where: { id: user_id },
         attributes: [
           "id",
           "full_name",
@@ -20,32 +20,46 @@ export default {
           "interestedUser"
         ]
       });
-      if (!user) return { error: { code: 404, message: "User not found" } };
+
+      if (!user) {
+        return { error: { code: 404, message: "User not found" } };
+      }
+
       return { result: user };
     } catch (err) {
-      return { error: { code: 500, message: "Server error", detail: err.message } };
+      return {
+        error: { code: 500, message: "Server error", detail: err.message }
+      };
     }
   },
 
-  async updateUserInfo(userId, info) {
+  async updateUserInfo(user_id, info) {
     try {
-      const user = await UserInfo.findOne({ where: { id: userId } });
-      if (!user) return { error: { code: 404, message: "User not found" } };
+      const user = await UserInfo.findOne({ where: { id: user_id } });
 
-      await UserInfo.update({
-        full_name: info.fullName,
-        bio: info.bio,
-        gender: info.gender,
-        birth_date: info.birthDate,
-        location: info.location,
-        hometown: info.hometown
-      }, {
-        where: { id: userId }
-      });
+      if (!user) {
+        return { error: { code: 404, message: "User not found" } };
+      }
+
+      await UserInfo.update(
+        {
+          full_name: info.full_name,
+          bio: info.bio,
+          gender: info.gender,
+          birth_date: info.birth_date,
+          location: info.location,
+          hometown: info.hometown
+        },
+        {
+          where: { id: user_id }
+        }
+      );
 
       return { result: { message: "User info updated successfully" } };
     } catch (err) {
-      return { error: { code: 500, message: "Server error", detail: err.message } };
+      return {
+        error: { code: 500, message: "Server error", detail: err.message }
+      };
     }
   },
 
@@ -67,10 +81,16 @@ export default {
           "interestedUser"
         ]
       });
-      if (!userInfo) return { error: { code: 404, message: "User not found" } };
+
+      if (!userInfo) {
+        return { error: { code: 404, message: "User not found" } };
+      }
+
       return { result: userInfo };
     } catch (err) {
-      return { error: { code: 500, message: "Server error", detail: err.message } };
+      return {
+        error: { code: 500, message: "Server error", detail: err.message }
+      };
     }
   }
 };

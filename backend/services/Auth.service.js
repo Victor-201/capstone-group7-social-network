@@ -1,15 +1,17 @@
 import sequelize from "../configs/database.config.js";
 import bcryptjs from "bcryptjs";
 import jwt from "jsonwebtoken";
+import {
+  generateAccessToken,
+  generateRefreshToken
+} from "../helpers/token.helper.js";
 import models from "../models/index.js";
-import registationValidate from "../validation/Registation.validation.js";
-import signInValidate from "../validation/signIn.validation.js";
+import { registationValidate, signInValidate } from "../validators/Registation.validator.js";
 import { sendMail } from "../helpers/sendMail.helper.js";
-import dotenv from "dotenv";
-
-dotenv.config();
 
 const { UserAccount, UserInfo, RefreshToken } = models;
+
+const MAX_REFRESH_TOKENS = 5;
 
 const generateOtp = () => Math.floor(100000 + Math.random() * 900000).toString();
 
@@ -17,12 +19,29 @@ export default {
   async signUp(data) {
     const { error } = registationValidate.validate(data, { abortEarly: false });
     if (error) {
-      return { error: { code: 400, name: error.name, message: error.details.map(e => e.message) } };
+      return {
+        error: {
+          code: 400,
+          name: error.name,
+          message: error.details.map(e => e.message)
+        }
+      };
     }
 
-    const exists = await UserAccount.findOne({ where: { email: data.email, user_name: data.userName, phone_number: data.phoneNumber } });
-    if (exists) {
-      return { error: { code: 400, name: "UserExist", message: "User already exists" } };
+    const [emailExists, usernameExists, phoneExists] = await Promise.all([
+      UserAccount.findOne({ where: { email: data.email } }),
+      UserAccount.findOne({ where: { user_name: data.user_name } }),
+      UserAccount.findOne({ where: { phone_number: data.phone_number } })
+    ]);
+
+    if (emailExists || usernameExists || phoneExists) {
+      return {
+        error: {
+          code: 400,
+          name: "UserExists",
+          message: "Email, username, or phone number already in use"
+        }
+      };
     }
 
     const hashed = await bcryptjs.hash(data.password, 10);
@@ -36,8 +55,8 @@ export default {
 
       await UserAccount.create({
         id: userInfo.id,
-        phone_number: data.phoneNumber,
-        user_name: data.userName,
+        phone_number: data.phone_number,
+        user_name: data.user_name,
         email: data.email,
         password: hashed
       }, { transaction: t });
@@ -46,7 +65,7 @@ export default {
     return {
       result: {
         name: "UserCreated",
-        message: "User created successfully"
+        message: "Account created successfully"
       }
     };
   },
@@ -54,43 +73,74 @@ export default {
   async signIn(data) {
     const { error } = signInValidate.validate(data, { abortEarly: false });
     if (error) {
-      return { error: { code: 400, name: error.name, message: error.details.map(e => e.message) } };
+      return {
+        error: {
+          code: 400,
+          name: error.name,
+          message: error.details.map(e => e.message)
+        }
+      };
     }
 
-    const loginName = data.loginName.trim();
+    const login_name = data.login_name.trim();
     let clause = {};
-    if (/^\d{9,11}$/.test(loginName)) clause.phone_number = loginName;
-    else if (/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(loginName)) clause.email = loginName;
-    else clause.user_name = loginName;
+    if (/^\d{9,11}$/.test(login_name)) clause.phone_number = login_name;
+    else if (/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(login_name)) clause.email = login_name;
+    else clause.user_name = login_name;
 
     const user = await UserAccount.findOne({ where: clause });
     if (!user) {
-      return { error: { code: 400, name: "UserNotFound", message: "User not found" } };
+      return {
+        error: {
+          code: 400,
+          name: "UserNotFound",
+          message: "Account does not exist"
+        }
+      };
     }
 
     const valid = await bcryptjs.compare(data.password, user.password);
     if (!valid) {
-      return { error: { code: 400, name: "InvalidPassword", message: "Invalid password" } };
+      return {
+        error: {
+          code: 400,
+          name: "InvalidPassword",
+          message: "Incorrect password"
+        }
+      };
     }
 
     const payload = {
       id: user.id,
-      userName: user.user_name,
+      user_name: user.user_name,
       role: user.role,
       email: user.email
     };
 
-    const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, { expiresIn: process.env.ACCESS_TOKEN_EXPIRES_IN });
-    const refreshToken = jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET, { expiresIn: process.env.REFRESH_TOKEN_EXPIRES_IN });
+    const accessToken = generateAccessToken(payload);
+    const { token: refreshToken, expiresAt } = generateRefreshToken(payload);
 
-    const expiresAt = new Date(jwt.decode(refreshToken).exp * 1000);
+    const userTokens = await RefreshToken.findAll({
+      where: { user_id: user.id },
+      order: [['createdAt', 'ASC']]
+    });
 
-    await RefreshToken.create({ user_id: user.id, token: refreshToken, expires_at: expiresAt });
+    if (userTokens.length >= MAX_REFRESH_TOKENS) {
+      const tokensToDelete = userTokens.slice(0, userTokens.length - MAX_REFRESH_TOKENS + 1);
+      const ids = tokensToDelete.map(t => t.id);
+      await RefreshToken.destroy({ where: { id: ids } });
+    }
+
+    await RefreshToken.create({
+      user_id: user.id,
+      token: refreshToken,
+      expires_at: expiresAt
+    });
 
     return {
       result: {
         name: "UserLoggedIn",
-        message: "Login successful",
+        message: "Logged in successfully",
         accessToken,
         refreshToken
       }
@@ -99,100 +149,164 @@ export default {
 
   async signOut(token) {
     if (!token) {
-      return { error: { code: 400, name: "NoTokenProvided", message: "No token provided" } };
+      return {
+        error: {
+          code: 400,
+          name: "NoTokenProvided",
+          message: "No token provided"
+        }
+      };
     }
+
     const deleted = await RefreshToken.destroy({ where: { token } });
     if (!deleted) {
-      return { error: { code: 404, name: "TokenNotFound", message: "Token not found or already logged out" } };
+      return {
+        error: {
+          code: 404,
+          name: "TokenNotFound",
+          message: "Invalid or already logged out token"
+        }
+      };
     }
-    return { result: { name: "UserLoggedOut", message: "Logout successful" } };
+
+    return {
+      result: {
+        name: "UserLoggedOut",
+        message: "Logged out successfully"
+      }
+    };
   },
 
   async refreshToken(token) {
     if (!token) {
-      return { error: { code: 403, name: "NoToken", message: "No token provided!" } };
+      return {
+        error: {
+          code: 403,
+          name: "NoToken",
+          message: "No refresh token provided"
+        }
+      };
     }
 
     const tokenRecord = await RefreshToken.findOne({ where: { token } });
     if (!tokenRecord) {
-      return { error: { code: 403, name: "InvalidRefreshToken", message: "Invalid refresh token!" } };
+      return {
+        error: {
+          code: 403,
+          name: "InvalidRefreshToken",
+          message: "Invalid refresh token"
+        }
+      };
     }
 
     try {
       const data = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
       const userInfo = await UserInfo.findByPk(data.id);
       if (!userInfo) {
-        return { error: { code: 404, name: "UserNotFound", message: "User not found!" } };
+        return {
+          error: {
+            code: 404,
+            name: "UserNotFound",
+            message: "Account does not exist"
+          }
+        };
       }
 
       const payload = {
         id: data.id,
-        userName: data.userName,
+        user_name: data.user_name,
         role: data.role,
-        email: data.email,
+        email: data.email
       };
 
-      const newAccessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
-        expiresIn: process.env.ACCESS_TOKEN_EXPIRES_IN
-      });
+      const accessToken = generateAccessToken(payload);
 
       return {
         result: {
           name: "AccessTokenGenerated",
           message: "Access token generated successfully",
-          accessToken: newAccessToken
+          accessToken
         }
       };
     } catch (err) {
-      return { error: { code: 401, name: "TokenExpired", message: "Unauthorized or token expired!" } };
+      return {
+        error: {
+          code: 401,
+          name: "TokenExpired",
+          message: "Token expired or invalid"
+        }
+      };
     }
   },
 
-  async forgotPassword(data) {
-    const { email } = data;
+  async forgotPassword({ email }) {
     const user = await UserAccount.findOne({ where: { email } });
     if (!user) {
-      return { error: { code: 404, name: "EmailNotFound", message: "Email not found" } };
+      return {
+        error: {
+          code: 404,
+          name: "EmailNotFound",
+          message: "Email does not exist"
+        }
+      };
     }
 
     const otpCode = generateOtp();
     const hashedOtp = await bcryptjs.hash(otpCode, 10);
-    const otpExpiry = new Date(Date.now() + 60 * 1000); // 1 minute
+    const otpExpiry = new Date(Date.now() + 5 * 60 * 1000);
 
-    await UserAccount.update({ otp_code: hashedOtp, otp_expiry: otpExpiry }, { where: { id: user.id } });
+    await UserAccount.update(
+      { otp_code: hashedOtp, otp_expiry: otpExpiry },
+      { where: { id: user.id } }
+    );
 
-    await sendMail(email, "Reset your password", `Your OTP code is: ${otpCode}`);
+    await sendMail(email, "Password recovery OTP", `Your OTP code is: ${otpCode}`);
 
     return {
       result: {
         name: "OtpSent",
-        message: "OTP has been sent to your email"
+        message: "OTP sent to email"
       }
     };
   },
 
-  async verifyOtpCode(data) {
-    const { email, otp_code } = data;
-
+  async verifyOtpCode({ email, otp_code }) {
     const user = await UserAccount.findOne({ where: { email } });
     if (!user || !user.otp_code || !user.otp_expiry) {
-      return { error: { code: 400, name: "InvalidRequest", message: "Invalid request" } };
+      return {
+        error: {
+          code: 400,
+          name: "InvalidRequest",
+          message: "Invalid request data"
+        }
+      };
     }
 
     const isMatch = await bcryptjs.compare(otp_code, user.otp_code);
     if (!isMatch) {
-      return { error: { code: 400, name: "InvalidOtp", message: "Invalid OTP" } };
+      return {
+        error: {
+          code: 400,
+          name: "InvalidOtp",
+          message: "Invalid OTP code"
+        }
+      };
     }
 
-    const now = new Date();
-    if (new Date(user.otp_expiry) < now) {
-      return { error: { code: 400, name: "OtpExpired", message: "OTP has expired" } };
+    if (new Date(user.otp_expiry) < new Date()) {
+      return {
+        error: {
+          code: 400,
+          name: "OtpExpired",
+          message: "OTP code has expired"
+        }
+      };
     }
 
     const resetToken = jwt.sign(
       { id: user.id, email: user.email },
       process.env.RESET_PASSWORD_TOKEN_SECRET,
-      { expiresIn: '30m' }
+      { expiresIn: "30m" }
     );
 
     return {
@@ -204,21 +318,31 @@ export default {
     };
   },
 
-  async resetPassword(newPassword, token) {
+  async resetPassword(new_password, token) {
     if (!token) {
-      return { error: { code: 401, name: "NoToken", message: "No token provided!" } };
+      return {
+        error: {
+          code: 401,
+          name: "NoToken",
+          message: "No token provided"
+        }
+      };
     }
 
     try {
       const data = jwt.verify(token, process.env.RESET_PASSWORD_TOKEN_SECRET);
-
       const user = await UserAccount.findOne({ where: { email: data.email } });
       if (!user) {
-        return { error: { code: 404, name: "UserNotFound", message: "User not found" } };
+        return {
+          error: {
+            code: 404,
+            name: "UserNotFound",
+            message: "Account does not exist"
+          }
+        };
       }
 
-      const hashedPassword = await bcryptjs.hash(newPassword, 10);
-
+      const hashedPassword = await bcryptjs.hash(new_password, 10);
       await UserAccount.update(
         { password: hashedPassword, otp_code: null, otp_expiry: null },
         { where: { id: user.id } }
@@ -227,11 +351,17 @@ export default {
       return {
         result: {
           name: "PasswordReset",
-          message: "Password has been reset successfully"
+          message: "Password changed successfully"
         }
       };
     } catch (err) {
-      return { error: { code: 401, name: "InvalidToken", message: "Invalid or expired token" } };
+      return {
+        error: {
+          code: 401,
+          name: "InvalidToken",
+          message: "Token is invalid or expired"
+        }
+      };
     }
   }
 };

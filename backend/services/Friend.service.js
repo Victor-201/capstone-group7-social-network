@@ -1,0 +1,133 @@
+import models from '../models/index.js';
+import { Op } from 'sequelize';
+
+const { Friend, UserInfo } = models;
+
+const extractFriendIds = (records, targetId) =>
+  records.map(r => r.user_id === targetId ? r.friend_id : r.user_id);
+
+export default {
+  async sendFriendRequest(user_id, friend_id) {
+    if (!friend_id || user_id === friend_id) {
+      return { error: { code: 400, message: "Invalid action" } };
+    }
+
+    const existing = await Friend.findOne({
+      where: {
+        [Op.or]: [
+          { user_id, friend_id },
+          { user_id: friend_id, friend_id: user_id }
+        ],
+        status: { [Op.in]: ['pending', 'accepted'] }
+      }
+    });
+
+    if (existing) {
+      return { error: { code: 400, message: "Friend request already exists or already friends" } };
+    }
+
+    await Friend.create({ user_id, friend_id, status: 'pending' });
+    return { result: { message: "Friend request sent successfully" } };
+  },
+
+  async respondToFriendRequest(user_id, friend_id, status) {
+    if (user_id === friend_id) {
+      return { error: { code: 400, message: "Cannot do this action" } };
+    }
+
+    const request = await Friend.findOne({
+      where: { user_id: friend_id, friend_id: user_id }
+    });
+
+    if (!request) {
+      return { error: { code: 404, message: "Friend request not found" } };
+    }
+
+    request.status = status;
+    await request.save();
+    return { result: { message: "Friend request updated successfully" } };
+  },
+
+  async getMutualFriends(user_id, friend_id) {
+    if (!friend_id || user_id === friend_id) {
+      return { error: { code: 400, message: "Invalid user" } };
+    }
+
+    const aFriends = await Friend.findAll({
+      where: {
+        status: 'accepted',
+        [Op.or]: [{ user_id }, { friend_id: user_id }]
+      },
+      attributes: ['user_id', 'friend_id']
+    });
+
+    const bFriends = await Friend.findAll({
+      where: {
+        status: 'accepted',
+        [Op.or]: [{ user_id: friend_id }, { friend_id: friend_id }]
+      },
+      attributes: ['user_id', 'friend_id']
+    });
+
+    const aSet = new Set(extractFriendIds(aFriends, user_id));
+    const bSet = new Set(extractFriendIds(bFriends, friend_id));
+
+    const mutualIds = [...aSet].filter(id => bSet.has(id));
+    if (mutualIds.length === 0) {
+      return { error: { code: 404, message: "No mutual friends found" } };
+    }
+
+    const mutualFriends = await UserInfo.findAll({
+      where: { id: { [Op.in]: mutualIds } },
+      attributes: ['id', 'full_name', 'avatar']
+    });
+
+    return { result: { mutualFriends } };
+  },
+
+  async getFriendsList(user_id) {
+    const sent = await Friend.findAll({
+      where: { user_id, status: 'accepted' },
+      include: [{ model: UserInfo, as: 'Recipient', attributes: ['id', 'full_name', 'avatar'] }]
+    });
+
+    const received = await Friend.findAll({
+      where: { friend_id: user_id, status: 'accepted' },
+      include: [{ model: UserInfo, as: 'Requester', attributes: ['id', 'full_name', 'avatar'] }]
+    });
+
+    const friends = [
+      ...sent.map(f => f.Recipient),
+      ...received.map(f => f.Requester)
+    ];
+
+    if (friends.length === 0) {
+      return { error: { code: 404, message: "No friends found" } };
+    }
+
+    return { result: { friends } };
+  },
+
+  async deleteFriend(user_id, friend_id) {
+    if (!friend_id || user_id === friend_id) {
+      return { error: { code: 400, message: "Invalid user" } };
+    }
+
+    const friend = await Friend.findOne({
+      where: {
+        status: 'accepted',
+        [Op.or]: [
+          { user_id, friend_id },
+          { user_id: friend_id, friend_id: user_id }
+        ]
+      }
+    });
+
+    if (!friend) {
+      return { error: { code: 404, message: "Friend not found" } };
+    }
+
+    await friend.destroy();
+    return { result: { message: "Friend deleted successfully" } };
+  }
+};
