@@ -3,7 +3,7 @@ const { Comment } = models;
 
 export const createComment = async (req, res) => {
   const post_id = req.params.id;
-  const { content, parent_comment_id } = req.body;
+  const { content } = req.body;
   const user_id = req.user.id;
 
   try {
