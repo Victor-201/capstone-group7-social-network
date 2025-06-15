@@ -6,7 +6,7 @@ import {
   generateRefreshToken
 } from "../helpers/token.helper.js";
 import models from "../models/index.js";
-import { registationValidate, signInValidate } from "../validators/Registation.validator.js";
+import { registationValidate, signInValidate } from "../validators/Auth.validator.js";
 import { sendMail } from "../helpers/sendMail.helper.js";
 
 const { UserAccount, UserInfo, RefreshToken } = models;
