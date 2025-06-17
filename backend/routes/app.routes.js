@@ -8,6 +8,9 @@ import routerFollow from './Follow.routes.js';
 import routerPost from './Post.routes.js';
 import routerComment from './Comment.routes.js';
 import routerChat from './Chat.routes.js';
+import routerMessage from './Message.routes.js';
+import routerNotification from './Notification.routes.js';
+import routerLike from './Like.routes.js';
 
 
 const router = express.Router();
@@ -21,6 +24,8 @@ router.use('/user', verifyToken, routerFollow);
 router.use('/user', verifyToken, routerPost);
 router.use('/user', verifyToken, routerComment);
 router.use('/user', verifyToken, routerChat);
-
+router.use('/user', verifyToken, routerMessage);
+router.use('/user', verifyToken, routerNotification);
+router.use('/user', verifyToken, routerLike);
 
 export default router;

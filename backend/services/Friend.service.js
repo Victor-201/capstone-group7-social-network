@@ -26,13 +26,17 @@ export default {
       return { error: { code: 400, message: "Friend request already exists or already friends" } };
     }
 
-    await Friend.create({ user_id, friend_id, status: 'pending' });
-    return { result: { message: "Friend request sent successfully" } };
+    const friend = await Friend.create({ user_id, friend_id, status: 'pending' });
+    return { result: { message: "Friend request sent successfully", friend } };
   },
-
+  
   async respondToFriendRequest(user_id, friend_id, status) {
     if (user_id === friend_id) {
-      return { error: { code: 400, message: "Cannot do this action" } };
+      return { error: { code: 400, message: "Cannot perform this action" } };
+    }
+
+    if (!['accepted', 'rejected'].includes(status)) {
+      return { error: { code: 400, message: "Invalid status value" } };
     }
 
     const request = await Friend.findOne({
@@ -45,7 +49,18 @@ export default {
 
     request.status = status;
     await request.save();
-    return { result: { message: "Friend request updated successfully" } };
+
+    return {
+      result: {
+        message: `Friend request ${status}`,
+        request,
+        notify: {
+          sendTo: friend_id,
+          action_id: request.id,
+          content: `${status === 'accepted' ? 'accepted your friend request' : 'rejected your friend request'}`,
+        }
+      }
+    };
   },
 
   async getMutualFriends(user_id, friend_id) {

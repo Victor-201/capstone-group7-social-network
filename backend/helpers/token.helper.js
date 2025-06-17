@@ -1,16 +1,13 @@
 import jwt from 'jsonwebtoken';
-import dotenv from 'dotenv';
 import ms from 'ms';
-
-dotenv.config();
-
-const {
+import {
   ACCESS_TOKEN_SECRET,
   REFRESH_TOKEN_SECRET,
   RESET_PASSWORD_TOKEN_SECRET,
   ACCESS_TOKEN_EXPIRES_IN,
   REFRESH_TOKEN_EXPIRES_IN
-} = process.env;
+} from "../configs/env.config.js";
+
 
 if (!ACCESS_TOKEN_SECRET || !REFRESH_TOKEN_SECRET || !RESET_PASSWORD_TOKEN_SECRET) {
   throw new Error("Missing required token secrets in environment variables.");

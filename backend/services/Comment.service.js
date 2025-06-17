@@ -1,5 +1,5 @@
 import models from '../models/index.js';
-const { Comment } = models;
+const { Comment, Post } = models;
 
 export default {
   async createComment(post_id, user_id, content) {
@@ -8,16 +8,19 @@ export default {
     }
 
     try {
-      const comment = await Comment.create({
-        post_id,
-        user_id,
-        content,
-      });
+      const comment = await Comment.create({ post_id, user_id, content });
+
+      const post = await Post.findByPk(post_id);
+      if (!post) {
+        return { error: { code: 404, message: 'Post not found' } };
+      }
+
+      const receiver_id = post.user_id;
 
       return {
         result: {
-          message: 'Comment created successfully',
-          comment
+          comment,
+          receiver_id
         }
       };
     } catch (error) {

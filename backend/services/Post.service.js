@@ -1,5 +1,6 @@
 import models from '../models/index.js';
 import { uploadMultipleMedia } from '../helpers/multer.helper.js';
+import friendService from './Friend.service.js';
 
 const { Post, PostMedia } = models;
 
@@ -10,20 +11,45 @@ export default {
       const accessModifier = body.accessModifier || 'public';
 
       const mediaResults = uploadMultipleMedia(Array.isArray(files) ? files : []);
-      const post = await Post.create({ content, user_id, access_modifier: accessModifier });
+
+      const post = await Post.create({
+        content,
+        user_id,
+        access_modifier: accessModifier
+      });
 
       if (mediaResults.length > 0) {
         const mediaRecords = mediaResults.map((file) => ({
           post_id: post.id,
           media_url: file.public_id,
-          media_type: file.media_type || null,
+          media_type: file.media_type || null
         }));
         await PostMedia.bulkCreate(mediaRecords);
       }
 
-      return { result: { message: 'Post created successfully', post } };
+      const { result: friends } = await friendService.getFriendsList(user_id);
+      const friendIds = friends?.map(friend => friend.id) || [];
+
+      return {
+        result: {
+          message: 'Post created successfully',
+          post,
+          notifi: {
+            action_id: post.id,
+            receiver_ids: friendIds,
+            action_type: 'post',
+            content: 'shared a new post'
+          }
+        }
+      };
     } catch (error) {
-      return { error: { code: 500, message: 'Error creating post', detail: error.message } };
+      return {
+        error: {
+          code: 500,
+          message: 'Error creating post',
+          detail: error.message
+        }
+      };
     }
   },
 
@@ -39,7 +65,6 @@ export default {
       return { error: { code: 500, message: 'Error fetching posts', detail: error.message } };
     }
   },
-
   async getPostDetail(postId) {
     try {
       const post = await Post.findOne({
