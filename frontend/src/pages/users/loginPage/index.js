@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../../contexts/AuthContext';
 import './style.scss';
 
@@ -9,9 +9,20 @@ const LoginPage = () => {
     password: ''
   });
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const { login } = useAuth(); // Sử dụng hook useAuth
+
+  // Check for success message from forgot password
+  useEffect(() => {
+    if (location.state?.message) {
+      setSuccess(location.state.message);
+      // Clear the state to prevent showing message on refresh
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -53,6 +64,7 @@ const LoginPage = () => {
         </div>
 
         {error && <div className="auth-error">{error}</div>}
+        {success && <div className="auth-success">{success}</div>}
 
         <form onSubmit={handleSubmit} className="auth-form">
           <div className="form-group">
@@ -85,6 +97,10 @@ const LoginPage = () => {
             <button type="submit" className="auth-button" disabled={loading}>
               {loading ? 'Đang xử lý...' : 'Đăng nhập'}
             </button>
+          </div>
+          
+          <div className="forgot-password-link">
+            <Link to="/forgot-password">Quên mật khẩu?</Link>
           </div>
         </form>
 
