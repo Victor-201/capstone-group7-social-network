@@ -2,14 +2,18 @@ import express from 'express';
 import router from './routes/app.routes.js';
 import sequelize from './configs/database.config.js';
 import http from 'http';
+import cors from 'cors';
 import { Server } from 'socket.io';
 import {
   messageHandler,
   notificationHandler
 } from './socket.js';
+import { PORT } from "./configs/env.config.js";
+import { socketVerifyToken } from './middleware/authorization.middleware.js';
+
+
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -31,12 +35,15 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use((req, res, next) => {
-  console.log(`[ROUTE] ${req.method} ${req.originalUrl}`);
-  next();
-});
+app.use(cors({
+  origin: 'http://localhost:3000',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true,
+}));
+
 app.use('/api', router);
 
+io.use(socketVerifyToken);
 
 io.on('connection', (socket) => {
   console.log('A user connected');
@@ -59,10 +66,8 @@ io.on('connection', (socket) => {
 })();
 
 // Lắng nghe port
-if (process.env.NODE_ENV !== 'test') {
-  server.listen(8080, () => {
-    console.log("Server is running on port 8080");
-  });
-}
+server.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
 
 export { server, app };

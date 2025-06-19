@@ -31,6 +31,7 @@ const models = {
   PostMedia: PostMedia(sequelize),
   Friend: Friend(sequelize),
   RefreshToken: RefreshToken(sequelize),
+  sequelize,
 };
 
 

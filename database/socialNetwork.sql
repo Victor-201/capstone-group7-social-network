@@ -95,6 +95,7 @@ CREATE TABLE Likes (
     id CHAR(36) PRIMARY KEY,
     post_id CHAR(36) NOT NULL,
     user_id CHAR(36) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     UNIQUE(post_id, user_id),
     FOREIGN KEY (post_id) REFERENCES Posts(id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES User_Infos(id) ON DELETE CASCADE

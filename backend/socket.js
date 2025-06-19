@@ -1,10 +1,8 @@
 export const notificationHandler = (io, socket) => {
-  socket.on('joinNotification', (userId) => {
-    if (userId) {
-      socket.join(userId);
-      socket.emit('joinedRoom');
-      console.log(`User ${userId} joined notification room`);
-    }
+  socket.on('joinNotification', () => {
+    const userId = socket.user.id;
+    socket.join(userId);
+    console.log(`${userId} joined notification room`);
   });
 
   socket.on('disconnect', () => {
