@@ -1,11 +1,10 @@
-// useLogout.js
 import { useNavigate } from 'react-router-dom';
 
 const useLogout = () => {
   const navigate = useNavigate();
 
   const logout = () => {
-    localStorage.removeItem('user');
+    localStorage.clear();
     alert("Đăng xuất thành công!");
     navigate('/login');
   };
