@@ -24,7 +24,7 @@ const UserSection = ({ user, onClose }) => {
                     <div className="popup__avatar">
                         <AvatarUser user={user} />
                     </div>
-                    <span className="popup__username">{user.userName}</span>
+                    <span className="popup__username">{user.full_name}</span>
                 </Link>
             </header>
 

@@ -1,7 +1,7 @@
 import React, { memo, useState, useEffect, useRef } from 'react';
 import { ROUTERS } from '../../utils/router';
 import { Link, NavLink } from 'react-router-dom';
-import { RiHome9Line, RiHome9Fill, RiGroupLine, RiGroupFill, RiFolderVideoLine, RiFolderVideoFill} from 'react-icons/ri';
+import { RiHome9Line, RiHome9Fill, RiGroupLine, RiGroupFill, RiFolderVideoLine, RiFolderVideoFill } from 'react-icons/ri';
 import { TiGroupOutline, TiGroup } from 'react-icons/ti';
 import { IoNotifications } from 'react-icons/io5';
 import { TbMessageCircleFilled } from 'react-icons/tb';
@@ -10,33 +10,20 @@ import './style.scss';
 import UserPanelPopup from './modals/UserPanelPopup';
 import AvatarUser from '../../components/avatarUser';
 import Logo from '../../assets/images/logo/logo.png';
-import SearchPopup from './modals/SearchPopup';
 import useClickOutside from '../../hooks/useClickOutside';
+import useUserInfo from '../../hooks/useUserInfo';
 
 const Header = () => {
     const [activeUsePanelPopup, setActiveUsePanelPopup] = useState(null); // 'user', 'noti', 'mess'
     const [isFocusedSearch, setIsFocusedSearch] = useState(false);
     const popupUserPanelRef = useRef(null);
-    const searchRef = useRef(null); // Thêm ref cho phần tìm kiếm
-    const [user, setUser] = useState({ userName: 'Văn Thắng', avatar: 'cld-sample-5.jpg' });
+    const searchRef = useRef(null);
+    const userData = JSON.parse(localStorage.getItem("user"));
+    const userId = userData?.id;
+    const role = userData?.role;
     const [menus, setMenus] = useState([]);
-    const role = sessionStorage.getItem('role');
-    const userId = sessionStorage.getItem('userId');
-
-    // Fetch user data
-    useEffect(() => {
-        if (userId) {
-            const authHeader = sessionStorage.getItem('authHeader');
-            fetch(`http://localhost:8083/api/user/${userId}`, {
-                method: 'GET',
-                headers: { 'Authorization': authHeader },
-            })
-                .then((res) => res.json())
-                .then((data) => setUser(data))
-                .catch((err) => console.error('Error fetching user:', err));
-        }
-    }, [userId]);
-
+    const { userInfo, error } = useUserInfo(userId);
+    console.log("User Info:", userInfo, "Error:", error);
     // Set menu items based on role
     useEffect(() => {
         const baseMenus = [
@@ -124,7 +111,7 @@ const Header = () => {
                             onClick={() => setActiveUsePanelPopup(activeUsePanelPopup === 'user' ? null : 'user')}
                         >
                             <div className="header__avatar">
-                                <AvatarUser user={user} />
+                                <AvatarUser user={userInfo} />
                             </div>
                             <span className="header__icon-badge header__avatar-badge">
                                 {activeUsePanelPopup === 'user' ? <FaCaretUp /> : <FaCaretDown />}
@@ -133,7 +120,7 @@ const Header = () => {
                         {activeUsePanelPopup && (
                             <UserPanelPopup
                                 type={activeUsePanelPopup}
-                                user={user}
+                                user={userInfo}
                                 onClose={() => setActiveUsePanelPopup(null)}
                             />
                         )}
