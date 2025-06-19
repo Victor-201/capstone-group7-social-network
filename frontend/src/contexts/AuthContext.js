@@ -26,37 +26,15 @@ export const AuthProvider = ({ children }) => {
         
         if (token && storedUser) {
           try {
-            // Kiểm tra xem token có hợp lệ không
-            const response = await fetch(`${API_URL}/api/auth/me`, {
-              headers: {
-                Authorization: `Bearer ${token}`
-              }
-            });
-            
-            if (response.ok) {
-              // Token hợp lệ
-              const updatedUserData = await response.json();
-              const parsedStoredUser = JSON.parse(storedUser);
-              // Merge stored user data with any updated data from server
-              const mergedUser = { ...parsedStoredUser, ...updatedUserData };
-              setUser(mergedUser);
-              localStorage.setItem('user', JSON.stringify(mergedUser));
-              setIsAuthenticated(true);
-            } else if (response.status === 401) {
-              // Token không hợp lệ, xóa dữ liệu cũ
-              localStorage.removeItem('token');
-              localStorage.removeItem('user');
-            } else {
-              // For other errors, keep user logged in but use stored data
-              // This prevents logout on server unavailability
-              setUser(JSON.parse(storedUser));
-              setIsAuthenticated(true);
-            }
-          } catch (error) {
-            // If server is down or network error, still use local data
-            console.error('Auth check error:', error);
+            // Sử dụng stored user data nếu có token
             setUser(JSON.parse(storedUser));
             setIsAuthenticated(true);
+          } catch (error) {
+            // Nếu có lỗi khi parse user data, xóa dữ liệu cũ
+            console.error('Auth check error:', error);
+            localStorage.removeItem('token');
+            localStorage.removeItem('refreshToken');
+            localStorage.removeItem('user');
           }
         }
       } finally {
@@ -65,30 +43,43 @@ export const AuthProvider = ({ children }) => {
     };
     
     checkLoggedIn();
-  }, [API_URL]);
+  }, []); // Remove API_URL from dependency array
 
   // Hàm đăng nhập
   const login = async (username, password) => {
     try {
-      const response = await fetch(`${API_URL}/api/auth/login`, {
+      const response = await fetch(`${API_URL}/api/public/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ username, password })
+        body: JSON.stringify({ login_name: username, password })
       });
       
       const data = await response.json();
       
       if (!response.ok) {
-        throw new Error(data.message || 'Đăng nhập thất bại');
+        // Backend trả về message trong array hoặc string
+        const errorMessage = Array.isArray(data.message) ? data.message.join(', ') : data.message;
+        throw new Error(errorMessage || 'Đăng nhập thất bại');
       }
       
       // Lưu token và thông tin người dùng
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify(data.user));
+      localStorage.setItem('token', data.accessToken);
+      localStorage.setItem('refreshToken', data.refreshToken);
       
-      setUser(data.user);
+      // Decode JWT để lấy thông tin user
+      const tokenPayload = JSON.parse(atob(data.accessToken.split('.')[1]));
+      const user = {
+        id: tokenPayload.id,
+        username: tokenPayload.user_name,
+        email: tokenPayload.email,
+        role: tokenPayload.role
+      };
+      
+      localStorage.setItem('user', JSON.stringify(user));
+      
+      setUser(user);
       setIsAuthenticated(true);
       
       return { success: true };
@@ -100,32 +91,49 @@ export const AuthProvider = ({ children }) => {
   // Hàm đăng ký
   const register = async (userData) => {
     try {
-      console.log("Registering with data:", userData); // Thêm debug log
+      console.log("API_URL:", API_URL);
+      console.log("Registering with data:", userData);
       
-      const response = await fetch(`${API_URL}/api/auth/register`, {
+      // Chuẩn bị data theo format của backend
+      const registrationData = {
+        full_name: userData.fullName,
+        user_name: userData.username,
+        email: userData.email,
+        password: userData.password,
+        confirm_password: userData.confirmPassword,
+        phone_number: userData.phoneNumber,
+        gender: userData.gender,
+        birth_date: userData.birthDate
+      };
+      
+      console.log("Sending registration data:", registrationData);
+      console.log("Request URL:", `${API_URL}/api/public/register`);
+      
+      const response = await fetch(`${API_URL}/api/public/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(userData)
+        body: JSON.stringify(registrationData)
       });
       
-      // Thêm log để kiểm tra response
       console.log("Registration response status:", response.status);
+      console.log("Registration response ok:", response.ok);
       
       const data = await response.json();
       console.log("Registration response data:", data);
       
       if (!response.ok) {
-        throw new Error(data.message || 'Đăng ký thất bại');
+        // Backend trả về message trong array hoặc string
+        const errorMessage = Array.isArray(data.message) ? data.message.join(', ') : data.message;
+        throw new Error(errorMessage || 'Đăng ký thất bại');
       }
       
-      // Lưu token và thông tin người dùng
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify(data.user));
-      
-      setUser(data.user);
-      setIsAuthenticated(true);
+      // Đăng ký thành công, tự động đăng nhập
+      const loginResult = await login(userData.username, userData.password);
+      if (!loginResult.success) {
+        throw new Error('Đăng ký thành công nhưng không thể đăng nhập tự động');
+      }
       
       return { success: true };
     } catch (error) {
@@ -146,6 +154,7 @@ export const AuthProvider = ({ children }) => {
   // Hàm đăng xuất
   const logout = () => {
     localStorage.removeItem('token');
+    localStorage.removeItem('refreshToken');
     localStorage.removeItem('user');
     setUser(null);
     setIsAuthenticated(false);
@@ -380,6 +389,79 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Hàm quên mật khẩu - gửi OTP
+  const forgotPassword = async (email) => {
+    try {
+      const response = await fetch(`${API_URL}/api/public/forgot-password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email })
+      });
+      
+      const data = await response.json();
+      
+      if (!response.ok) {
+        const errorMessage = Array.isArray(data.message) ? data.message.join(', ') : data.message;
+        throw new Error(errorMessage || 'Gửi OTP thất bại');
+      }
+      
+      return { success: true, message: data.message };
+    } catch (error) {
+      return { success: false, message: error.message };
+    }
+  };
+
+  // Hàm verify OTP
+  const verifyOtp = async (email, otpCode) => {
+    try {
+      const response = await fetch(`${API_URL}/api/public/verify-otp`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email, otp_code: otpCode })
+      });
+      
+      const data = await response.json();
+      
+      if (!response.ok) {
+        const errorMessage = Array.isArray(data.message) ? data.message.join(', ') : data.message;
+        throw new Error(errorMessage || 'Xác thực OTP thất bại');
+      }
+      
+      return { success: true, token: data.token, message: data.message };
+    } catch (error) {
+      return { success: false, message: error.message };
+    }
+  };
+
+  // Hàm reset mật khẩu
+  const resetPassword = async (newPassword, token) => {
+    try {
+      const response = await fetch(`${API_URL}/api/public/reset-password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ newPassword })
+      });
+      
+      const data = await response.json();
+      
+      if (!response.ok) {
+        const errorMessage = Array.isArray(data.message) ? data.message.join(', ') : data.message;
+        throw new Error(errorMessage || 'Đặt lại mật khẩu thất bại');
+      }
+      
+      return { success: true, message: data.message };
+    } catch (error) {
+      return { success: false, message: error.message };
+    }
+  };
+
   const value = {
     user,
     isAuthenticated,
@@ -388,6 +470,10 @@ export const AuthProvider = ({ children }) => {
     register,
     logout,
     updateUserInfo, // Thêm hàm cập nhật thông tin người dùng
+    // Forgot password functions
+    forgotPassword,
+    verifyOtp,
+    resetPassword,
     // Friendship functions
     sendFriendRequest,
     respondToFriendRequest,
@@ -399,7 +485,7 @@ export const AuthProvider = ({ children }) => {
     unfollowUser,
     getFollowers,
     getFollowing,
-    checkFollowStatus
+    checkFollowStatus,
   };
 
   return (

@@ -8,7 +8,8 @@ export const ROUTERS = {
     },
     AUTH: {
         LOGIN: "/login",
-        REGISTER: "/register"
+        REGISTER: "/register",
+        FORGOT_PASSWORD: "/forgot-password"
     },
     ADMIN: "/admin" 
 };

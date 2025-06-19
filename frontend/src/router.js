@@ -3,6 +3,7 @@ import PersonalPage from './pages/users/personalPage';
 import WatchPage from './pages/users/watchPage';
 import LoginPage from './pages/users/loginPage';
 import RegisterPage from './pages/users/registerPage';
+import ForgotPasswordPage from './pages/users/forgotPasswordPage';
 import FriendsPage from './pages/users/friendsPage';
 import GroupsPage from './pages/users/groupsPage';
 import MasterLayout from './layouts/masterLayout';
@@ -38,13 +39,17 @@ const renderUserRouter = () => {
     {
       path: ROUTERS.AUTH.REGISTER,
       Component: <RegisterPage />,
+    },
+    {
+      path: ROUTERS.AUTH.FORGOT_PASSWORD,
+      Component: <ForgotPasswordPage />,
     }
   ];
 
   return (
     <Routes>
       {userRouters.map((item, key) => (
-        item.path === ROUTERS.AUTH.LOGIN || item.path === ROUTERS.AUTH.REGISTER ? (
+        item.path === ROUTERS.AUTH.LOGIN || item.path === ROUTERS.AUTH.REGISTER || item.path === ROUTERS.AUTH.FORGOT_PASSWORD ? (
           <Route key={key} path={item.path} element={item.Component} />
         ) : (
           <Route

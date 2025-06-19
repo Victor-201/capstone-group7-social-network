@@ -1,0 +1,74 @@
+@import "../../../styles/pages/theme";
+@import "../loginPage/style.scss";
+
+// Custom styles for forgot password page
+.auth-container {
+  .progress-indicator {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 20px 0;
+    gap: 15px;
+    
+    .step {
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 14px;
+      background-color: var(--auth-border);
+      color: var(--auth-text-secondary);
+      transition: all 0.3s ease;
+      
+      &.active {
+        background: var(--auth-gradient);
+        color: white;
+        transform: scale(1.1);
+      }
+      
+      &:not(:last-child)::after {
+        content: '';
+        position: absolute;
+        width: 15px;
+        height: 2px;
+        background-color: var(--auth-border);
+        margin-left: 50px;
+        z-index: -1;
+      }
+      
+      &.active:not(:last-child)::after {
+        background: var(--auth-primary);
+      }
+    }
+  }
+  
+  .form-help {
+    display: block;
+    margin-top: 5px;
+    font-size: 12px;
+    color: var(--auth-text-secondary);
+    font-style: italic;
+  }
+  
+  .auth-button.secondary {
+    background: transparent;
+    color: var(--auth-primary);
+    border: 2px solid var(--auth-primary);
+    margin-top: 10px;
+    
+    &:hover {
+      background: var(--auth-primary);
+      color: white;
+    }
+    
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+  }
+}
