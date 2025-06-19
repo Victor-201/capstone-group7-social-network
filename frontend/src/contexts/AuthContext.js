@@ -96,14 +96,14 @@ export const AuthProvider = ({ children }) => {
       
       // Chuẩn bị data theo format của backend
       const registrationData = {
-        full_name: userData.fullName,
-        user_name: userData.username,
+        full_name: userData.full_name,
+        user_name: userData.user_name,
         email: userData.email,
         password: userData.password,
-        confirm_password: userData.confirmPassword,
-        phone_number: userData.phoneNumber,
+        confirm_password: userData.confirm_password,
+        phone_number: userData.phone_number,
         gender: userData.gender,
-        birth_date: userData.birthDate
+        birth_date: userData.birth_date
       };
       
       console.log("Sending registration data:", registrationData);

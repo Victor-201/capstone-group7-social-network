@@ -5,14 +5,14 @@ import './style.scss';
 
 const RegisterPage = () => {
   const [formData, setFormData] = useState({
-    username: '',
+    user_name: '',
     email: '',
     password: '',
-    confirmPassword: '',
-    fullName: '',
-    phoneNumber: '',
+    confirm_password: '',
+    full_name: '',
+    phone_number: '',
     gender: '',
-    birthDate: ''
+    birth_date: ''
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -36,7 +36,7 @@ const RegisterPage = () => {
       console.log("Register form data:", formData);
       
       // Kiểm tra password confirmation
-      if (formData.password !== formData.confirmPassword) {
+      if (formData.password !== formData.confirm_password) {
         throw new Error('Mật khẩu xác nhận không khớp');
       }
 
@@ -75,8 +75,8 @@ const RegisterPage = () => {
             <input
               type="text"
               id="fullName"
-              name="fullName"
-              value={formData.fullName}
+              name="full_name"
+              value={formData.full_name}
               onChange={handleChange}
               required
               placeholder="Nhập họ và tên của bạn"
@@ -90,8 +90,8 @@ const RegisterPage = () => {
             <input
               type="text"
               id="username"
-              name="username"
-              value={formData.username}
+              name="user_name"
+              value={formData.user_name}
               onChange={handleChange}
               required
               placeholder="Nhập tên đăng nhập"
@@ -120,8 +120,8 @@ const RegisterPage = () => {
             <input
               type="tel"
               id="phoneNumber"
-              name="phoneNumber"
-              value={formData.phoneNumber}
+              name="phone_number"
+              value={formData.phone_number}
               onChange={handleChange}
               required
               placeholder="Nhập số điện thoại"
@@ -150,9 +150,9 @@ const RegisterPage = () => {
             <label htmlFor="birthDate">Ngày sinh *</label>
             <input
               type="date"
-              id="birthDate"
-              name="birthDate"
-              value={formData.birthDate}
+              id="birth_date"
+              name="birth_date"
+              value={formData.birth_date}
               onChange={handleChange}
               required
               max={new Date().toISOString().split('T')[0]}
@@ -179,8 +179,8 @@ const RegisterPage = () => {
             <input
               type="password"
               id="confirmPassword"
-              name="confirmPassword"
-              value={formData.confirmPassword}
+              name="confirm_password"
+              value={formData.confirm_password}
               onChange={handleChange}
               required
               placeholder="Nhập lại mật khẩu"
