@@ -12,6 +12,7 @@ import routerMessage from './Message.routes.js';
 import routerNotification from './Notification.routes.js';
 import routerLike from './Like.routes.js';
 import routerAdmin from './Admin.routes.js';
+import routerSearch from './Search.routes.js';
 
 const router = express.Router();
 
@@ -28,5 +29,6 @@ router.use('/user', verifyToken, routerMessage);
 router.use('/user', verifyToken, routerNotification);
 router.use('/user', verifyToken, routerLike);
 router.use('/admin', verifyAdmin, routerAdmin);
+router.use('/search', verifyToken, routerSearch);
 
 export default router;
