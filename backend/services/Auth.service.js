@@ -48,9 +48,9 @@ export default {
 
     await sequelize.transaction(async (t) => {
       const userInfo = await UserInfo.create({
-        full_name: data.fullName,
+        full_name: data.full_name,
         gender: data.gender,
-        birth_date: data.birthdate
+        birth_date: data.birth_date
       }, { transaction: t });
 
       await UserAccount.create({

@@ -20,6 +20,7 @@ export const likePost = async (req, res) => {
     console.log(receiver_id);
     if (!notification.error) {
       req.io?.to(receiver_id).emit("newNotification", notification.result);
+      console.log('Emitting notification to room');
     }
   }
   return res.status(201).json({ message: result.message });
