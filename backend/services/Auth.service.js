@@ -8,6 +8,7 @@ import {
 import models from "../models/index.js";
 import { registationValidate, signInValidate } from "../validators/Auth.validator.js";
 import { sendMail } from "../helpers/sendMail.helper.js";
+import { Op } from "sequelize";
 
 const { UserAccount, UserInfo, RefreshToken } = models;
 
@@ -83,10 +84,13 @@ export default {
     }
 
     const login_name = data.login_name.trim();
-    let clause = {};
-    if (/^\d{9,11}$/.test(login_name)) clause.phone_number = login_name;
-    else if (/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(login_name)) clause.email = login_name;
-    else clause.user_name = login_name;
+    const clause = {
+      [Op.or]: [
+        { user_name: login_name },
+        { email: login_name },
+        { phone_number: login_name }
+      ]
+    };
 
     const user = await UserAccount.findOne({ where: clause });
     if (!user) {
