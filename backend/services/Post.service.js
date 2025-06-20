@@ -2,7 +2,7 @@ import models from '../models/index.js';
 import { uploadMultipleMedia } from '../helpers/multer.helper.js';
 import friendService from './Friend.service.js';
 
-const { Post, PostMedia } = models;
+const { Post, PostMedia, Friend, Follow } = models;
 
 export default {
   async createPost(user_id, body, files) {
@@ -122,4 +122,49 @@ export default {
       return { error: { code: 500, message: 'Error sharing post', detail: error.message } };
     }
   },
+  async getRelatedPosts(user_id, page = 1, limit = 10) {
+    try {
+      const offset = (page - 1) * limit;
+
+      const [friends, follows] = await Promise.all([
+        friendService.getFriendsList(user_id),
+        Follow.findAll({ where: { follower_id: user_id }, attributes: ['following_id'] })
+      ]);
+
+      const friendIds = friends.result.friends.map(friend => friend.id);
+      const followedIds = follows.map(f => f.following_id);
+
+      const relatedIds = [...new Set([user_id, ...friendIds, ...followedIds])];
+
+      if (relatedIds.length === 0) {
+        return { result: [], total: 0, page, limit };
+      }
+
+      const [posts, total] = await Promise.all([
+        Post.findAll({
+          where: {
+            user_id: relatedIds,
+            access_modifier: 'public'
+          },
+          include: [
+            { model: PostMedia, as: 'media', attributes: ['media_url', 'media_type'] }
+          ],
+          order: [['created_at', 'DESC']],
+          limit,
+          offset
+        }),
+        Post.count({
+          where: {
+            user_id: relatedIds,
+            access_modifier: 'public'
+          }
+        })
+      ]);
+
+      return { result: posts, total, page, limit };
+
+    } catch (error) {
+      return { error: { code: 500, message: 'Error fetching related posts', detail: error.message } };
+    }
+  }
 };
