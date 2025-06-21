@@ -13,22 +13,35 @@ import routerNotification from './Notification.routes.js';
 import routerLike from './Like.routes.js';
 import routerAdmin from './Admin.routes.js';
 import routerSearch from './Search.routes.js';
+import routerProfile from './Profile.routes.js';
 
 const router = express.Router();
 
 
+// Đăng nhập / đăng ký không cần token
 router.use('/public', routerAuth);
-router.use("/user",verifyToken,routerUserInfo);
-router.use("/user",verifyToken,routerUserMedia);
-router.use("/user",verifyToken,routeFriend);
-router.use('/user', verifyToken, routerFollow);
-router.use('/user', verifyToken, routerPost);
-router.use('/user', verifyToken, routerComment);
-router.use('/user', verifyToken, routerChat);
-router.use('/user', verifyToken, routerMessage);
-router.use('/user', verifyToken, routerNotification);
-router.use('/user', verifyToken, routerLike);
+
+// Admin
 router.use('/admin', verifyAdmin, routerAdmin);
+
+// Search
 router.use('/search', verifyToken, routerSearch);
+
+// Group toàn bộ /user vào 1 verifyToken
+router.use('/user', verifyToken);
+
+// Gắn router con sau khi đã verifyToken
+router.use('/user', routerUserInfo);
+router.use('/user', routerUserMedia);
+router.use('/user', routeFriend);
+router.use('/user', routerFollow);
+router.use('/user', routerPost);
+router.use('/user', routerComment);
+router.use('/user', routerChat);
+router.use('/user', routerMessage);
+router.use('/user', routerNotification);
+router.use('/user', routerLike);
+router.use('/user', routerProfile);
+
 
 export default router;

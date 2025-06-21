@@ -53,3 +53,13 @@ export const sharePost = async (req, res) => {
   if (error) return res.status(error.code).json(error);
   return res.status(201).json(result);
 };
+
+export const getRelatedPosts = async (req, res) => {
+  const { error, ...result } = await postService.getRelatedPosts(
+    req.user.id,
+    parseInt(req.query.page) || 1,
+    parseInt(req.query.limit) || 10
+  );
+  if (error) return res.status(error.code).json(error);
+  return res.status(200).json(result);
+};
