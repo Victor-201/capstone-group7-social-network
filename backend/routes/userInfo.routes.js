@@ -3,8 +3,8 @@ import express from "express";
 
 const router = express.Router();
 
-router.get("/profile", getUserInfo);
-router.put("/profile", updateUserInfo);
-router.get("/profile/:id", getUserInfoById);
+router.get("/info", getUserInfo);
+router.put("/info", updateUserInfo);
+router.get("/info/:id", getUserInfoById);
 
 export default router;

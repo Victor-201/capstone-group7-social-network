@@ -23,18 +23,6 @@ const ProfileDetail = (sequelize) => {
             type: DataTypes.STRING(255),
             allowNull: true,
         },
-        bio: {
-            type: DataTypes.TEXT,
-            allowNull: true,
-        },
-        gender: {
-            type: DataTypes.STRING(50),
-            allowNull: true,
-        },
-        birth_date: {
-            type: DataTypes.DATE,
-            allowNull: true,
-        },
         hometown: {
             type: DataTypes.STRING(255),
             allowNull: true,
@@ -48,6 +36,10 @@ const ProfileDetail = (sequelize) => {
             ),
             allowNull: false,
             defaultValue: 'single',
+        },
+        create_at: {
+            type: DataTypes.DATE,
+            defaultValue: DataTypes.NOW,
         },
     },
         {

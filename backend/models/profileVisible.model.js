@@ -15,10 +15,7 @@ const ProfileVisible = (sequelize) => {
           'education',
           'relationship_status',
           'hometown',
-          'location',
-          'bio',
-          'gender',
-          'birth_date'
+          'location'
         ),
         allowNull: false,
         primaryKey: true,
@@ -31,7 +28,7 @@ const ProfileVisible = (sequelize) => {
     },
     {
       tableName: 'profile_visible',
-      timestamps: false,
+      timestamps: true,
     }
   );
 

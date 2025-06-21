@@ -1,23 +1,27 @@
 import models from "../models/index.js";
-const { UserInfo } = models;
+const { UserInfo, UserAccount } = models;
 
 export default {
   async getUserInfo(user_id) {
     try {
       const user = await UserInfo.findOne({
         where: { id: user_id },
+        include: [
+          {
+            model: UserAccount,
+            as: "userAccount",
+            attributes: ["email", "phone_number", "user_name", "created_at"]
+          }
+        ],
         attributes: [
           "id",
           "full_name",
-          "bio",
-          "gender",
-          "birth_date",
-          "location",
-          "hometown",
           "avatar",
           "cover",
           "isOnline",
-          "interestedUser"
+          'birth_date',
+          "gender",
+          "bio",
         ]
       });
 
@@ -44,11 +48,9 @@ export default {
       await UserInfo.update(
         {
           full_name: info.full_name,
-          bio: info.bio,
-          gender: info.gender,
           birth_date: info.birth_date,
-          location: info.location,
-          hometown: info.hometown
+          gender: info.gender,
+          bio: info.bio,
         },
         {
           where: { id: user_id }
@@ -67,18 +69,22 @@ export default {
     try {
       const userInfo = await UserInfo.findOne({
         where: { id },
+        include: [
+          {
+            model: UserAccount,
+            as: "userAccount",
+            attributes: ["email", "phone_number", "user_name", "created_at"]
+          }
+        ],
         attributes: [
           "id",
           "full_name",
-          "bio",
-          "gender",
-          "birth_date",
-          "location",
-          "hometown",
           "avatar",
           "cover",
           "isOnline",
-          "interestedUser"
+          "birth_date",
+          "gender",
+          "bio",
         ]
       });
 

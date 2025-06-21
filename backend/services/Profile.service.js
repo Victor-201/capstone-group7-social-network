@@ -1,9 +1,14 @@
 import model from "../models/index.js";
+import { updateProfileSchema } from "../validators/Profile.validator.js";
+
 const { ProfileDetail, ProfileVisible } = model;
 
 const getProfile = async (userId) => {
   try {
-    const profile = await ProfileDetail.findOne({ where: { user_id: userId }, include: [{ model: ProfileVisible }] });
+    const profile = await ProfileDetail.findOne({
+      where: { user_id: userId },
+      include: [{ model: ProfileVisible }]
+    });
     if (!profile) {
       return { error: { code: 404, message: "Profile not found" } };
     }
@@ -15,6 +20,16 @@ const getProfile = async (userId) => {
 
 const updateProfile = async (userId, data) => {
   try {
+    const { error } = updateProfileSchema.validate(data);
+    if (error) {
+      return {
+        error: {
+          code: 400,
+          name: error.name,
+          message: error.details.map((e) => e.message),
+        },
+      };
+    }
     const profile = await ProfileDetail.findOne({ where: { user_id: userId } });
     if (!profile) {
       return { error: { code: 404, message: "Profile not found" } };

@@ -12,6 +12,18 @@ const UserInfo = (sequelize) => {
       type: DataTypes.STRING,
       allowNull: true,
     },
+    birth_date: {
+      type: DataTypes.DATE,
+      allowNull: false,
+    },
+    gender: {
+      type: DataTypes.STRING(50),
+      allowNull: false, 
+    },
+    bio: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
     cover: {
       type: DataTypes.STRING,
       allowNull: true,
@@ -32,6 +44,7 @@ const UserInfo = (sequelize) => {
 
   model.associate = (models) => {
     model.hasOne(models.UserAccount, {
+      as: 'userAccount',
       foreignKey: 'id',
       onDelete: 'CASCADE'
     });
