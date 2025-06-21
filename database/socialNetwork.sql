@@ -2,11 +2,6 @@
 CREATE TABLE User_Infos (
     id CHAR(36) PRIMARY KEY,
     full_name VARCHAR(255),
-    bio TEXT,
-    gender VARCHAR(50),
-    birth_date DATE,
-    location VARCHAR(255),
-    hometown VARCHAR(255),
     avatar CHAR(36) DEFAULT NULL,
     cover CHAR(36) DEFAULT NULL,
     isOnline BOOLEAN DEFAULT FALSE,
@@ -52,6 +47,30 @@ CREATE TABLE User_Media (
 ALTER TABLE User_Infos
     ADD FOREIGN KEY (avatar) REFERENCES User_Media(media_id) ON DELETE SET NULL,
     ADD FOREIGN KEY (cover) REFERENCES User_Media(media_id) ON DELETE SET NULL;
+
+-- Table: Profile_Details
+CREATE TABLE Profile_Details (
+    id CHAR(36) PRIMARY KEY,
+    user_id CHAR(36) NOT NULL,
+    job VARCHAR(255),
+    education VARCHAR(255),
+    relationship_status ENUM('single','in_a_relationship','engaged','married') DEFAULT 'single',
+    hometown VARCHAR(255),
+    location VARCHAR(255),
+    bio TEXT,
+    gender VARCHAR(50),
+    birth_date DATE,
+    FOREIGN KEY (user_id) REFERENCES User_Infos(id) ON DELETE CASCADE
+);
+
+-- Table: Profile_Visible
+CREATE TABLE Profile_Visible (
+    profile_detail_id CHAR(36) NOT NULL,
+    field_name ENUM('job','education','relationship_status','hometown','location','bio','gender','birth_date') NOT NULL,
+    is_visible BOOLEAN DEFAULT TRUE,
+    PRIMARY KEY (profile_detail_id, field_name),
+    FOREIGN KEY (profile_detail_id) REFERENCES Profile_Details(id) ON DELETE CASCADE
+);
 
 -- Table: Posts
 CREATE TABLE Posts (
