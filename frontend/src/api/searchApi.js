@@ -1,10 +1,10 @@
 import { API_BASE_URL } from "../config/apiConfig";
 
-const BASE_URL = `${API_BASE_URL}/user`;
+const BASE_URL = `${API_BASE_URL}/search`;
 
-// Lấy thông tin user hiện tại
-export const getUserInfo = async (token) => {
-    const response = await fetch(`${BASE_URL}/profile`, {
+// Tìm kiếm users
+export const searchUsers = async (token, query, page = 1, limit = 10) => {
+    const response = await fetch(`${BASE_URL}/users?q=${encodeURIComponent(query)}&page=${page}&limit=${limit}`, {
         method: 'GET',
         headers: {
             Authorization: `Bearer ${token}`,
@@ -20,9 +20,9 @@ export const getUserInfo = async (token) => {
     return await response.json();
 };
 
-// Lấy thông tin user theo ID
-export const getUserById = async (token, userId) => {
-    const response = await fetch(`${BASE_URL}/${userId}`, {
+// Tìm kiếm posts
+export const searchPosts = async (token, query, page = 1, limit = 10) => {
+    const response = await fetch(`${BASE_URL}/posts?q=${encodeURIComponent(query)}&page=${page}&limit=${limit}`, {
         method: 'GET',
         headers: {
             Authorization: `Bearer ${token}`,
@@ -38,15 +38,14 @@ export const getUserById = async (token, userId) => {
     return await response.json();
 };
 
-// Cập nhật thông tin user
-export const updateUserInfo = async (token, userData) => {
-    const response = await fetch(`${BASE_URL}/update`, {
-        method: 'PUT',
+// Tìm kiếm tổng quát
+export const globalSearch = async (token, query, type = 'all', page = 1, limit = 10) => {
+    const response = await fetch(`${BASE_URL}/global?q=${encodeURIComponent(query)}&type=${type}&page=${page}&limit=${limit}`, {
+        method: 'GET',
         headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify(userData),
     });
     
     if (!response.ok) {
@@ -57,15 +56,14 @@ export const updateUserInfo = async (token, userData) => {
     return await response.json();
 };
 
-// Đổi mật khẩu
-export const changePassword = async (token, passwordData) => {
-    const response = await fetch(`${BASE_URL}/change-password`, {
-        method: 'PUT',
+// Lấy lịch sử tìm kiếm
+export const getSearchHistory = async (token) => {
+    const response = await fetch(`${BASE_URL}/history`, {
+        method: 'GET',
         headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify(passwordData),
     });
     
     if (!response.ok) {
@@ -76,14 +74,14 @@ export const changePassword = async (token, passwordData) => {
     return await response.json();
 };
 
-// Upload avatar
-export const uploadAvatar = async (token, formData) => {
-    const response = await fetch(`${BASE_URL}/upload-avatar`, {
-        method: 'POST',
+// Xóa lịch sử tìm kiếm
+export const clearSearchHistory = async (token) => {
+    const response = await fetch(`${BASE_URL}/history`, {
+        method: 'DELETE',
         headers: {
             Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
         },
-        body: formData,
     });
     
     if (!response.ok) {

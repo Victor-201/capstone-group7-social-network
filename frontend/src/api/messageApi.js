@@ -1,10 +1,29 @@
 import { API_BASE_URL } from "../config/apiConfig";
 
-const BASE_URL = `${API_BASE_URL}/user`;
+const BASE_URL = `${API_BASE_URL}/message`;
 
-// Lấy thông tin user hiện tại
-export const getUserInfo = async (token) => {
-    const response = await fetch(`${BASE_URL}/profile`, {
+// Gửi tin nhắn
+export const sendMessage = async (token, messageData) => {
+    const response = await fetch(`${BASE_URL}/send`, {
+        method: 'POST',
+        headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(messageData),
+    });
+    
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || `HTTP ${response.status}`);
+    }
+
+    return await response.json();
+};
+
+// Lấy tin nhắn trong cuộc trò chuyện
+export const getChatMessages = async (token, chatId, page = 1, limit = 20) => {
+    const response = await fetch(`${BASE_URL}/chat/${chatId}?page=${page}&limit=${limit}`, {
         method: 'GET',
         headers: {
             Authorization: `Bearer ${token}`,
@@ -20,33 +39,15 @@ export const getUserInfo = async (token) => {
     return await response.json();
 };
 
-// Lấy thông tin user theo ID
-export const getUserById = async (token, userId) => {
-    const response = await fetch(`${BASE_URL}/${userId}`, {
-        method: 'GET',
-        headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-        },
-    });
-    
-    if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || `HTTP ${response.status}`);
-    }
-
-    return await response.json();
-};
-
-// Cập nhật thông tin user
-export const updateUserInfo = async (token, userData) => {
-    const response = await fetch(`${BASE_URL}/update`, {
+// Cập nhật tin nhắn
+export const updateMessage = async (token, messageId, content) => {
+    const response = await fetch(`${BASE_URL}/update/${messageId}`, {
         method: 'PUT',
         headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify(userData),
+        body: JSON.stringify({ content }),
     });
     
     if (!response.ok) {
@@ -57,15 +58,33 @@ export const updateUserInfo = async (token, userData) => {
     return await response.json();
 };
 
-// Đổi mật khẩu
-export const changePassword = async (token, passwordData) => {
-    const response = await fetch(`${BASE_URL}/change-password`, {
+// Xóa tin nhắn
+export const deleteMessage = async (token, messageId) => {
+    const response = await fetch(`${BASE_URL}/delete/${messageId}`, {
+        method: 'DELETE',
+        headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+        },
+    });
+    
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || `HTTP ${response.status}`);
+    }
+
+    return await response.json();
+};
+
+// Đánh dấu tin nhắn đã đọc
+export const markMessagesAsRead = async (token, chatId) => {
+    const response = await fetch(`${BASE_URL}/mark-read`, {
         method: 'PUT',
         headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify(passwordData),
+        body: JSON.stringify({ chatId }),
     });
     
     if (!response.ok) {
@@ -76,9 +95,9 @@ export const changePassword = async (token, passwordData) => {
     return await response.json();
 };
 
-// Upload avatar
-export const uploadAvatar = async (token, formData) => {
-    const response = await fetch(`${BASE_URL}/upload-avatar`, {
+// Upload file/media cho tin nhắn
+export const uploadMessageMedia = async (token, formData) => {
+    const response = await fetch(`${BASE_URL}/upload-media`, {
         method: 'POST',
         headers: {
             Authorization: `Bearer ${token}`,
