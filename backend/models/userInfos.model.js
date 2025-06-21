@@ -8,20 +8,6 @@ const UserInfo = (sequelize) => {
       primaryKey: true,
     },
     full_name: DataTypes.STRING,
-    bio: {
-      type:DataTypes.TEXT,
-      allowNull: true,
-    },
-    gender: DataTypes.STRING,
-    birth_date: DataTypes.DATE,
-    location: {
-      type:DataTypes.TEXT,
-      allowNull: true,
-    },
-    hometown: {
-      type:DataTypes.TEXT,
-      allowNull: true,
-    },
     avatar: {
       type: DataTypes.STRING,
       allowNull: true,
@@ -127,6 +113,16 @@ const UserInfo = (sequelize) => {
     model.hasMany(models.Message, {
       foreignKey: 'sender_id',
       as: 'Messages',
+      onDelete: 'CASCADE'
+    });
+    model.hasMany(models.Message, {
+      foreignKey: 'receiver_id',
+      as: 'ReceivedMessages',
+      onDelete: 'CASCADE'
+    });
+    model.hasOne(models.ProfileDetail, {
+      foreignKey: 'user_id',
+      as: 'ProfileDetails',
       onDelete: 'CASCADE'
     });
   };

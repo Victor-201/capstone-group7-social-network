@@ -14,6 +14,8 @@ import UserMedia from "./userMedia.model.js";
 import PostMedia from "./postMedia.model.js";
 import Friend from "./Friends.model.js";
 import RefreshToken from "./refreshTokens.modle.js";
+import ProfileDetail from "./profileDetails.model.js";
+import ProfileVisible from "./profileVisible.model.js";
 
 const models = {
   UserAccount: UserAccount(sequelize),
@@ -31,6 +33,8 @@ const models = {
   PostMedia: PostMedia(sequelize),
   Friend: Friend(sequelize),
   RefreshToken: RefreshToken(sequelize),
+  ProfileDetail: ProfileDetail(sequelize),
+  ProfileVisible: ProfileVisible(sequelize),
   sequelize,
 };
 
