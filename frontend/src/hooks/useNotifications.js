@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { getUserInfo } from '../api/userApi';
+import { getNotifications } from '../api/notificationApi';
 
-const useUserInfo = () => {
-    const [userInfo, setUserInfo] = useState(null);
+const useNotifications = () => {
+    const [notifications, setNotification] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -18,8 +18,8 @@ const useUserInfo = () => {
             }
             
             try {
-                const data = await getUserInfo(token);
-                setUserInfo(data);
+                const data = await getNotifications(token);
+                setNotification(data);
             } catch (err) {
                 console.error('Error fetching user info:', err.message);
                 setError(err.message);
@@ -29,7 +29,7 @@ const useUserInfo = () => {
         })();
     }, []);
 
-    return { userInfo, loading, error };
+    return { notifications, loading, error };
 };
 
-export default useUserInfo;
+export default useNotifications;

@@ -10,7 +10,7 @@ export default {
                     {
                         model: UserInfo,
                         as: "receiver",
-                        attributes: ["id", "user_name", "avatar"],
+                        attributes: ["id", "full_name", "avatar"],
                     },
                 ],
                 order: [["created_at", "DESC"]],
