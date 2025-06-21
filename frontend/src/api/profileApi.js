@@ -1,10 +1,10 @@
 import { API_BASE_URL } from "../config/apiConfig";
 
-const BASE_URL = `${API_BASE_URL}/user`;
+const BASE_URL = `${API_BASE_URL}/profile`;
 
-// Lấy thông tin user hiện tại
-export const getUserInfo = async (token) => {
-    const response = await fetch(`${BASE_URL}/profile`, {
+// Lấy profile details
+export const getProfileDetails = async (token, userId) => {
+    const response = await fetch(`${BASE_URL}/details${userId ? `?userId=${userId}` : ''}`, {
         method: 'GET',
         headers: {
             Authorization: `Bearer ${token}`,
@@ -20,9 +20,28 @@ export const getUserInfo = async (token) => {
     return await response.json();
 };
 
-// Lấy thông tin user theo ID
-export const getUserById = async (token, userId) => {
-    const response = await fetch(`${BASE_URL}/${userId}`, {
+// Cập nhật profile details
+export const updateProfileDetails = async (token, profileData) => {
+    const response = await fetch(`${BASE_URL}/update-details`, {
+        method: 'PUT',
+        headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(profileData),
+    });
+    
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || `HTTP ${response.status}`);
+    }
+
+    return await response.json();
+};
+
+// Lấy cài đặt privacy
+export const getPrivacySettings = async (token) => {
+    const response = await fetch(`${BASE_URL}/privacy`, {
         method: 'GET',
         headers: {
             Authorization: `Bearer ${token}`,
@@ -38,15 +57,15 @@ export const getUserById = async (token, userId) => {
     return await response.json();
 };
 
-// Cập nhật thông tin user
-export const updateUserInfo = async (token, userData) => {
-    const response = await fetch(`${BASE_URL}/update`, {
+// Cập nhật cài đặt privacy
+export const updatePrivacySettings = async (token, privacyData) => {
+    const response = await fetch(`${BASE_URL}/privacy`, {
         method: 'PUT',
         headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify(userData),
+        body: JSON.stringify(privacyData),
     });
     
     if (!response.ok) {
@@ -57,28 +76,9 @@ export const updateUserInfo = async (token, userData) => {
     return await response.json();
 };
 
-// Đổi mật khẩu
-export const changePassword = async (token, passwordData) => {
-    const response = await fetch(`${BASE_URL}/change-password`, {
-        method: 'PUT',
-        headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(passwordData),
-    });
-    
-    if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || `HTTP ${response.status}`);
-    }
-
-    return await response.json();
-};
-
-// Upload avatar
-export const uploadAvatar = async (token, formData) => {
-    const response = await fetch(`${BASE_URL}/upload-avatar`, {
+// Upload cover photo
+export const uploadCoverPhoto = async (token, formData) => {
+    const response = await fetch(`${BASE_URL}/upload-cover`, {
         method: 'POST',
         headers: {
             Authorization: `Bearer ${token}`,

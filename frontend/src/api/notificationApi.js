@@ -1,10 +1,96 @@
 import { API_BASE_URL } from "../config/apiConfig";
-
+<<<<<<< Updated upstream
 const BASE_URL = `${API_BASE_URL}/user`;
 
-// Lấy thông tin user hiện tại
-export const getUserInfo = async (token) => {
-    const response = await fetch(`${BASE_URL}/profile`, {
+export const getNotifications = async (token) => {
+    const response = await fetch(`${BASE_URL}/notifications`, {
+=======
+
+const BASE_URL = `${API_BASE_URL}/notification`;
+
+// Lấy danh sách thông báo
+export const getNotifications = async (token, page = 1, limit = 20) => {
+    const response = await fetch(`${BASE_URL}/list?page=${page}&limit=${limit}`, {
+>>>>>>> Stashed changes
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+        },
+    });
+<<<<<<< Updated upstream
+
+=======
+    
+>>>>>>> Stashed changes
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || `HTTP ${response.status}`);
+    }
+
+    return await response.json();
+<<<<<<< Updated upstream
+}
+=======
+};
+
+// Đánh dấu thông báo đã đọc
+export const markNotificationAsRead = async (token, notificationId) => {
+    const response = await fetch(`${BASE_URL}/mark-read/${notificationId}`, {
+        method: 'PUT',
+        headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+        },
+    });
+    
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || `HTTP ${response.status}`);
+    }
+
+    return await response.json();
+};
+
+// Đánh dấu tất cả thông báo đã đọc
+export const markAllNotificationsAsRead = async (token) => {
+    const response = await fetch(`${BASE_URL}/mark-all-read`, {
+        method: 'PUT',
+        headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+        },
+    });
+    
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || `HTTP ${response.status}`);
+    }
+
+    return await response.json();
+};
+
+// Xóa thông báo
+export const deleteNotification = async (token, notificationId) => {
+    const response = await fetch(`${BASE_URL}/delete/${notificationId}`, {
+        method: 'DELETE',
+        headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+        },
+    });
+    
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || `HTTP ${response.status}`);
+    }
+
+    return await response.json();
+};
+
+// Lấy số lượng thông báo chưa đọc
+export const getUnreadNotificationCount = async (token) => {
+    const response = await fetch(`${BASE_URL}/unread-count`, {
         method: 'GET',
         headers: {
             Authorization: `Bearer ${token}`,
@@ -19,77 +105,4 @@ export const getUserInfo = async (token) => {
 
     return await response.json();
 };
-
-// Lấy thông tin user theo ID
-export const getUserById = async (token, userId) => {
-    const response = await fetch(`${BASE_URL}/${userId}`, {
-        method: 'GET',
-        headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-        },
-    });
-    
-    if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || `HTTP ${response.status}`);
-    }
-
-    return await response.json();
-};
-
-// Cập nhật thông tin user
-export const updateUserInfo = async (token, userData) => {
-    const response = await fetch(`${BASE_URL}/update`, {
-        method: 'PUT',
-        headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(userData),
-    });
-    
-    if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || `HTTP ${response.status}`);
-    }
-
-    return await response.json();
-};
-
-// Đổi mật khẩu
-export const changePassword = async (token, passwordData) => {
-    const response = await fetch(`${BASE_URL}/change-password`, {
-        method: 'PUT',
-        headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(passwordData),
-    });
-    
-    if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || `HTTP ${response.status}`);
-    }
-
-    return await response.json();
-};
-
-// Upload avatar
-export const uploadAvatar = async (token, formData) => {
-    const response = await fetch(`${BASE_URL}/upload-avatar`, {
-        method: 'POST',
-        headers: {
-            Authorization: `Bearer ${token}`,
-        },
-        body: formData,
-    });
-    
-    if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || `HTTP ${response.status}`);
-    }
-
-    return await response.json();
-};
+>>>>>>> Stashed changes

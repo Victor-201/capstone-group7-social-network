@@ -1,37 +1,14 @@
 import React, { useState } from 'react';
 import { BsThreeDots } from 'react-icons/bs';
 import NotificationItem from '../../../../components/notificationItem';
+import useNotifications from '../../../../hooks/useNotifications';
+import Loader from '../../../../components/loader';
 
 const NotificationSection = () => {
     const [filter, setFilter] = useState('all');
+    const { notifications, loading, error } = useNotifications();
 
-    const notifications = [
-        {
-            id: 1,
-            senderId: 101,
-            receiverId: 202,
-            actionType: 'friend_accept',
-            actionId: 555,
-            isRead: false,
-            createdAt: '2025-05-10T14:30:00',
-        },
-        {
-            id: 2,
-            senderId: 103,
-            receiverId: 202,
-            actionType: 'group_invite',
-            actionId: 777,
-            isRead: true,
-            createdAt: '2025-05-09T18:45:00',
-        },
-    ];
-
-    const senderNames = {
-        101: 'Minh Hải',
-        103: 'Hữu Nghĩa',
-    };
-
-    const filteredNoti = filter === 'all' ? notifications : notifications.filter(n => !n.isRead);
+    console.log('Notifications:', notifications);
 
     return (
         <section className="popup__section popup__section--notification">
@@ -53,15 +30,22 @@ const NotificationSection = () => {
                     Chưa đọc
                 </button>
             </div>
-            <ul className="popup__notification-list">
-                {filteredNoti.map(noti => (
-                    <NotificationItem
-                        key={noti.id}
-                        noti={noti}
-                        senderName={senderNames[noti.senderId] || 'Ai đó'}
-                    />
-                ))}
-            </ul>
+            {loading ? (
+                <div className="popup__loader">
+                    <Loader />
+                </div>
+            ) : notifications.length === 0 ? (
+                <div className="popup__no-notification">Không có thông báo nào.</div>
+            ) : (
+                <ul className="popup__notification-list">
+                    {notifications.map(noti => (
+                        <NotificationItem
+                            key={noti.id}
+                            noti={noti}
+                        />
+                    ))}
+                </ul>
+            )}
         </section>
     );
 };

@@ -12,6 +12,7 @@ import AvatarUser from '../../components/avatarUser';
 import Logo from '../../assets/images/logo/logo.png';
 import useClickOutside from '../../hooks/useClickOutside';
 import useUserInfo from '../../hooks/useUserInfo';
+import Loader from '../../components/loader';
 
 const Header = () => {
     const [activeUsePanelPopup, setActiveUsePanelPopup] = useState(null); // 'user', 'noti', 'mess'
@@ -22,8 +23,7 @@ const Header = () => {
     const userId = userData?.id;
     const role = userData?.role;
     const [menus, setMenus] = useState([]);
-    const { userInfo, error } = useUserInfo(userId);
-    console.log("User Info:", userInfo, "Error:", error);
+    const { userInfo, loading, error } = useUserInfo(userId);
     // Set menu items based on role
     useEffect(() => {
         const baseMenus = [
@@ -111,7 +111,11 @@ const Header = () => {
                             onClick={() => setActiveUsePanelPopup(activeUsePanelPopup === 'user' ? null : 'user')}
                         >
                             <div className="header__avatar">
+                            {loading ? (
+                                <Loader />
+                            ):(
                                 <AvatarUser user={userInfo} />
+                                )}
                             </div>
                             <span className="header__icon-badge header__avatar-badge">
                                 {activeUsePanelPopup === 'user' ? <FaCaretUp /> : <FaCaretDown />}
@@ -129,6 +133,7 @@ const Header = () => {
             </div>
         </header>
     );
+    
 };
 
 export default memo(Header);
