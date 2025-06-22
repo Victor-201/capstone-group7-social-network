@@ -19,6 +19,7 @@
     position: absolute;
     inset: 0;
     backdrop-filter: blur(8px); // nền bị mờ
+    background-color: rgba(0, 0, 0, 0.5); // thêm màu nền mờ
     z-index: 1;
   }
 }
