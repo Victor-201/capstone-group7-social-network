@@ -1,10 +1,9 @@
 import { API_BASE_URL } from "../config/apiConfig";
 
-const BASE_URL = `${API_BASE_URL}/auth`;
 
 // Đăng nhập
 export const login = async (credentials) => {
-    const response = await fetch(`${BASE_URL}/login`, {
+    const response = await fetch(`${API_BASE_URL}/public/login`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -22,7 +21,7 @@ export const login = async (credentials) => {
 
 // Đăng ký
 export const register = async (userData) => {
-    const response = await fetch(`${BASE_URL}/register`, {
+    const response = await fetch(`${API_BASE_URL}/public/register`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -40,7 +39,7 @@ export const register = async (userData) => {
 
 // Đăng xuất
 export const logout = async (token) => {
-    const response = await fetch(`${BASE_URL}/logout`, {
+    const response = await fetch(`${API_BASE_URL}/public/logout`, {
         method: 'POST',
         headers: {
             Authorization: `Bearer ${token}`,
@@ -58,7 +57,7 @@ export const logout = async (token) => {
 
 // Refresh token
 export const refreshToken = async (refreshToken) => {
-    const response = await fetch(`${BASE_URL}/refresh`, {
+    const response = await fetch(`${API_BASE_URL}/public/refresh`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -76,7 +75,7 @@ export const refreshToken = async (refreshToken) => {
 
 // Quên mật khẩu
 export const forgotPassword = async (email) => {
-    const response = await fetch(`${BASE_URL}/forgot-password`, {
+    const response = await fetch(`${API_BASE_URL}/public/forgot-password`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -94,7 +93,7 @@ export const forgotPassword = async (email) => {
 
 // Reset mật khẩu
 export const resetPassword = async (token, newPassword) => {
-    const response = await fetch(`${BASE_URL}/reset-password`, {
+    const response = await fetch(`${API_BASE_URL}/public/reset-password`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -112,7 +111,7 @@ export const resetPassword = async (token, newPassword) => {
 
 // Xác thực email
 export const verifyEmail = async (token) => {
-    const response = await fetch(`${BASE_URL}/verify-email`, {
+    const response = await fetch(`${API_BASE_URL}/public/verify-email`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

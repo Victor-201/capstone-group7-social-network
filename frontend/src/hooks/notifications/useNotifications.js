@@ -52,39 +52,39 @@ export const useNotifications = (page = 1, limit = 20) => {
     return { notifications, loading, error, hasMore, loadMore, refetch: () => fetchNotifications(1) };
 };
 
-export const useUnreadNotificationCount = () => {
-    const [count, setCount] = useState(0);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+// export const useUnreadNotificationCount = () => {
+//     const [count, setCount] = useState(0);
+//     const [loading, setLoading] = useState(true);
+//     const [error, setError] = useState(null);
 
-    const fetchUnreadCount = useCallback(async () => {
-        const token = localStorage.getItem('token');
-        if (!token) {
-            setError("No token provided");
-            setLoading(false);
-            return;
-        }
+//     const fetchUnreadCount = useCallback(async () => {
+//         const token = localStorage.getItem('token');
+//         if (!token) {
+//             setError("No token provided");
+//             setLoading(false);
+//             return;
+//         }
 
-        try {
-            setLoading(true);
-            setError(null);
-            const data = await getUnreadNotificationCount(token);
-            setCount(data.count || 0);
-        } catch (err) {
-            setError(err.message);
-        } finally {
-            setLoading(false);
-        }
-    }, []);
+//         try {
+//             setLoading(true);
+//             setError(null);
+//             const data = await getUnreadNotificationCount(token);
+//             setCount(data.count || 0);
+//         } catch (err) {
+//             setError(err.message);
+//         } finally {
+//             setLoading(false);
+//         }
+//     }, []);
 
-    useEffect(() => {
-        fetchUnreadCount();
+//     useEffect(() => {
+//         fetchUnreadCount();
         
-        // Set up polling for real-time updates
-        const interval = setInterval(fetchUnreadCount, 30000); // Check every 30 seconds
+//         // Set up polling for real-time updates
+//         const interval = setInterval(fetchUnreadCount, 30000); // Check every 30 seconds
         
-        return () => clearInterval(interval);
-    }, [fetchUnreadCount]);
+//         return () => clearInterval(interval);
+//     }, [fetchUnreadCount]);
 
-    return { count, loading, error, refetch: fetchUnreadCount };
-};
+//     return { count, loading, error, refetch: fetchUnreadCount };
+// };

@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../../../contexts/AuthContext';
-import './style.scss';
+import { useLogin } from '../../../../hooks/auth';
+import { login } from '../../../../api/accountApi';
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({
-    username: '',
+    login_name: '',
     password: ''
   });
   const [error, setError] = useState('');
@@ -13,7 +13,7 @@ const LoginPage = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const { login } = useAuth(); // Sử dụng hook useAuth
+  const { loginUser } = useLogin(); // Sử dụng hook useLogin
 
   // Check for success message from forgot password
   useEffect(() => {
@@ -39,7 +39,7 @@ const LoginPage = () => {
 
     try {
       // Sử dụng hàm login từ AuthContext
-      const result = await login(formData.username, formData.password);
+      const result = await loginUser(formData);
       
       if (!result.success) {
         throw new Error(result.message || 'Đăng nhập thất bại');
@@ -55,25 +55,18 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="auth-container">
-      <div className="auth-card">
-        <div className="auth-header">
-          <h1>nova</h1>
-          <h2>Đăng nhập</h2>
-          <p>Chào mừng trở lại! Đăng nhập để tiếp tục.</p>
-        </div>
-
-        {error && <div className="auth-error">{error}</div>}
-        {success && <div className="auth-success">{success}</div>}
+    <>
+      {error && <div className="auth-error">{error}</div>}
+      {success && <div className="auth-success">{success}</div>}
 
         <form onSubmit={handleSubmit} className="auth-form">
           <div className="form-group">
             <label htmlFor="username">Tên đăng nhập hoặc Email</label>
             <input
               type="text"
-              id="username"
-              name="username"
-              value={formData.username}
+              id="login_name"
+              name="login_name"
+              value={formData.login_name}
               onChange={handleChange}
               required
               placeholder="Nhập tên đăng nhập hoặc email"
@@ -103,12 +96,7 @@ const LoginPage = () => {
             <Link to="/forgot-password">Quên mật khẩu?</Link>
           </div>
         </form>
-
-        <div className="auth-footer">
-          <p>Chưa có tài khoản? <Link to="/register">Đăng ký ngay</Link></p>
-        </div>
-      </div>
-    </div>
+    </>
   );
 };
 

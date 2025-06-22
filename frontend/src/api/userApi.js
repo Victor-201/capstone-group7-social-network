@@ -4,7 +4,7 @@ const BASE_URL = `${API_BASE_URL}/user`;
 
 // Lấy thông tin user hiện tại
 export const getUserInfo = async (token) => {
-    const response = await fetch(`${BASE_URL}/profile`, {
+    const response = await fetch(`${BASE_URL}/info`, {
         method: 'GET',
         headers: {
             Authorization: `Bearer ${token}`,
@@ -22,7 +22,7 @@ export const getUserInfo = async (token) => {
 
 // Lấy thông tin user theo ID
 export const getUserById = async (token, userId) => {
-    const response = await fetch(`${BASE_URL}/${userId}`, {
+    const response = await fetch(`${BASE_URL}/info/${userId}`, {
         method: 'GET',
         headers: {
             Authorization: `Bearer ${token}`,
