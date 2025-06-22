@@ -2,6 +2,9 @@
 CREATE TABLE User_Infos (
     id CHAR(36) PRIMARY KEY,
     full_name VARCHAR(255),
+    bio TEXT,
+    gender VARCHAR(50),
+    birth_date DATE,
     avatar CHAR(36) DEFAULT NULL,
     cover CHAR(36) DEFAULT NULL,
     isOnline BOOLEAN DEFAULT FALSE,
@@ -57,16 +60,13 @@ CREATE TABLE Profile_Details (
     relationship_status ENUM('single','in_a_relationship','engaged','married') DEFAULT 'single',
     hometown VARCHAR(255),
     location VARCHAR(255),
-    bio TEXT,
-    gender VARCHAR(50),
-    birth_date DATE,
     FOREIGN KEY (user_id) REFERENCES User_Infos(id) ON DELETE CASCADE
 );
 
 -- Table: Profile_Visible
 CREATE TABLE Profile_Visible (
     profile_detail_id CHAR(36) NOT NULL,
-    field_name ENUM('job','education','relationship_status','hometown','location','bio','gender','birth_date') NOT NULL,
+    field_name ENUM('job','education','relationship_status','hometown','location') NOT NULL,
     is_visible BOOLEAN DEFAULT TRUE,
     PRIMARY KEY (profile_detail_id, field_name),
     FOREIGN KEY (profile_detail_id) REFERENCES Profile_Details(id) ON DELETE CASCADE
@@ -162,6 +162,7 @@ CREATE TABLE Messages (
     id CHAR(36) PRIMARY KEY,
     chat_id CHAR(36) NOT NULL,
     sender_id CHAR(36) NOT NULL,
+    is_read BOOLEAN DEFAULT FALSE,
     content TEXT,
     sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (chat_id) REFERENCES Chats(id) ON DELETE CASCADE,
@@ -173,7 +174,7 @@ CREATE TABLE Notifications (
     id CHAR(36) PRIMARY KEY,
     sender_id CHAR(36) NOT NULL,
     receiver_id CHAR(36) NOT NULL,
-    action_type ENUM ('post', 'comment', 'like', 'friend_request', 'message') NOT NULL,
+    action_type ENUM ('post', 'comment', 'like', 'friend_request', 'message', 'friend_respond') NOT NULL,
     action_id CHAR(36) NOT NULL,
     is_read BOOLEAN DEFAULT FALSE,
     content VARCHAR(255) DEFAULT NULL,
