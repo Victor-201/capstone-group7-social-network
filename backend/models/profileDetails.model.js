@@ -37,7 +37,7 @@ const ProfileDetail = (sequelize) => {
             allowNull: false,
             defaultValue: 'single',
         },
-        create_at: {
+        created_at: {
             type: DataTypes.DATE,
             defaultValue: DataTypes.NOW,
         },
