@@ -60,6 +60,7 @@ CREATE TABLE Profile_Details (
     relationship_status ENUM('single','in_a_relationship','engaged','married') DEFAULT 'single',
     hometown VARCHAR(255),
     location VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES User_Infos(id) ON DELETE CASCADE
 );
 
