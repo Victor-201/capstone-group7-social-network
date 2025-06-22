@@ -8,6 +8,6 @@ export const EnumSchemas = {
     access_modifier: Joi.string().valid('public', 'private', 'friends').required(),
   }).unknown(true),
   Notification: Joi.object({
-    type: Joi.string().valid('like', 'comment', 'follow', 'message').required(),
+    type: Joi.string().valid('post', 'comment', 'like', 'friend_request', 'message', 'friend_response').required(),
   }).unknown(true),
 };

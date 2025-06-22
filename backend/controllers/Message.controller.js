@@ -16,3 +16,11 @@ export const sendMessage = async (req, res) => {
     req.io.to(chat_id).emit('newMessage', result);
     return res.status(201).json(result);
 }
+
+export const markMessageAsRead = async (req, res) => {
+    const messageId = req.params.message_id;
+    const userId = req.user.id;
+    const { error, result } = await MessageService.markMessageAsRead(messageId, userId);
+    if (error) return res.status(error.code).json(error);
+    return res.status(200).json(result);
+}

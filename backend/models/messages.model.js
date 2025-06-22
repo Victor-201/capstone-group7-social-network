@@ -20,6 +20,10 @@ const Message = (sequelize) => {
       type: DataTypes.TEXT,
       allowNull: false
     },
+    is_read: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    },
     sent_at: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW
