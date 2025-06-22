@@ -5,8 +5,7 @@
   top: calc(100% + 8px);
   right: 0;
   width: 400px;
-  background-color: #fff;
-  border: 1px solid #ddd;
+  background-color: get-theme-color("primary-color");
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   padding: 15px;
@@ -153,6 +152,7 @@
     }
 
     &__section-more {
+      position: relative;
       background: none;
       border: none;
       width: 36px;
@@ -167,6 +167,39 @@
 
       &:hover {
         background-color: rgba(get-theme-color("secondary-color"), 0.3);
+      }
+
+      &--actions {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        background-color: get-theme-color("primary-color");
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        padding: 10px;
+        box-sizing: border-box;
+        z-index: 1001;
+        display: flex;
+        flex-direction: column;
+        align-items: start;
+
+        .notification-action {
+          width: 100%;
+          min-width: 200px;
+          white-space: nowrap;
+          padding: 10px 16px;
+          cursor: pointer;
+          color: rgba(get-theme-color("text-primary"), 0.8);
+          font-size: 15px;
+          transition: background-color 0.2s;
+          text-align: left;
+          border-radius: 10px;
+
+          &:hover {
+            background-color: get-theme-color("secondary-color");
+            color: get-theme-color("text-primary");
+          }
+        }
       }
     }
 

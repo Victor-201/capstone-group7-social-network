@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useLogin } from '../../../../hooks/auth';
-import { login } from '../../../../api/accountApi';
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({
@@ -11,7 +10,6 @@ const LoginPage = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
   const location = useLocation();
   const { loginUser } = useLogin(); // Sử dụng hook useLogin
 
@@ -44,9 +42,6 @@ const LoginPage = () => {
       if (!result.success) {
         throw new Error(result.message || 'Đăng nhập thất bại');
       }
-
-      // Chuyển hướng đến trang chủ
-      navigate('/');
     } catch (err) {
       setError(err.message);
     } finally {

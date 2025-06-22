@@ -1,6 +1,5 @@
 import { API_BASE_URL } from "../config/apiConfig";
 
-
 // Đăng nhập
 export const login = async (credentials) => {
     const response = await fetch(`${API_BASE_URL}/public/login`, {
@@ -33,7 +32,6 @@ export const register = async (userData) => {
         const errorData = await response.json();
         throw new Error(errorData.message || `HTTP ${response.status}`);
     }
-
     return await response.json();
 };
 

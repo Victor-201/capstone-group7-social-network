@@ -13,6 +13,7 @@ export const getUserInfo = async (token) => {
     });
     
     if (!response.ok) {
+        console.log("Token:", token); 
         const errorData = await response.json();
         throw new Error(errorData.message || `HTTP ${response.status}`);
     }
