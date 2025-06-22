@@ -11,7 +11,7 @@ import UserPanelPopup from './modals/UserPanelPopup';
 import AvatarUser from '../../components/avatarUser';
 import Logo from '../../assets/images/logo/logo.png';
 import useClickOutside from '../../hooks/useClickOutside';
-import useUserInfo from '../../hooks/useUserInfo';
+import {useUserInfo} from '../../hooks/user';
 import Loader from '../../components/loader';
 
 const Header = () => {
@@ -23,7 +23,7 @@ const Header = () => {
     const userId = userData?.id;
     const role = userData?.role;
     const [menus, setMenus] = useState([]);
-    const { userInfo, loading, error } = useUserInfo(userId);
+    const { userInfo, loading, error } = useUserInfo();
     // Set menu items based on role
     useEffect(() => {
         const baseMenus = [

@@ -1,14 +1,13 @@
 import HomePage from './pages/users/homePage';
 import PersonalPage from './pages/users/personalPage';
 import WatchPage from './pages/users/watchPage';
-import LoginPage from './pages/users/loginPage';
-import RegisterPage from './pages/users/registerPage';
 import ForgotPasswordPage from './pages/users/forgotPasswordPage';
 import FriendsPage from './pages/users/friendsPage';
 import GroupsPage from './pages/users/groupsPage';
 import MasterLayout from './layouts/masterLayout';
 import { ROUTERS } from './utils/router';
 import { Route, Routes } from 'react-router-dom';
+import AuthPage from './pages/users/authPage';
 
 const renderUserRouter = () => {
   const userRouters = [
@@ -34,11 +33,11 @@ const renderUserRouter = () => {
     },
     {
       path: ROUTERS.AUTH.LOGIN,
-      Component: <LoginPage />,
+      Component: <AuthPage />,
     },
     {
       path: ROUTERS.AUTH.REGISTER,
-      Component: <RegisterPage />,
+      Component: <AuthPage />,
     },
     {
       path: ROUTERS.AUTH.FORGOT_PASSWORD,

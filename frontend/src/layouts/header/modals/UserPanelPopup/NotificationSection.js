@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { BsThreeDots } from 'react-icons/bs';
 import NotificationItem from '../../../../components/notificationItem';
-import useNotifications from '../../../../hooks/useNotifications';
+import {useNotifications} from '../../../../hooks/notifications';
 import Loader from '../../../../components/loader';
 
 const NotificationSection = () => {

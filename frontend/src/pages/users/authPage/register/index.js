@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../../contexts/AuthContext';
-import './style.scss';
+import { useNavigate } from 'react-router-dom';
+import { useRegister } from '../../../../hooks/auth';
 
 const RegisterPage = () => {
   const [formData, setFormData] = useState({
@@ -17,7 +16,7 @@ const RegisterPage = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { register } = useAuth(); // Sử dụng hook useAuth
+  const { registerUser } = useRegister();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -42,7 +41,7 @@ const RegisterPage = () => {
 
       console.log("Calling register function...");
       // Sử dụng hàm register từ AuthContext
-      const result = await register(formData);
+      const result = await registerUser(formData);
       console.log("Register result:", result);
       
       if (!result.success) {
@@ -59,14 +58,7 @@ const RegisterPage = () => {
   };
 
   return (
-    <div className="auth-container">
-      <div className="auth-card">
-        <div className="auth-header">
-          <h1>nova</h1>
-          <h2>Đăng ký tài khoản</h2>
-          <p>Tham gia cùng Nova để kết nối với mọi người.</p>
-        </div>
-
+    <>
         {error && <div className="auth-error">{error}</div>}
 
         <form onSubmit={handleSubmit} className="auth-form">
@@ -195,12 +187,7 @@ const RegisterPage = () => {
             </button>
           </div>
         </form>
-
-        <div className="auth-footer">
-          <p>Đã có tài khoản? <Link to="/login">Đăng nhập</Link></p>
-        </div>
-      </div>
-    </div>
+      </>
   );
 };
 
