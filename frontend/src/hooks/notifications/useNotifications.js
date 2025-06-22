@@ -1,13 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { 
     getNotifications, 
-    markNotificationAsRead, 
-    markAllNotificationsAsRead,
-    deleteNotification,
     getUnreadNotificationCount
-} from '../api/notificationApi';
+} from '../../api/notificationApi';
 
-// Hook cho notifications
 export const useNotifications = (page = 1, limit = 20) => {
     const [notifications, setNotifications] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -56,7 +52,6 @@ export const useNotifications = (page = 1, limit = 20) => {
     return { notifications, loading, error, hasMore, loadMore, refetch: () => fetchNotifications(1) };
 };
 
-// Hook cho unread notification count
 export const useUnreadNotificationCount = () => {
     const [count, setCount] = useState(0);
     const [loading, setLoading] = useState(true);
@@ -92,69 +87,4 @@ export const useUnreadNotificationCount = () => {
     }, [fetchUnreadCount]);
 
     return { count, loading, error, refetch: fetchUnreadCount };
-};
-
-// Hook cho notification actions
-export const useNotificationActions = () => {
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
-
-    const markAsRead = async (notificationId) => {
-        const token = localStorage.getItem('token');
-        if (!token) throw new Error("No token provided");
-
-        try {
-            setLoading(true);
-            setError(null);
-            const data = await markNotificationAsRead(token, notificationId);
-            return data;
-        } catch (err) {
-            setError(err.message);
-            throw err;
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const markAllAsRead = async () => {
-        const token = localStorage.getItem('token');
-        if (!token) throw new Error("No token provided");
-
-        try {
-            setLoading(true);
-            setError(null);
-            const data = await markAllNotificationsAsRead(token);
-            return data;
-        } catch (err) {
-            setError(err.message);
-            throw err;
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const deleteNotif = async (notificationId) => {
-        const token = localStorage.getItem('token');
-        if (!token) throw new Error("No token provided");
-
-        try {
-            setLoading(true);
-            setError(null);
-            const data = await deleteNotification(token, notificationId);
-            return data;
-        } catch (err) {
-            setError(err.message);
-            throw err;
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    return {
-        markAsRead,
-        markAllAsRead,
-        deleteNotif,
-        loading,
-        error
-    };
 };
