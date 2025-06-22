@@ -15,7 +15,8 @@ const ProfileVisible = (sequelize) => {
           'education',
           'relationship_status',
           'hometown',
-          'location'
+          'location',
+          'created_at',
         ),
         allowNull: false,
         primaryKey: true,

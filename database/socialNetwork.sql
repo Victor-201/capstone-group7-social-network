@@ -67,7 +67,7 @@ CREATE TABLE Profile_Details (
 -- Table: Profile_Visible
 CREATE TABLE Profile_Visible (
     profile_detail_id CHAR(36) NOT NULL,
-    field_name ENUM('job','education','relationship_status','hometown','location') NOT NULL,
+    field_name ENUM('job','education','relationship_status','hometown','location', 'created_at') NOT NULL,
     is_visible BOOLEAN DEFAULT TRUE,
     PRIMARY KEY (profile_detail_id, field_name),
     FOREIGN KEY (profile_detail_id) REFERENCES Profile_Details(id) ON DELETE CASCADE
