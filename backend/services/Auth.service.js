@@ -10,7 +10,7 @@ import { registationValidate, signInValidate } from "../validators/Auth.validato
 import { sendMail } from "../helpers/sendMail.helper.js";
 import { Op } from "sequelize";
 
-const { UserAccount, UserInfo, RefreshToken, ProfileDetail } = models;
+const { UserAccount, UserInfo, RefreshToken, ProfileDetail, ProfileVisible } = models;
 
 const MAX_REFRESH_TOKENS = 5;
 
@@ -65,6 +65,9 @@ export default {
       await ProfileDetail.create({
         user_id: userInfo.id
       }, { transaction: t } );
+      await ProfileVisible.create({
+        profile_detail_id: userInfo.id,
+      }, { transaction: t });
   });
 
     return {

@@ -16,7 +16,7 @@ const Notification = (sequelize) => {
       allowNull: false,
     },
     action_type: {
-      type: DataTypes.STRING(50),
+      type: DataTypes.ENUM('post', 'comment', 'like', 'friend_request', 'message', 'friend_respond'),
       allowNull: false,
     },
     content: {

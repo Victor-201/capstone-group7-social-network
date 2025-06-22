@@ -128,11 +128,6 @@ const UserInfo = (sequelize) => {
       as: 'Messages',
       onDelete: 'CASCADE'
     });
-    model.hasMany(models.Message, {
-      foreignKey: 'receiver_id',
-      as: 'ReceivedMessages',
-      onDelete: 'CASCADE'
-    });
     model.hasOne(models.ProfileDetail, {
       foreignKey: 'user_id',
       as: 'ProfileDetails',

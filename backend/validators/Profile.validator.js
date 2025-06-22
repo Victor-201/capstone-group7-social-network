@@ -6,6 +6,6 @@ export const updateProfileSchema = Joi.object({
   location: Joi.string().max(255).allow(null, ""),
   hometown: Joi.string().max(255).allow(null, ""),
   relationship_status: Joi.string()
-    .valid("single", "in_a_relationship", "engaged", "married", "divorced", "widowed")
+    .valid("single", "in_a_relationship", "engaged", "married")
     .allow(null, "")
 });

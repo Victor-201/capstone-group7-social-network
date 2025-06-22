@@ -42,5 +42,23 @@ export default {
         } catch (error) {
             return { error: { code: 500, message: 'Error sending message', detail: error.message } };
         }
+    },
+    async markMessageAsRead(messageId, userId) {
+        try {
+            if (!messageId) {
+                return { error: { code: 400, message: 'Message ID is required' } };
+            }
+            const message = await models.Message.findByPk(messageId);
+            if (!message) {
+                return { error: { code: 404, message: 'Message not found' } };
+            }
+            if (message.sender_id === userId) {
+                return { error: { code: 400, message: 'Cannot mark your own message as read' } };
+            }
+            await models.Message.update({ is_read: true }, { where: { id: messageId } });
+            return { result: { id: messageId, is_read: true } };
+        } catch (error) {
+            return { error: { code: 500, message: 'Error marking message as read', detail: error.message } };
+        }
     }
 }
