@@ -1,16 +1,18 @@
 import { useEffect, useState } from 'react';
+import { loadMediaCloud } from '../api/cloudApi';
 
-export const useCloudinaryFile = (url) => {
+export const useCloudinaryFile = (mediaId, mediaType) => {
   const [blobUrl, setBlobUrl] = useState(null);
 
   useEffect(() => {
-    if (!url) return;
+    if (!mediaId) return;
 
     let isMounted = true;
     let objectUrl = null;
 
-    const fetchBlob = async () => {
+    const fetchFile = async () => {
       try {
+        const { url } = await loadMediaCloud(mediaId, mediaType);
         const res = await fetch(url);
         if (!res.ok) throw new Error('Tải file thất bại');
         const blob = await res.blob();
@@ -21,13 +23,13 @@ export const useCloudinaryFile = (url) => {
       }
     };
 
-    fetchBlob();
+    fetchFile();
 
     return () => {
       isMounted = false;
       if (objectUrl) URL.revokeObjectURL(objectUrl);
     };
-  }, [url]);
+  }, [mediaId, mediaType]);
 
   return blobUrl;
 };
