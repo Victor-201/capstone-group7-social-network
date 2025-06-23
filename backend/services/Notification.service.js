@@ -9,7 +9,7 @@ export default {
                 include: [
                     {
                         model: UserInfo,
-                        as: "receiver",
+                        as: "sender",
                         attributes: ["id", "full_name", "avatar"],
                     },
                 ],

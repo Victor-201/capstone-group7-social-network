@@ -1,6 +1,6 @@
 import { API_BASE_URL } from "../config/apiConfig";
 
-const BASE_URL = `${API_BASE_URL}/follow`;
+const BASE_URL = `${API_BASE_URL}/user/follow`;
 
 // Follow user
 export const followUser = async (token, userId) => {

@@ -1,19 +1,23 @@
 import { useState } from 'react';
 import { login } from '../../api/accountApi';
+import { useNavigate } from 'react-router-dom';
+import { ROUTERS } from '../../utils/router';
 
 export const useLogin = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const navigate = useNavigate();
 
     const loginUser = async (credentials) => {
         try {
             setLoading(true);
             setError(null);
             const data = await login(credentials);
+            console.log("Login data:", data);
             
             // Lưu token vào localStorage
-            if (data.token) {
-                localStorage.setItem('token', data.token);
+            if (data.accessToken) {
+                localStorage.setItem('token', data.accessToken);
                 localStorage.setItem('refreshToken', data.refreshToken);
             }
             
@@ -23,6 +27,7 @@ export const useLogin = () => {
             setError(err.message);
             throw err;
         } finally {
+            navigate(ROUTERS.USER.HOME);
             setLoading(false);
         }
     };

@@ -65,9 +65,6 @@ export default {
       await ProfileDetail.create({
         user_id: userInfo.id
       }, { transaction: t } );
-      await ProfileVisible.create({
-        profile_detail_id: userInfo.id,
-      }, { transaction: t });
   });
 
     return {

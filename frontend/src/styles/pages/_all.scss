@@ -53,3 +53,15 @@ a {
     text-decoration: none;
   }
 }
+
+button {
+  cursor: pointer;
+  background-color: transparent;
+  border: none;
+  color: get-theme-color("text-primary");
+  font-size: inherit;
+
+  &:hover {
+    color: get-theme-color("text-secondary");
+  }
+}
