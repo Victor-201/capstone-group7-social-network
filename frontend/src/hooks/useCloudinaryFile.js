@@ -12,11 +12,9 @@ export const useCloudinaryFile = (mediaId, mediaType) => {
 
     const fetchFile = async () => {
       try {
-        const { url } = await loadMediaCloud(mediaId, mediaType);
-        const res = await fetch(url);
-        if (!res.ok) throw new Error('Tải file thất bại');
-        const blob = await res.blob();
-        objectUrl = URL.createObjectURL(blob);
+        const res = await loadMediaCloud(mediaId, mediaType); 
+        const blob = await res.blob();                      
+        objectUrl = URL.createObjectURL(blob);              
         if (isMounted) setBlobUrl(objectUrl);
       } catch (err) {
         console.error('Lỗi khi tải file từ Cloudinary:', err);

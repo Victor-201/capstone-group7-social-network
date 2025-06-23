@@ -7,60 +7,26 @@ import friend1Image from "../../../../../assets/images/logo192.png";
 import { FaBriefcase, FaHome as FaHomeAddress, FaHeart } from "react-icons/fa";
 import { IoIosSchool, IoIosLocate } from "react-icons/io";
 import { FiX, FiPlus, FiEdit2 } from "react-icons/fi";
+import useUserPosts from "../../../../../hooks/userUserPosts";
 import "./style.scss";
 
-const PostsTab = ({user}) => {
-  const [posts, setPosts] = useState([
-    {
-      id: 1,
-      author: "Nguyễn Văn A",
-      time: "2 giờ trước",
-      content: "Chào mọi người! Đây là bài đăng mẫu trên trang cá nhân của tôi. #facebook #profile",
-      image: photo1Image,
-      reactions: 243,
-      comments: 42,
-      shares: 12,
-      liked: false,
-    },
-    {
-      id: 2,
-      author: "Nguyễn Văn A",
-      time: "1 ngày trước",
-      content: "Hôm nay là một ngày tuyệt vời! Đã hoàn thành xong dự án lớn.",
-      image: photo2Image,
-      reactions: 156,
-      comments: 28,
-      shares: 5,
-      liked: true,
-    },
-    {
-      id: 3,
-      author: "Nguyễn Văn A",
-      time: "3 ngày trước",
-      content: "Vừa đọc xong một cuốn sách hay. Ai có thể giới thiệu thêm sách về chủ đề này không?",
-      image: photo1Image,
-      reactions: 89,
-      comments: 31,
-      shares: 2,
-      liked: false,
-    },
-  ]);
+
+
+const PostsTab = ({ userInfo }) => {
+  const { posts, setPosts, error } = useUserPosts(
+  );
+  const totalPosts = posts ? posts.length : 0;
+  console.log("anh mình cứ thế thôi hẹ hẹ", userInfo);
+  const [bio, setBio] = useState(userInfo?.bio || "");
+  const [isEditingBio, setIsEditingBio] = useState(false);
+
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   const handleLike = (postId) => {
-    setPosts((prevPosts) =>
-      prevPosts.map((post) =>
-        post.id === postId
-          ? {
-              ...post,
-              liked: !post.liked,
-              reactions: post.liked ? post.reactions - 1 : post.reactions + 1,
-            }
-          : post
-      )
-    );
+
   };
+
 
   const handleEditAction = (action) => {
     if (action === "chỉnh sửa chi tiết") {
@@ -84,6 +50,28 @@ const PostsTab = ({user}) => {
         <div className="content__sidebar">
           <div className="about-card">
             <h3>Giới thiệu</h3>
+            <div className="about-card__bio-wrapper">
+              {isEditingBio ? (
+                <textarea
+                  className="about-card__bio-input"
+                  value={bio}
+                  onChange={(e) => setBio(e.target.value)}
+                  onBlur={() => setIsEditingBio(false)}
+                  autoFocus
+                />
+              ) : (
+                <p className="about-card__bio">
+                  {bio || "Chưa có tiểu sử"}
+                  <button
+                    className="about-card__edit-btn"
+                    onClick={() => setIsEditingBio(true)}
+                  >
+                    <FiEdit2 />
+                  </button>
+                </p>
+              )}
+            </div>
+
             <ul className="about-card__list">
               <li>
                 <FaBriefcase className="about-icon" />
@@ -146,13 +134,14 @@ const PostsTab = ({user}) => {
         </div>
 
         <div className="content__main">
-          <CreatePost user={user} />
+          <CreatePost userInfo={userInfo} />
+
           <div className="posts">
-            {posts.length === 0 ? (
+            {totalPosts === 0 ? (
               <p>Chưa có bài đăng nào</p>
             ) : (
               posts.map((post) => (
-                <PostCard key={post.id} post={post} handleLike={handleLike} user={user}/>
+                <PostCard key={post.id} post={post} handleLike={handleLike} userInfo={userInfo} />
               ))
             )}
           </div>
@@ -161,6 +150,18 @@ const PostsTab = ({user}) => {
 
       {isEditModalOpen && (
         <div className="edit-details-modal">
+          <div className="edit-details-modal__section">
+            <div className="edit-details-modal__category">
+              <span>Tiểu sử</span>
+            </div>
+            <textarea
+              className="edit-details-modal__bio-input"
+              value={bio}
+              onChange={(e) => setBio(e.target.value)}
+              placeholder="Nhập tiểu sử của bạn tại đây..."
+            />
+          </div>
+
           <div className="edit-details-modal__content">
             <div className="edit-details-modal__header">
               <h2>Chỉnh sửa chi tiết</h2>

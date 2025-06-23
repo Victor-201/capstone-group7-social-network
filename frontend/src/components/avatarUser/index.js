@@ -4,7 +4,7 @@ import { useCloudinaryFile } from "../../hooks/useCloudinaryFile";
 
 export const AvatarUser = ({ user }) => {
   const blobUrl = useCloudinaryFile(user?.avatar, "image");
-
+  
   return (
     <img
       src={blobUrl || avatarDefault}

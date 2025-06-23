@@ -6,7 +6,7 @@ import coverImage from "../../../../../assets/images/logo192.png";
 import friend1Image from "../../../../../assets/images/logo192.png";
 import "./style.scss";
 
-const ProfileSection = ({ tabsRef, activeTab, handleTabClick, user }) => {
+const ProfileSection = ({ tabsRef, activeTab, handleTabClick, userInfo }) => {
 
   const handleEditAction = (action) => {
     alert(`Tính năng ${action} đang được phát triển!`);
@@ -14,6 +14,7 @@ const ProfileSection = ({ tabsRef, activeTab, handleTabClick, user }) => {
 
   const friendImages = [friend1Image];
 
+  if (userInfo) {
   return (
     <section className="profile">
       <div className="profile__cover-container">
@@ -30,7 +31,7 @@ const ProfileSection = ({ tabsRef, activeTab, handleTabClick, user }) => {
         <div className="profile__avatar-container">
           <div className="profile__avatar-wrapper">
             <div className="profile__avatar-image">
-              <AvatarUser user={user} />
+              <AvatarUser user={userInfo} />
             </div>
             <div
               className="profile__edit-avatar-overlay"
@@ -42,7 +43,7 @@ const ProfileSection = ({ tabsRef, activeTab, handleTabClick, user }) => {
         </div>
         <div className="profile__info">
           <div className="profile__name-container">
-            <h1 className="profile__name">Nguyễn Văn lưởng</h1>
+            <h1 className="profile__name">{userInfo.full_name}</h1> 
             <div className="profile__verified-badge">
               <FiCheckCircle />
             </div>
@@ -53,7 +54,7 @@ const ProfileSection = ({ tabsRef, activeTab, handleTabClick, user }) => {
             <div className="profile__friends-avatars">
               {friendImages.map((friendImage, index) => (
                 <div key={index} className="avatar-image">
-                  <AvatarUser user={user} />
+                  <AvatarUser user={userInfo} />
                 </div>
               ))}
             </div>
@@ -107,5 +108,6 @@ const ProfileSection = ({ tabsRef, activeTab, handleTabClick, user }) => {
     </section>
   );
 };
+}
 
 export default ProfileSection;

@@ -2,19 +2,15 @@ import { useState, useEffect, useRef } from "react";
 import ProfileSection from "./modals/ProfileSection";
 import PostsTab from "./modals/PostsTab";
 import AboutTab from "./modals/AboutTab";
+import {useUserInfo} from '../../../hooks/user';
 import "./style.scss";
 
 const PersonalPage = () => {
-  const user = {
-    userName: "Văn Thắng",
-    avatar: "cld-sample-5.jpg",
-    cover: "cld-sample-4.jpg",
-    friends: 100,
-    followers: 200,
-    following: 300,
-  };
+  
   const [activeTab, setActiveTab] = useState("posts");
   const tabsRef = useRef(null);
+  const { userInfo, error } = useUserInfo();
+  console.log("User Info:", userInfo, "Error:", error);
 
 
   const handleTabClick = (tabId) => {
@@ -42,9 +38,9 @@ const PersonalPage = () => {
     <div className="container">
       <article className="personal-page">
         <main className="main">
-          <ProfileSection tabsRef={tabsRef} activeTab={activeTab} handleTabClick={handleTabClick} user={user} />
+          <ProfileSection tabsRef={tabsRef} activeTab={activeTab} handleTabClick={handleTabClick} userInfo={userInfo} />
           <div className="tab-contents">
-            {activeTab === "posts" && <PostsTab user={user}/>}
+            {activeTab === "posts" && <PostsTab userInfo={userInfo}/>}
             {activeTab === "about" && <AboutTab  />}
           </div>
         </main>
