@@ -34,3 +34,17 @@ export const deleteReadNotifications = async (req, res) => {
   if (error) return res.status(error.code).json(error);
   return res.status(200).json(result);
 };
+
+export const markAsUnread = async (req, res) => {
+  const id = req.params.id;
+  const {error, result} = await NotificationService.unRead(id);
+  if(error) return res.status(error.code).json(error);
+  return res.status(200).json(result);
+}
+
+export const unreadCount = async (req, res) => {
+  const receiver_id = req.user.id;
+  const { error, result } = NotificationService.countUnreadNotifications(receiver_id);
+  if(error) return res.status(error.code).json(error);
+  return res.status(200).json(result);
+}

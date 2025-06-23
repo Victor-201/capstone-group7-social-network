@@ -1,4 +1,5 @@
 import models from "../models/index.js";
+import sequelize from "../configs/database.config.js";
 
 export default {
     async getMessagesByChatId(chatId) {
@@ -38,27 +39,86 @@ export default {
             if (!message) {
                 return { error: { code: 500, message: 'Failed to send message' } };
             }
-            return { result: message};
+            return { result: message };
         } catch (error) {
             return { error: { code: 500, message: 'Error sending message', detail: error.message } };
         }
     },
-    async markMessageAsRead(messageId, userId) {
+    async markAllMessagesAsRead(chat_id, user_id) {
         try {
-            if (!messageId) {
-                return { error: { code: 400, message: 'Message ID is required' } };
+            if (!chat_id || !user_id) {
+                return { error: { code: 400, message: "chat_id and user_id are required" } };
             }
-            const message = await models.Message.findByPk(messageId);
-            if (!message) {
-                return { error: { code: 404, message: 'Message not found' } };
+
+            const isParticipant = await models.ChatParticipant.findOne({
+                where: {
+                    chat_id,
+                    user_id,
+                },
+            });
+            if (!isParticipant) {
+                return { error: { code: 403, message: "User is not a participant of this chat" } };
             }
-            if (message.sender_id === userId) {
-                return { error: { code: 400, message: 'Cannot mark your own message as read' } };
-            }
-            await models.Message.update({ is_read: true }, { where: { id: messageId } });
-            return { result: { id: messageId, is_read: true } };
+
+            const [countUpdated] = await models.Message.update(
+                { is_read: true },
+                {
+                    where: {
+                        chat_id,
+                        is_read: false,
+                        sender_id: { [models.sequelize.Op.ne]: user_id },
+                    },
+                }
+            );
+
+            return {
+                result: {
+                    updated_count: countUpdated,
+                    message: `Marked ${countUpdated} messages as read`,
+                },
+            };
         } catch (error) {
-            return { error: { code: 500, message: 'Error marking message as read', detail: error.message } };
+            return {
+                error: {
+                    code: 500,
+                    message: "Error marking messages as read",
+                    detail: error.message,
+                },
+            };
+        }
+    },
+    async countUnreadMessages(user_id, chat_id) {
+        if (!user_id || !chat_id) {
+            return { error: { code: 400, message: "user_id and chat_id are required" } };
+        }
+
+        try {
+            const isParticipant = await models.ChatParticipant.findOne({
+                where: {
+                    chat_id,
+                    user_id,
+                },
+            });
+            if (!isParticipant) {
+                return { error: { code: 403, message: "User is not a participant of this chat" } };
+            }
+            const unreadCount = await models.Message.count({
+                where: {
+                    chat_id,
+                    is_read: false,
+                    sender_id: { [models.sequelize.Op.ne]: user_id },
+                },
+            });
+
+            return { result: unreadCount };
+        } catch (error) {
+            return {
+                error: {
+                    code: 500,
+                    message: "Error counting unread messages",
+                    detail: error.message,
+                },
+            };
         }
     }
 }
