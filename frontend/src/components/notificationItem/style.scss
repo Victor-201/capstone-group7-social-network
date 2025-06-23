@@ -2,6 +2,7 @@
 
 .notification {
   &__item {
+    position: relative;
     &--read {
       .notification__info {
         &::before {
@@ -82,4 +83,66 @@
     font-size: 12px;
     color: get-theme-color("text-secondary");
   }
+
+  &__more {
+    display: none;
+    position: absolute;
+    width: 40px;
+    aspect-ratio: 1 / 1;
+    background-color: get-theme-color("background-color-light");
+    border-radius: 50%;
+    top: 50%;
+    right: 20px;
+    transform: translateY(-50%);
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 1000;
+  }
+
+  &__item:hover .notification__more {
+    display: flex;
+  }
+
+  &__more--actions {
+    position: absolute;
+    right: 0;
+    top: 30px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+    padding: 8px 0;
+    min-width: 160px;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    animation: fadeIn 0.2s;
+  }
+
+  &__action {
+    background: none;
+    border: none;
+    color: #333;
+    padding: 10px 20px;
+    text-align: left;
+    font-size: 15px;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    border-radius: 6px;
+  }
+
+  &__action:hover {
+    background: #f0f2f5;
+    color: #1976d2;
+  }
+
+  &__action:last-child {
+    color: #e53935;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-8px);}
+  to { opacity: 1; transform: translateY(0);}
 }
