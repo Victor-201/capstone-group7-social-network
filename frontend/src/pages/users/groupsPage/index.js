@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../../../contexts/AuthContext';
 import { FaUsers, FaSearch, FaPlus, FaUserPlus, FaSignOutAlt, FaSpinner } from 'react-icons/fa';
 import './style.scss';
 
 const GroupsPage = () => {
-  const { user, isAuthenticated } = useAuth();
   const [activeTab, setActiveTab] = useState('yourGroups');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -16,7 +14,8 @@ const GroupsPage = () => {
   // Fetch groups data from API
   useEffect(() => {
     const fetchGroups = async () => {
-      if (!isAuthenticated) {
+      const token = localStorage.getItem('token');
+      if (!token) {
         setIsLoading(false);
         return;
       }
@@ -64,11 +63,12 @@ const GroupsPage = () => {
     };
 
     fetchGroups();
-  }, [isAuthenticated, API_URL]);
+  }, [API_URL]);
 
   // Handle joining a group
   const handleJoinGroup = async (groupId) => {
-    if (!isAuthenticated) return;
+    const token = localStorage.getItem('token');
+    if (!token) return;
 
     try {
       const token = localStorage.getItem('token');
@@ -113,10 +113,10 @@ const GroupsPage = () => {
 
   // Handle leaving a group
   const handleLeaveGroup = async (groupId) => {
-    if (!isAuthenticated) return;
+    const token = localStorage.getItem('token');
+    if (!token) return;
 
     try {
-      const token = localStorage.getItem('token');
       const response = await fetch(`${API_URL}/api/groups/${groupId}/leave`, {
         method: 'POST',
         headers: {

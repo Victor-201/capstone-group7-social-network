@@ -1,6 +1,6 @@
 import { API_BASE_URL } from "../config/apiConfig";
 
-const BASE_URL = `${API_BASE_URL}/friend`;
+const BASE_URL = `${API_BASE_URL}/user/friend`;
 
 // Gửi lời mời kết bạn
 export const sendFriendRequest = async (token, userId) => {
