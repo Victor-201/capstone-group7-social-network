@@ -13,7 +13,6 @@ import routerNotification from './Notification.routes.js';
 import routerLike from './Like.routes.js';
 import routerAdmin from './Admin.routes.js';
 import routerSearch from './Search.routes.js';
-import routerProfile from './Profile.routes.js';
 
 const router = express.Router();
 
@@ -41,7 +40,6 @@ router.use('/user', routerChat);
 router.use('/user', routerMessage);
 router.use('/user', routerNotification);
 router.use('/user', routerLike);
-router.use('/user', routerProfile);
 
 
 export default router;
