@@ -1,0 +1,76 @@
+@import "../../../styles/pages/theme";
+
+.terms-container {
+  background-color: get-theme-color("background-color-light");
+  padding: 40px;
+  max-width: 960px;
+  margin: 0 auto;
+  font-family: 'Segoe UI', sans-serif;
+  color: get-theme-color("text-primary");
+  font-size: 18px; // cỡ chữ mặc định cho đoạn văn
+
+  h1, h2 {
+    color: get-theme-color("text-secondary");
+  }
+
+  h1 {
+    font-size: 24px;
+    margin-bottom: 10px;
+  }
+
+  h2 {
+    font-size: 20px;
+    margin-top: 30px;
+    margin-bottom: 10px;
+    border-left: 5px solid get-theme-color("tertiary-color");
+    padding-left: 12px;
+  }
+
+  p, ul li {
+    font-size: 18px;
+    line-height: 1.6;
+    margin-bottom: 12px;
+  }
+
+  a {
+    color: get-theme-color("quaternary-color");
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+.terms-header {
+  background-color: get-theme-color("primary-color");
+  color: get-theme-color("text-quaternary");
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 30px;
+  text-align: center;
+
+  h1 {
+    font-size: 24px;
+    margin: 0;
+  }
+
+  p {
+    margin-top: 8px;
+    font-size: 18px;
+    color: get-theme-color("text-tertiary");
+  }
+}
+
+.terms-content {
+  background-color: get-theme-color("primary-color");
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  font-size: 18px;
+}
+
+ul {
+  list-style: disc;
+  padding-left: 24px;
+}

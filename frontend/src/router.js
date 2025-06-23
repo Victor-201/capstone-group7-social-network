@@ -5,6 +5,7 @@ import ForgotPasswordPage from './pages/users/forgotPasswordPage';
 import FriendsPage from './pages/users/friendsPage';
 import GroupsPage from './pages/users/groupsPage';
 import MasterLayout from './layouts/masterLayout';
+import TermsOfServicePage from './pages/users/termsOfServicePage';
 import { ROUTERS } from './utils/router';
 import { Route, Routes } from 'react-router-dom';
 import AuthPage from './pages/users/authPage';
@@ -31,32 +32,41 @@ const renderUserRouter = () => {
       path: ROUTERS.USER.PROFILE,
       Component: <PersonalPage />,
     },
+  ];
+
+  const publicRouters = [
     {
-      path: ROUTERS.AUTH.LOGIN,
+      path: ROUTERS.PUBLIC.LOGIN,
       Component: <AuthPage />,
     },
     {
-      path: ROUTERS.AUTH.REGISTER,
+      path: ROUTERS.PUBLIC.REGISTER,
       Component: <AuthPage />,
     },
     {
-      path: ROUTERS.AUTH.FORGOT_PASSWORD,
+      path: ROUTERS.PUBLIC.FORGOT_PASSWORD,
       Component: <ForgotPasswordPage />,
-    }
+    },
+    {
+      path: ROUTERS.PUBLIC.TERMS_OF_SERVICE,
+      Component: <TermsOfServicePage />,
+    },
   ];
 
   return (
     <Routes>
+      {publicRouters.map((item, key) => (
+        <Route key={key} path={item.path} element={item.Component} />
+      ))}
+
       {userRouters.map((item, key) => (
-        item.path === ROUTERS.AUTH.LOGIN || item.path === ROUTERS.AUTH.REGISTER || item.path === ROUTERS.AUTH.FORGOT_PASSWORD ? (
-          <Route key={key} path={item.path} element={item.Component} />
-        ) : (
-          <Route
-            key={key}
-            path={item.path}
-            element={<MasterLayout>{item.Component}</MasterLayout>}
-          />
-        )
+        <Route
+          key={key}
+          path={item.path}
+          element={
+              <MasterLayout>{item.Component}</MasterLayout>
+          }
+        />
       ))}
     </Routes>
   );
