@@ -1,10 +1,5 @@
 import { useEffect, useState } from 'react';
 
-/**
- * Hook tải file từ Cloudinary và trả về blob URL để hiển thị.
- * @param {string} url - Đường dẫn ảnh hoặc video Cloudinary
- * @returns {string|null} blobUrl - URL để hiển thị nội dung mà không cần tải xuống
- */
 export const useCloudinaryFile = (url) => {
   const [blobUrl, setBlobUrl] = useState(null);
 

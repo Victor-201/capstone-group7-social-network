@@ -6,11 +6,12 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 dotenv.config({ path: path.resolve(__dirname, '../../.env') });
+
 export const {
-  ACCESS_TOKEN_SECRET,
-  REFRESH_TOKEN_SECRET,
-  RESET_PASSWORD_TOKEN_SECRET,
-  ACCESS_TOKEN_EXPIRES_IN,
-  REFRESH_TOKEN_EXPIRES_IN,
-  PORT
+  DB_HOST,
+  DB_PORT,
+  PORT,
+  CLOUD_WEB_URL,
+  CLOUD_NAME,
+  API_BASE_URL,
 } = process.env;
