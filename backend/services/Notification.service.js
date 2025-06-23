@@ -1,5 +1,5 @@
 import models from "../models/index.js";
-const { Notification, UserInfo } = models;
+const { Notification, UserInfo, sequelize } = models;
 
 export default {
     async getNotification(receiver_id) {
@@ -103,6 +103,31 @@ export default {
             console.error("Error creating notification:", err);
             return { error: { code: 500, message: "Internal server error" } };
         }
-    }
+    },
+    async unRead(id) {
+        try {
+            if (!id) return { error: { code: 400, message: "Notification ID is required" } };
 
+            const notification = await Notification.findOne({ where: { id } });
+            if (!notification) return { error: { code: 404, message: "Notification not found" } };
+
+            notification.is_read = false;
+            await notification.save();
+
+            return { result: notification };
+        } catch (err) {
+            return { error: { code: 500, message: "Server error", detail: err.message } };
+        }
+    },
+    async countUnreadNotifications (receiver_id) {
+        if(!receiver_id){
+            return {error: {code: 400, message: "receiver_id is required"}};
+        }
+        try{
+            const unreadCount = await Notification.count({where: {receiver_id, is_read: false}});
+            return {result: unreadCount};
+        }catch (error){
+            return { error: { code: 500, message: "Server error", detail: error.message } };
+        }
+    }
 };

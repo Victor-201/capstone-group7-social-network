@@ -18,9 +18,17 @@ export const sendMessage = async (req, res) => {
 }
 
 export const markMessageAsRead = async (req, res) => {
-    const messageId = req.params.message_id;
+    const chatId = req.params.chat_id;
     const userId = req.user.id;
-    const { error, result } = await MessageService.markMessageAsRead(messageId, userId);
+    const { error, result } = await MessageService.markAllMessagesAsRead(chatId, userId);
+    if (error) return res.status(error.code).json(error);
+    return res.status(200).json(result);
+}
+
+export const countUnreadMessages = async (req, res) => {
+    const chatId = req.params.chat_id;
+    const userId = req.user.id;
+    const { error, result } = await MessageService.countUnreadMessages(chatId, userId);
     if (error) return res.status(error.code).json(error);
     return res.status(200).json(result);
 }

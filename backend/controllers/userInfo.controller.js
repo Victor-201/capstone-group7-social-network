@@ -18,3 +18,19 @@ export const getUserInfoById = async (req, res) => {
   if (error) return res.status(error.code).json(error);
   return res.status(200).json(result);
 };
+
+export const updateProfile = async (req, res) => {
+  const { error, result } = await userInfoService.updateProfile(req.user.id, req.body);
+  if (error) {
+    return res.status(error.code).json(error);
+  }
+  return res.status(200).json(result);
+};
+
+export const updateProfileVisibility = async (req, res) => {
+  const { error, result } = await userInfoService.updateProfileVisibility(req.user.id, req.body);
+  if (error) {
+    return res.status(error.code).json(error);
+  }
+  return res.status(200).json(result);
+};
