@@ -1,106 +1,42 @@
-import { useState } from 'react';
-import { createPost, uploadPostMedia } from '../../api/postApi';
+import { useState } from "react";
+import { createPost } from "../../api/postApi";
 
 export const useCreatePost = () => {
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
-    const [uploadProgress, setUploadProgress] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [error, setError] = useState(null);
+  const token = localStorage.getItem("token");
 
-    const createNewPost = async (postData) => {
-        const token = localStorage.getItem('token');
-        if (!token) throw new Error("No token provided");
+  const createPostWithMedia = async (postData, mediaFiles = []) => {
+    const formData = new FormData();
+    formData.append("content", postData.content);
+    formData.append("access_modifier", postData.access_modifier); // ✅ THÊM access_modifier
 
-        try {
-            setLoading(true);
-            setError(null);
-            const data = await createPost(token, postData);
-            return data;
-        } catch (err) {
-            setError(err.message);
-            throw err;
-        } finally {
-            setLoading(false);
-        }
-    };
+    mediaFiles.forEach((file) => {
+      formData.append("media", file);
+    });
 
-    const uploadMedia = async (formData, onProgress) => {
-        const token = localStorage.getItem('token');
-        if (!token) throw new Error("No token provided");
+    setLoading(true);
+    setUploadProgress(0);
+    setError(null);
 
-        try {
-            setLoading(true);
-            setError(null);
-            setUploadProgress(0);
+    try {
+      console.log("Đang gửi post:", postData);
+      await createPost(token, formData);
+    } catch (err) {
+      setError(err.message || "Đã xảy ra lỗi khi đăng bài.");
+      throw err;
+    } finally {
+      setLoading(false);
+      setUploadProgress(100);
+      setTimeout(() => setUploadProgress(0), 1000);
+    }
+  };
 
-            // Simulate progress if callback provided
-            if (onProgress) {
-                const progressInterval = setInterval(() => {
-                    setUploadProgress(prev => {
-                        const newProgress = prev + 10;
-                        onProgress(newProgress);
-                        if (newProgress >= 90) {
-                            clearInterval(progressInterval);
-                        }
-                        return newProgress;
-                    });
-                }, 100);
-            }
-
-            const data = await uploadPostMedia(token, formData);
-            setUploadProgress(100);
-            
-            if (onProgress) onProgress(100);
-            
-            return data;
-        } catch (err) {
-            setError(err.message);
-            throw err;
-        } finally {
-            setLoading(false);
-            setTimeout(() => setUploadProgress(0), 1000);
-        }
-    };
-
-    const createPostWithMedia = async (postData, mediaFiles) => {
-        try {
-            setLoading(true);
-            setError(null);
-
-            let mediaUrls = [];
-
-            // Upload media files nếu có
-            if (mediaFiles && mediaFiles.length > 0) {
-                const formData = new FormData();
-                mediaFiles.forEach((file, index) => {
-                    formData.append(`media_${index}`, file);
-                });
-
-                const mediaResponse = await uploadMedia(formData);
-                mediaUrls = mediaResponse.urls || [];
-            }
-
-            // Tạo post với media URLs
-            const finalPostData = {
-                ...postData,
-                mediaUrls: mediaUrls
-            };
-
-            const data = await createNewPost(finalPostData);
-            return data;
-        } catch (err) {
-            setError(err.message);
-            throw err;
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    return {
-        createNewPost,
-        uploadMedia,
-        createPostWithMedia,
-        loading,
-        error,
-        uploadProgress
-    };
+  return {
+    createPostWithMedia,
+    loading,
+    error,
+    uploadProgress,
+  };
 };

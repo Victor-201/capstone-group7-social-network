@@ -7,8 +7,8 @@ import friend1Image from "../../../../../assets/images/logo192.png";
 import { FaBriefcase, FaHome as FaHomeAddress, FaHeart } from "react-icons/fa";
 import { IoIosSchool, IoIosLocate } from "react-icons/io";
 import { FiX, FiPlus, FiEdit2 } from "react-icons/fi";
-import useUserPosts from "../../../../../hooks/userUserPosts";
 import "./style.scss";
+import { useUserPosts } from "../../../../../hooks/posts/useUserPosts";
 
 
 
@@ -16,7 +16,7 @@ const PostsTab = ({ userInfo }) => {
   const { posts, setPosts, error } = useUserPosts(
   );
   const totalPosts = posts ? posts.length : 0;
-  console.log("anh mình cứ thế thôi hẹ hẹ", userInfo);
+  console.log("anh mình cứ thế thôi hẹ hẹ: ", userInfo?.ProfileDetails.visibleFields[0] .profile_detail_id, userInfo?.ProfileDetails.visibleFields.is_visible);
   const [bio, setBio] = useState(userInfo?.bio || "");
   const [isEditingBio, setIsEditingBio] = useState(false);
 
@@ -73,10 +73,12 @@ const PostsTab = ({ userInfo }) => {
             </div>
 
             <ul className="about-card__list">
+              { userInfo?.ProfileDetails.visibleFields.field_name=== "job" && userInfo?.ProfileDetails.visibleFields.is_visible===true && (
               <li>
                 <FaBriefcase className="about-icon" />
-                Làm việc tại <strong>Công ty ABC</strong>
+                Làm việc tại<strong>{userInfo.ProfileDetails.job}</strong>
               </li>
+              )}
               <li>
                 <IoIosSchool className="about-icon" />
                 Học tại <strong>Đại học XYZ</strong>
@@ -137,13 +139,13 @@ const PostsTab = ({ userInfo }) => {
           <CreatePost userInfo={userInfo} />
 
           <div className="posts">
-            {totalPosts === 0 ? (
+            { totalPosts === 0 ? (
               <p>Chưa có bài đăng nào</p>
             ) : (
               posts.map((post) => (
                 <PostCard key={post.id} post={post} handleLike={handleLike} userInfo={userInfo} />
               ))
-            )}
+            )} 
           </div>
         </div>
       </div>

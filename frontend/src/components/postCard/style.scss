@@ -308,5 +308,83 @@
         }
       }
     }
+    .post__wrapper {
+  width: 50%;
+  max-width: 50px;
+  margin: 0 auto;
+  padding: 0 16px;
+  box-sizing: border-box;
+
+  @media (max-width: 600px) {
+    padding: 0 12px;
   }
+}
+
+
+
+
+
+  &:hover {
+    transform: scale(1.01);
+  }
+
+  img,
+  video {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
+  }
+
+  video {
+    max-height: 300px;
+  }
+
+  @media (max-width: 768px) {
+    flex: 1 1 100%;
+  }
+}
+
+  }
+
+.post__media-item {
+  width: 50%;
+  aspect-ratio: 2 / 3; // ✅ chiều cao gấp 1.5 lần chiều ngang
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  background-color: #fff;
+
+  border-right: 1px solid #ddd;
+  border-bottom: 1px solid #ddd;
+
+  &:nth-child(2n) {
+    border-right: none;
+  }
+
+  img,
+  video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  @media (max-width: 768px) {
+    width: 100%;
+    border-right: none;
+
+    &:nth-child(2n) {
+      border-right: none;
+    }
+  }
+}
+
+.post__media-list {
+  display: flex;
+  flex-wrap: wrap;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  overflow: hidden;
 }

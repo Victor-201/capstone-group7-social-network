@@ -4,10 +4,11 @@ import { BsCameraFill } from "react-icons/bs";
 import AvatarUser from "../../../../../components/avatarUser";
 import coverImage from "../../../../../assets/images/logo192.png";
 import friend1Image from "../../../../../assets/images/logo192.png";
+import { useCloudinaryFile } from "../../../../../hooks/useCloudinaryFile";
 import "./style.scss";
 
 const ProfileSection = ({ tabsRef, activeTab, handleTabClick, userInfo }) => {
-
+const coverImageUrl = useCloudinaryFile(userInfo?.cover, "image");
   const handleEditAction = (action) => {
     alert(`Tính năng ${action} đang được phát triển!`);
   };
@@ -18,7 +19,7 @@ const ProfileSection = ({ tabsRef, activeTab, handleTabClick, userInfo }) => {
   return (
     <section className="profile">
       <div className="profile__cover-container">
-        <img src={coverImage} alt="Cover" className="profile__cover" />
+        <img src={coverImageUrl} alt="Cover" className="profile__cover" />
         <button
           className="profile__edit-cover-btn"
           onClick={() => handleEditAction("thay đổi ảnh bìa")}

@@ -18,7 +18,7 @@ const Like = (sequelize) => {
     },
   }, {
     tableName: 'likes',
-    timestamps: true,
+    timestamps: false,
     indexes: [
       {
         unique: true,
