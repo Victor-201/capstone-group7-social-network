@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
-import { useAuth } from '../../../contexts/AuthContext';
+import React, { useState, useEffect } from 'react';
 import { FaSpinner, FaExclamationTriangle, FaSearch, FaFilter, FaEllipsisH } from 'react-icons/fa';
 import FriendCard from '../../../components/friendCard';
 import Sidebar from './modals/Sidebar';
+import { useFriends } from '../../../hooks/friends/useFriends';
+import { useFriendRequests } from '../../../hooks/friends/useFriendRequests';
+import { useFollow } from '../../../hooks/friends/useFollow';
+import { useFriendActions } from '../../../hooks/friends/useFriendActions';
 import './style.scss';
 
 // Custom styled icon component
@@ -12,151 +15,77 @@ const ThemedIcon = ({ icon: Icon, className }) => {
 };
 
 const FriendsPage = () => {
-  const { getFriendsList, getPendingFriendRequests, getFollowers, getFollowing, sendFriendRequest, respondToFriendRequest, removeFriend, followUser, unfollowUser } = useAuth();
+  // Sử dụng hooks từ friends/ folder
+  const {
+    friends,
+    loading: friendsLoading,
+    error: friendsError,
+    refetch: refetchFriends
+  } = useFriends();
+
+  const {
+    receivedRequests,
+    sentRequests,
+    loading: requestsLoading,
+    error: requestsError,
+    refetch: refetchRequests
+  } = useFriendRequests();
+
+  const {
+    followers,
+    following,
+    loading: followLoading,
+    error: followError,
+    follow: followUser,
+    unfollow: unfollowUser,
+    isUserFollowed,
+    refetch: refetchFollow
+  } = useFollow();
+
+  const {
+    sendRequest: sendFriendRequest,
+    acceptRequest: acceptFriendRequest,
+    rejectRequest: rejectFriendRequest,
+    removeFriend,
+    loading: actionLoading,
+    error: actionError
+  } = useFriendActions();
+
   const [activeTab, setActiveTab] = useState('friends');
-  const [friends, setFriends] = useState([
-    {
-      id: 'friend-1',
-      fullName: 'Nguyễn Xuân Hải',
-      username: 'xuanhai0913',
-      avatar: 'v1652278394/user_avatars/friend_1.jpg',
-    },
-    {
-      id: 'friend-2',
-      fullName: 'Nguyễn Ngọc Trung',
-      username: 'hoangthie',
-      avatar: 'v1652278394/user_avatars/friend_2.jpg',
-    },
-    {
-      id: 'friend-3',
-      fullName: 'Nguyễn Văn Thắng',
-      username: 'tranminhf',
-      avatar: 'v1652278394/user_avatars/friend_3.jpg',
-    }
-  ]);
-  const [pendingRequests, setPendingRequests] = useState([
-    {
-      id: 'request-1',
-      requester: {
-        id: 'requester-1',
-        fullName: 'Đỗ Văn G',
-        username: 'dovang',
-        avatar: 'v1652278394/user_avatars/requester_1.jpg',
-      },
-    },
-    {
-      id: 'request-2',
-      requester: {
-        id: 'requester-2',
-        fullName: 'Vũ Thị H',
-        username: 'vuthih',
-        avatar: 'v1652278394/user_avatars/requester_2.jpg',
-      },
-    }
-  ]);
-  const [followers, setFollowers] = useState([
-    {
-      id: 'follower-1',
-      fullName: 'Ngô Văn I',
-      username: 'ngovani',
-      avatar: 'v1652278394/user_avatars/follower_1.jpg',
-    },
-    {
-      id: 'follower-2',
-      fullName: 'Lê Thị K',
-      username: 'lethik',
-      avatar: 'v1652278394/user_avatars/follower_2.jpg',
-    }
-  ]);
-  const [following, setFollowing] = useState([
-    {
-      id: 'following-1',
-      fullName: 'Trịnh Thị L',
-      username: 'trinhthi',
-      avatar: 'v1652278394/user_avatars/following_1.jpg',
-    },
-    {
-      id: 'following-2',
-      fullName: 'Đặng Văn M',
-      username: 'dangvanm',
-      avatar: 'v1652278394/user_avatars/following_2.jpg',
-    }
-  ]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [actionLoading, setActionLoading] = useState({});
+  const [localActionLoading, setLocalActionLoading] = useState({});
   const [message, setMessage] = useState(null);
 
-  // Comment out useEffect temporarily for testing
-  /*useEffect(() => {
-    if (isAuthenticated) {
-      fetchData();
-    }
-  }, [isAuthenticated]);*/
+  // Fetch data khi component mount
+  useEffect(() => {
+    fetchAllData();
+  }, [refetchFriends, refetchRequests, refetchFollow]);
 
-  // Fetch all data for the page
-  const fetchData = async () => {
-    setLoading(true);
-    setError(null);
-    
-    try {
-      // Fetch friends list
-      const friendsResult = await getFriendsList();
-      if (friendsResult.success) {
-        setFriends(friendsResult.friends);
-      } else {
-        console.error('Error fetching friends:', friendsResult.message);
-      }
-      
-      // Fetch pending requests
-      const requestsResult = await getPendingFriendRequests();
-      if (requestsResult.success) {
-        setPendingRequests(requestsResult.requests);
-      } else {
-        console.error('Error fetching requests:', requestsResult.message);
-      }
-      
-      // Fetch followers
-      const followersResult = await getFollowers();
-      if (followersResult.success) {
-        setFollowers(followersResult.followers);
-      } else {
-        console.error('Error fetching followers:', followersResult.message);
-      }
-      
-      // Fetch following
-      const followingResult = await getFollowing();
-      if (followingResult.success) {
-        setFollowing(followingResult.following);
-      } else {
-        console.error('Error fetching following:', followingResult.message);
-      }
-      
-    } catch (err) {
-      setError('Không thể tải dữ liệu. Vui lòng thử lại sau.');
-      console.error('Error fetching friend data:', err);
-    } finally {
-      setLoading(false);
-    }
+  // Fetch tất cả dữ liệu
+  const fetchAllData = async () => {
+    await Promise.all([
+      refetchFriends(),
+      refetchRequests(),
+      refetchFollow()
+    ]);
   };
 
   // Handle sending a friend request
   const handleSendRequest = async (userId) => {
-    setActionLoading(prev => ({ ...prev, [`add_${userId}`]: true }));
+    setLocalActionLoading(prev => ({ ...prev, [`add_${userId}`]: true }));
     
     try {
       const result = await sendFriendRequest(userId);
       if (result.success) {
         setMessage('Đã gửi lời mời kết bạn thành công');
         // Refresh the data
-        fetchData();
+        await fetchAllData();
       } else {
-        setError(result.message || 'Không thể gửi lời mời kết bạn');
+        console.error('Error sending friend request:', result.message);
       }
     } catch (err) {
-      setError('Đã xảy ra lỗi. Vui lòng thử lại sau.');
+      console.error('Đã xảy ra lỗi. Vui lòng thử lại sau.');
     } finally {
-      setActionLoading(prev => ({ ...prev, [`add_${userId}`]: false }));
+      setLocalActionLoading(prev => ({ ...prev, [`add_${userId}`]: false }));
       
       // Clear message after 3 seconds
       setTimeout(() => {
@@ -167,21 +96,27 @@ const FriendsPage = () => {
 
   // Handle accepting/declining a friend request
   const handleRequestResponse = async (requesterId, action) => {
-    setActionLoading(prev => ({ ...prev, [`${action}_${requesterId}`]: true }));
+    setLocalActionLoading(prev => ({ ...prev, [`${action}_${requesterId}`]: true }));
     
     try {
-      const result = await respondToFriendRequest(requesterId, action);
+      let result;
+      if (action === 'accept') {
+        result = await acceptFriendRequest(requesterId);
+      } else {
+        result = await rejectFriendRequest(requesterId);
+      }
+      
       if (result.success) {
         setMessage(`Đã ${action === 'accept' ? 'chấp nhận' : 'từ chối'} lời mời kết bạn`);
         // Refresh data after action
-        fetchData();
+        await fetchAllData();
       } else {
-        setError(result.message || 'Không thể xử lý lời mời kết bạn');
+        console.error('Error handling friend request:', result.message);
       }
     } catch (err) {
-      setError('Đã xảy ra lỗi. Vui lòng thử lại sau.');
+      console.error('Đã xảy ra lỗi. Vui lòng thử lại sau.');
     } finally {
-      setActionLoading(prev => ({ ...prev, [`${action}_${requesterId}`]: false }));
+      setLocalActionLoading(prev => ({ ...prev, [`${action}_${requesterId}`]: false }));
       
       // Clear message after 3 seconds
       setTimeout(() => {
@@ -196,21 +131,21 @@ const FriendsPage = () => {
       return;
     }
     
-    setActionLoading(prev => ({ ...prev, [`remove_${friendId}`]: true }));
+    setLocalActionLoading(prev => ({ ...prev, [`remove_${friendId}`]: true }));
     
     try {
       const result = await removeFriend(friendId);
       if (result.success) {
         setMessage('Đã xóa khỏi danh sách bạn bè');
-        // Update the friends list
-        setFriends(friends.filter(friend => friend.id !== friendId));
+        // Friends list will be updated automatically by the hook
+        await fetchAllData();
       } else {
-        setError(result.message || 'Không thể xóa bạn bè');
+        console.error('Error removing friend:', result.message);
       }
     } catch (err) {
-      setError('Đã xảy ra lỗi. Vui lòng thử lại sau.');
+      console.error('Đã xảy ra lỗi. Vui lòng thử lại sau.');
     } finally {
-      setActionLoading(prev => ({ ...prev, [`remove_${friendId}`]: false }));
+      setLocalActionLoading(prev => ({ ...prev, [`remove_${friendId}`]: false }));
       
       // Clear message after 3 seconds
       setTimeout(() => {
@@ -221,7 +156,7 @@ const FriendsPage = () => {
 
   // Handle follow/unfollow user
   const handleFollowToggle = async (userId, isFollowing) => {
-    setActionLoading(prev => ({ ...prev, [`follow_${userId}`]: true }));
+    setLocalActionLoading(prev => ({ ...prev, [`follow_${userId}`]: true }));
     
     try {
       let result;
@@ -229,28 +164,21 @@ const FriendsPage = () => {
         result = await unfollowUser(userId);
         if (result.success) {
           setMessage('Đã hủy theo dõi người dùng');
-          // Update following list
-          setFollowing(following.filter(user => user.id !== userId));
         }
       } else {
         result = await followUser(userId);
         if (result.success) {
           setMessage('Đã theo dõi người dùng');
-          // Refresh data to get updated following list
-          const followingResult = await getFollowing();
-          if (followingResult.success) {
-            setFollowing(followingResult.following);
-          }
         }
       }
       
       if (!result.success) {
-        setError(result.message || 'Không thể thực hiện thao tác theo dõi');
+        console.error('Error with follow action:', result.message);
       }
     } catch (err) {
-      setError('Đã xảy ra lỗi. Vui lòng thử lại sau.');
+      console.error('Đã xảy ra lỗi. Vui lòng thử lại sau.');
     } finally {
-      setActionLoading(prev => ({ ...prev, [`follow_${userId}`]: false }));
+      setLocalActionLoading(prev => ({ ...prev, [`follow_${userId}`]: false }));
       
       // Clear message after 3 seconds
       setTimeout(() => {
@@ -259,16 +187,16 @@ const FriendsPage = () => {
     }
   };
 
-  // Check if a user is being followed by current user
-  const isUserFollowed = (userId) => {
-    return following.some(user => user.id === userId);
-  };
-
   return (
     <div className="friends-page">
       <div className="container">
         {message && (<div className="message success-message">{message}</div>)}
-        {error && (<div className="message error-message"><ThemedIcon icon={FaExclamationTriangle} className="error-icon" /> {error}</div>)}
+        {(friendsError || requestsError || followError || actionError) && (
+          <div className="message error-message">
+            <ThemedIcon icon={FaExclamationTriangle} className="error-icon" /> 
+            {friendsError || requestsError || followError || actionError}
+          </div>
+        )}
         
         <div className="friends-wrapper">
           <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
@@ -285,7 +213,7 @@ const FriendsPage = () => {
                 </div>
               </div>
               
-              {loading ? (
+              {(friendsLoading || requestsLoading || followLoading || actionLoading) ? (
                 <div className="loading-container">
                   <ThemedIcon icon={FaSpinner} className="spinner" />
                   <p>Đang tải...</p>
@@ -321,8 +249,8 @@ const FriendsPage = () => {
                               onFollow={() => handleFollowToggle(friend.id, false)}
                               onUnfollow={() => handleFollowToggle(friend.id, true)}
                               loading={{
-                                remove: actionLoading[`remove_${friend.id}`],
-                                follow: actionLoading[`follow_${friend.id}`]
+                                remove: localActionLoading[`remove_${friend.id}`],
+                                follow: localActionLoading[`follow_${friend.id}`]
                               }}
                             />
                           ))}
@@ -334,20 +262,20 @@ const FriendsPage = () => {
                   {activeTab === 'requests' && (
                     <div className="requests-list">
                       <h2>
-                        Lời mời kết bạn ({pendingRequests.length})
+                        Lời mời kết bạn ({receivedRequests.length})
                         <div className="section-actions">
                           <button className="action-btn">
                             <ThemedIcon icon={FaEllipsisH} />
                           </button>
                         </div>
                       </h2>
-                      {pendingRequests.length === 0 ? (
+                      {receivedRequests.length === 0 ? (
                         <div className="empty-state">
                           <p>Không có lời mời kết bạn nào.</p>
                         </div>
                       ) : (
                         <div className="cards-grid">
-                          {pendingRequests.map(request => (
+                          {receivedRequests.map(request => (
                             <FriendCard
                               key={request.id}
                               user={{
@@ -358,8 +286,8 @@ const FriendsPage = () => {
                               onAccept={() => handleRequestResponse(request.requester.id, 'accept')}
                               onReject={() => handleRequestResponse(request.requester.id, 'reject')}
                               loading={{
-                                accept: actionLoading[`accept_${request.requester.id}`],
-                                reject: actionLoading[`reject_${request.requester.id}`]
+                                accept: localActionLoading[`accept_${request.requester.id}`],
+                                reject: localActionLoading[`reject_${request.requester.id}`]
                               }}
                             />
                           ))}

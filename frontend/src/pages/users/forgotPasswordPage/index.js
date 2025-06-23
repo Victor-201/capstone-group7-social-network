@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../../contexts/AuthContext';
+import * as accountApi from '../../../api/accountApi';
 import './style.scss';
 
 const ForgotPasswordPage = () => {
@@ -15,7 +15,6 @@ const ForgotPasswordPage = () => {
   const [loading, setLoading] = useState(false);
   const [resetToken, setResetToken] = useState('');
   const navigate = useNavigate();
-  const { forgotPassword, verifyOtp, resetPassword } = useAuth();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -31,12 +30,7 @@ const ForgotPasswordPage = () => {
     setLoading(true);
 
     try {
-      const result = await forgotPassword(formData.email);
-      
-      if (!result.success) {
-        throw new Error(result.message || 'Gửi OTP thất bại');
-      }
-
+      const result = await accountApi.forgotPassword(formData.email);
       setStep(2);
     } catch (err) {
       setError(err.message);
@@ -51,12 +45,7 @@ const ForgotPasswordPage = () => {
     setLoading(true);
 
     try {
-      const result = await verifyOtp(formData.email, formData.otpCode);
-      
-      if (!result.success) {
-        throw new Error(result.message || 'Xác thực OTP thất bại');
-      }
-
+      const result = await accountApi.verifyOtp(formData.email, formData.otpCode);
       setResetToken(result.token);
       setStep(3);
     } catch (err) {
@@ -80,12 +69,8 @@ const ForgotPasswordPage = () => {
         throw new Error('Mật khẩu phải có ít nhất 6 ký tự');
       }
 
-      const result = await resetPassword(formData.newPassword, resetToken);
+      const result = await accountApi.resetPassword(resetToken, formData.newPassword);
       
-      if (!result.success) {
-        throw new Error(result.message || 'Đặt lại mật khẩu thất bại');
-      }
-
       // Chuyển về trang đăng nhập với thông báo thành công
       navigate('/login', { 
         state: { 

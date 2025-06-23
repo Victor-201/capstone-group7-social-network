@@ -107,6 +107,24 @@ export const resetPassword = async (token, newPassword) => {
     return await response.json();
 };
 
+// Xác minh OTP cho reset password
+export const verifyOtp = async (email, otpCode) => {
+    const response = await fetch(`${API_BASE_URL}/public/verify-otp`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, otpCode }),
+    });
+    
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || `HTTP ${response.status}`);
+    }
+
+    return await response.json();
+};
+
 // Xác thực email
 export const verifyEmail = async (token) => {
     const response = await fetch(`${API_BASE_URL}/public/verify-email`, {
