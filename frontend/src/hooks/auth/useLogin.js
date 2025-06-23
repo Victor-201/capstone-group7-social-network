@@ -19,6 +19,7 @@ export const useLogin = () => {
             if (data.accessToken) {
                 localStorage.setItem('token', data.accessToken);
                 localStorage.setItem('refreshToken', data.refreshToken);
+                navigate(ROUTERS.USER.HOME);
             }
             
             return data;
@@ -27,7 +28,6 @@ export const useLogin = () => {
             setError(err.message);
             throw err;
         } finally {
-            navigate(ROUTERS.USER.HOME);
             setLoading(false);
         }
     };
