@@ -1,11 +1,14 @@
-import { CLOUD_IMAGE_BASE_URL, CLOUD_VIDEO_BASE_URL } from "../config/apiConfig";
+import { CLOUD_IMAGE_BASE_URL, CLOUD_VIDEO_BASE_URL } from "../config/cloudConfig";
 
-// Đăng nhập
 export const loadMediaCloud = async (media_id, media_type) => {
-    const response = await fetch(`${media_type === 'image' ? CLOUD_IMAGE_BASE_URL : CLOUD_VIDEO_BASE_URL}/${media_id}`);
-    if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || `HTTP ${response.status}`);
-    }
-    return await response.json();
+  const baseUrl = media_type === 'image' ? CLOUD_IMAGE_BASE_URL : CLOUD_VIDEO_BASE_URL;
+  const url = `${baseUrl}/${media_id}`;
+
+  const response = await fetch(url, { method: "HEAD" }); 
+  if (!response.ok) {
+    let errorMessage = `HTTP ${response.status}`;
+    throw new Error(errorMessage);
+  }
+
+  return { url }; 
 };
