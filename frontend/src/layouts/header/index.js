@@ -9,13 +9,14 @@ import { FaSearch, FaCaretUp, FaCaretDown } from 'react-icons/fa';
 import './style.scss';
 import UserPanelPopup from './modals/UserPanelPopup';
 import AvatarUser from '../../components/avatarUser';
+import { useUnreadNotificationCount } from '../../hooks/notifications';
 import Logo from '../../assets/images/logo/logo.png';
 import useClickOutside from '../../hooks/useClickOutside';
 import {useUserInfo} from '../../hooks/user';
 import Loader from '../../components/loader';
 
 const Header = () => {
-    const [activeUsePanelPopup, setActiveUsePanelPopup] = useState(null); // 'user', 'noti', 'mess'
+    const [activeUsePanelPopup, setActiveUsePanelPopup] = useState(null);
     const [isFocusedSearch, setIsFocusedSearch] = useState(false);
     const popupUserPanelRef = useRef(null);
     const searchRef = useRef(null);
@@ -24,6 +25,8 @@ const Header = () => {
     const role = userData?.role;
     const [menus, setMenus] = useState([]);
     const { userInfo, loading, error } = useUserInfo();
+    const { count: unreadCount, loading: loadingUnreadCount, error: errorUnreadCount } = useUnreadNotificationCount();
+
     // Set menu items based on role
     useEffect(() => {
         const baseMenus = [
@@ -104,7 +107,7 @@ const Header = () => {
                         </div>
                         <div className="header__icon" onClick={() => setActiveUsePanelPopup('noti')}>
                             <IoNotifications />
-                            <span className="header__icon-badge">2</span>
+                            {unreadCount > 0 && <span className="header__icon-badge">{unreadCount}</span>}
                         </div>
                         <div
                             className="header__icon"

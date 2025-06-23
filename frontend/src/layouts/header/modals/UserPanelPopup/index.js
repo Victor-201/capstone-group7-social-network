@@ -62,7 +62,14 @@ const handleDeleteReadNotifications = async () => {
                             )}
                         </button>
                     </header>
-                    {type === 'noti' && <NotificationSection filter={filter} key={notiRefreshKey} onClose={onClose} />}
+                    {type === 'noti' && (
+    <NotificationSection
+        filter={filter}
+        key={notiRefreshKey}
+        onClose={onClose}
+        onRefresh={() => setNotiRefreshKey(prev => prev + 1)}
+    />
+)}
                     {type === 'mess' && <MessageSection />}
                 </>
             )}

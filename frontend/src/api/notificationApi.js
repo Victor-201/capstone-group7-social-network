@@ -37,6 +37,26 @@ export const markAsRead = async (token, notificationId) => {
     return data.result || data;
 };
 
+export const markAsUnRead = async (token, notificationId) => {
+    if (!notificationId) throw new Error('Notification ID is required');
+
+    const response = await fetch(`${BASE_URL}/notifications/${notificationId}/unread`, {
+        method: 'PUT',
+        headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+        },
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(data.message || `HTTP ${response.status}`);
+    }
+
+    return data.result || data;
+};
+
 export const markAllAsRead = async (token) => {
     const response = await fetch(`${BASE_URL}/notifications/read-all`, {
         method: 'PUT',
@@ -69,3 +89,22 @@ export const deleteReadNotifications = async (token) => {
     }
     return data.result || data;
 };
+
+export const getUnreadCount = async (token) => {
+    const response = await fetch(`${BASE_URL}/notifications/unread-count`, {
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+        },
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(data.message || `HTTP ${response.status}`);
+    }
+
+    return data.result || data; 
+};
+

@@ -1,11 +1,9 @@
-import React, { useState } from 'react';
 import NotificationItem from '../../../../components/notificationItem';
 import { useNotifications } from '../../../../hooks/notifications';
 import Loader from '../../../../components/loader';
 
-const NotificationSection = ({ filter, onClose }) => {
+const NotificationSection = ({ filter, onClose, onRefresh }) => {
     const { notifications, loading, error } = useNotifications(filter);
-
     return (
         <section className="popup__section popup__section--notification">
             {/* filter buttons... */}
@@ -20,13 +18,17 @@ const NotificationSection = ({ filter, onClose }) => {
             ) : (
                 <ul className="popup__notification-list">
                     {notifications.map(noti => (
-                        <NotificationItem key={noti.id} noti={noti} onClose={onClose} />
+                        <NotificationItem
+                            key={noti.id}
+                            noti={noti}
+                            onClose={onClose}
+                            onRefresh={onRefresh} // TRUYỀN THẲNG onRefresh
+                        />
                     ))}
                 </ul>
             )}
         </section>
     );
 };
-
 
 export default NotificationSection;
