@@ -29,7 +29,7 @@ const ProfileVisible = (sequelize) => {
     },
     {
       tableName: 'profile_visible',
-      timestamps: true,
+      timestamps: false,
     }
   );
 
