@@ -1,5 +1,6 @@
 import models from "../models/index.js";
 import sequelize from "../configs/database.config.js";
+import { Op } from "sequelize";
 
 export default {
     async getMessagesByChatId(chatId) {
@@ -116,6 +117,59 @@ export default {
                 error: {
                     code: 500,
                     message: "Error counting unread messages",
+                    detail: error.message,
+                },
+            };
+        }
+    },
+    async getUserInfoInChat(user_id, chat_id) {
+        if (!user_id || !chat_id) {
+            return { error: { code: 400, message: "user_id or chat_id is required" } };
+        }
+        try {
+            const participants = await models.ChatParticipant.findAll({
+                where: {
+                    chat_id,
+                    user_id: { [Op.ne]: user_id },
+                },
+            });
+            const otherIds = participants.map((p) => p.user_id);
+
+            if (!otherIds || otherIds.length <= 0) {
+                return { error: { code: 404, message: "No other participants found in this chat" } };
+            }
+
+            const otherUsers = await models.UserInfo.findAll({
+                where: {
+                    id: { [Op.in]: otherIds },
+                },
+            });
+
+            const latestMessages = {};
+            for (const id of otherIds) {
+                const latestMessage = await models.Message.findOne({
+                    where: {
+                        chat_id,
+                        sender_id: id,
+                    },
+                    order: [["sent_at", "DESC"]],
+                });
+                latestMessages[id] = latestMessage || null;
+            }
+
+            const result = otherUsers.map((user) => {
+                return {
+                    user,
+                    latest_message: latestMessages[user.id] || null,
+                };
+            });
+
+            return { result };
+        } catch (error) {
+            return {
+                error: {
+                    code: 500,
+                    message: "Error getting user and latest messages",
                     detail: error.message,
                 },
             };

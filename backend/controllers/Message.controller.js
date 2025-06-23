@@ -32,3 +32,12 @@ export const countUnreadMessages = async (req, res) => {
     if (error) return res.status(error.code).json(error);
     return res.status(200).json(result);
 }
+
+export const getUserInfoInChat = async (req, res) => {
+    const user_id = req.user.id;
+    const chat_id = req.params.chat_id;
+    const { error, result } = await MessageService.getUserInfoInChat(chat_id, user_id);
+    if (error) return res.status(error.code).json(error);
+    return res.status(200).json(result);
+}
+
