@@ -1,28 +1,23 @@
 import postService from '../services/post.service.js';
+import notify from '../helpers/notification.helper.js';
 
 export const CreatePost = async (req, res) => {
   const { error, result } = await postService.createPost(req.user.id, req.body, req.files);
   if (error) return res.status(error.code).json(error);
 
-  const { receiver_ids, action_id, action_type, content } = result.notifi || {};
-
+  const { receiver_ids, action_id, action_type, content } = result?.notifi || {};
   if (receiver_ids?.length > 0) {
     for (const receiver_id of receiver_ids) {
-      const notification = await notificationService.createNotification(
-        req.user.id,
-        receiver_id,
-        action_type,
-        action_id,
-        `${req.user.user_name} ${content}`
-      );
-
-      if (!notification.error) {
-        req.io?.to(receiver_id).emit("newNotification", notification.result);
+      const notifyResult = await notify(req.user.id, receiver_id, action_type, action_id, `${req.user.user_name} ${content}`);
+      if (notifyResult?.error) {
+        console.error("Send notification failed:", notifyResult.error);
       }
     }
   }
-  return res.status(201).json({ message: result.message, post: result.post });
+
+  return res.status(201).json({ message: result?.message || "Post created successfully", post: result?.post });
 };
+
 
 export const GetPosts = async (req, res) => {
   const { error, result } = await postService.getPosts(req.user.id);

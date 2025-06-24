@@ -29,7 +29,7 @@ export default {
     const friend = await Friend.create({ user_id, friend_id, status: 'pending' });
     return { result: { success: true, message: "Friend request sent successfully", friend } };
   },
-  
+
   async respondToFriendRequest(user_id, friend_id, status) {
     if (user_id === friend_id) {
       return { error: { code: 400, message: "Cannot perform this action" } };
@@ -146,10 +146,10 @@ export default {
   async getSentRequests(user_id) {
     const sentRequests = await Friend.findAll({
       where: { user_id, status: 'pending' },
-      include: [{ 
-        model: UserInfo, 
-        as: 'Recipient', 
-        attributes: ['id', 'full_name', 'avatar'] 
+      include: [{
+        model: UserInfo,
+        as: 'Recipient',
+        attributes: ['id', 'full_name', 'avatar']
       }]
     });
 
@@ -159,13 +159,83 @@ export default {
   async getReceivedRequests(user_id) {
     const receivedRequests = await Friend.findAll({
       where: { friend_id: user_id, status: 'pending' },
-      include: [{ 
-        model: UserInfo, 
-        as: 'Requester', 
-        attributes: ['id', 'full_name', 'avatar'] 
+      include: [{
+        model: UserInfo,
+        as: 'Requester',
+        attributes: ['id', 'full_name', 'avatar']
       }]
     });
 
     return { result: { requests: receivedRequests } };
   },
+
+  async getFriendSuggestions(user_id) {
+    if (!user_id) {
+      return { error: { code: 400, message: "user_id is required" } };
+    }
+
+    try {
+      
+      const directFriends = await Friend.findAll({
+        where: {
+          status: 'accepted',
+          [Op.or]: [{ user_id }, { friend_id: user_id }]
+        },
+        attributes: ["user_id", "friend_id"]
+      });
+      const directFriendIds = directFriends.map(f =>
+        f.user_id === user_id ? f.friend_id : f.user_id
+      );
+
+      
+      const friendsOfFriends = await Friend.findAll({
+        where: {
+          status: 'accepted',
+          [Op.or]: [
+            { user_id: { [Op.in]: directFriendIds } },
+            { friend_id: { [Op.in]: directFriendIds } }
+          ]
+        },
+        attributes: ["user_id", "friend_id"]
+      });
+      const friendsOfFriendsIds = friendsOfFriends.map(f =>
+        directFriendIds.includes(f.user_id) ? f.friend_id : f.user_id
+      );
+
+      const suggestedIds = [...new Set(friendsOfFriendsIds.filter(id =>
+        id !== user_id && !directFriendIds.includes(id)
+      ))];
+
+      if (suggestedIds.length === 0) {
+        return { result: [] };
+      }
+
+      const existingRelations = await Friend.findAll({
+        where: {
+          [Op.or]: [
+            { user_id, friend_id: { [Op.in]: suggestedIds } },
+            { friend_id: user_id, user_id: { [Op.in]: suggestedIds } }
+          ]
+        },
+        attributes: ["user_id", "friend_id", "status"]
+      });
+      const excludedIds = new Set(existingRelations.map(r =>
+        r.user_id === user_id ? r.friend_id : r.user_id
+      ));
+
+      const finalSuggestedIds = suggestedIds.filter(id => !excludedIds.has(id));
+
+      if (finalSuggestedIds.length === 0) {
+        return { result: [] };
+      }
+
+      const suggestedUsers = await UserInfo.findAll({
+        where: { id: { [Op.in]: finalSuggestedIds } },
+        attributes: ["id", "full_name", "avatar"]
+      });
+      return { result: suggestedUsers };
+    } catch (error) {
+      return { error: { code: 500, message: "Internal server error", detail: error.message } };
+    }
+  }
 };

@@ -1,5 +1,5 @@
 import friendService from '../services/Friend.service.js';
-import notificationService from '../services/Notification.service.js';
+import notify from '../helpers/notification.helper.js';
 
 export const sendFriendRequest = async (req, res) => {
   const { friend_id } = req.body;
@@ -11,15 +11,13 @@ export const sendFriendRequest = async (req, res) => {
 
   const action_id = result.friend.id;
   const content = `${req.user.user_name} sent you a friend request`;
-  const notification = await notificationService.createNotification(
-    user_id,
+  const notifyResult = await notify(user_id,
     friend_id,
     action_type,
     action_id,
-    content
-  );
-  if (!notification.error) {
-    req.io?.to(friend_id).emit("newNotification", notification.result);
+    content);
+  if (notifyResult?.error) {
+    console.error("Send notification failed:", notifyResult.error);
   }
   return res.status(201).json(result);
 };
@@ -34,15 +32,13 @@ export const respondToFriendRequest = async (req, res) => {
   if (result.notify) {
     const { sendTo, action_id, content } = result.notify;
 
-    const notification = await notificationService.createNotification(
-      user_id,
+    const notifyResult = await notify(user_id,
       sendTo,
       action_type,
       action_id,
-      `${req.user.user_name} ${content}`
-    );
-    if (!notification.error) {
-      req.io?.to(sendTo).emit("newNotification", notification.result);
+      `${req.user.user_name} ${content}`);
+    if (notifyResult?.error) {
+      console.error("Send notification failed:", notifyResult.error);
     }
   }
   return res.status(200).json(result);
@@ -90,3 +86,11 @@ export const getReceivedRequests = async (req, res) => {
   if (error) return res.status(error.code).json(error);
   return res.status(200).json(result);
 };
+
+export const suggestFriends = async (req, res) => {
+  const user_id = req.user.id;
+
+  const { error, result } = await friendService.getFriendSuggestions(user_id);
+  if (error) return res.status(error.code).json(error);
+  return res.status(200).json(result);
+}

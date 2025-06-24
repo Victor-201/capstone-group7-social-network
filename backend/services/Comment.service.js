@@ -40,6 +40,7 @@ export default {
       if (!parentComment) {
         return { error: { code: 404, message: 'Parent comment not found' } };
       }
+      const receiver_id = parentComment.user_id;
 
       const reply = await Comment.create({
         post_id: parentComment.post_id,
@@ -51,7 +52,8 @@ export default {
       return {
         result: {
           message: 'Reply created successfully',
-          reply
+          reply,
+          receiver_id
         }
       };
     } catch (error) {
