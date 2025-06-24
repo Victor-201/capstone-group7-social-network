@@ -67,13 +67,23 @@ const FriendCard = ({
         return (
           <>
             <button 
-              className="action-button primary-button"
+              className="action-button remove-button"
               onClick={onRemove}
               disabled={loading.remove}
             >
               {loading.remove ? <FriendCardIcon icon={FaSpinner} className="spinner" /> : null}
-              Xác nhận
+              Hủy kết bạn
             </button>
+            {isFollowing !== undefined && (
+              <button 
+                className={`action-button ${isFollowing ? 'unfollow-button' : 'follow-button'}`}
+                onClick={isFollowing ? onUnfollow : onFollow}
+                disabled={loading.follow}
+              >
+                {loading.follow ? <FriendCardIcon icon={FaSpinner} className="spinner" /> : null}
+                {isFollowing ? 'Hủy theo dõi' : 'Theo dõi'}
+              </button>
+            )}
             <button className="action-button more-options-button">
               <FriendCardIcon icon={FaEllipsisH} />
             </button>
@@ -109,7 +119,9 @@ const FriendCard = ({
       </div>
       <div className="info">
         <h1>{user.fullName}</h1>
-        <p className="mutual-friends">{Math.floor(Math.random() * 15) + 1} bạn chung</p>
+        {user.mutualFriends !== undefined && (
+          <p className="mutual-friends">{user.mutualFriends} bạn chung</p>
+        )}
         {type === 'request' && user.createdAt && (
           <p className="request-time">
             Đã gửi lời mời: {new Date(user.createdAt).toLocaleDateString()}
