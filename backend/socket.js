@@ -1,4 +1,4 @@
-import { registerSocket, removeSocket } from "./services/socket.service";
+import { registerSocket, removeSocket } from "./services/socket.service.js";
 
 export const notificationHandler = (io, socket) => {
   socket.on('joinNotification', () => {
