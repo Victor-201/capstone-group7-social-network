@@ -4,7 +4,7 @@ export const ROUTERS = {
         FRIENDS: "/friends",
         WATCH: "/watch",
         GROUPS: "/groups",
-        PROFILE: "/user/:id"
+        PROFILE: "/:id"
     },
     PUBLIC: {
         LOGIN: "/login",
