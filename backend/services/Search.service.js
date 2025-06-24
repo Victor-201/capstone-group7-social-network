@@ -1,22 +1,22 @@
 import { Op, Sequelize } from 'sequelize';
 import models from '../models/index.js';
+import friendService from "./Friend.service.js";
 
 const { UserInfo, UserAccount, Post } = models;
 
 export default {
-  async searchUsers(query) {
+  async searchUsers(query, user_id) {
     try {
       const lowercaseQuery = query.toLowerCase();
+      if (!lowercaseQuery) {
+        return { error: null, result: [] };
+      }
 
       const users = await UserInfo.findAll({
         where: {
           [Op.or]: [
             Sequelize.where(
               Sequelize.fn('LOWER', Sequelize.col('UserInfo.full_name')),
-              { [Op.like]: `%${lowercaseQuery}%` }
-            ),
-            Sequelize.where(
-              Sequelize.fn('LOWER', Sequelize.col('UserInfo.id')),
               { [Op.like]: `%${lowercaseQuery}%` }
             ),
             Sequelize.where(
@@ -28,6 +28,7 @@ export default {
         include: [
           {
             model: UserAccount,
+            as: 'userAccount',
             attributes: ['user_name', 'email', 'phone_number', 'role'],
             required: false
           }
@@ -36,7 +37,26 @@ export default {
         limit: 10
       });
 
-      return { error: null, result: users };
+      const resultWithMutual = [];
+
+      for (const user of users) {
+        if (user.id === user_id) continue;
+
+        const [{ result: mutualData, count = 0 } = {}, { isFriend = false } = {}] = await Promise.all([
+          friendService.getMutualFriends(user_id, user.id),
+          friendService.isFriend(user_id, user.id)
+        ]);
+
+        resultWithMutual.push({
+          ...user.toJSON(),
+          mutualFriendsCount: count,
+          mutualFriends: mutualData?.mutualFriends || [],
+          isFriend
+        });
+      }
+
+      return { error: null, result: resultWithMutual };
+
     } catch (error) {
       console.error('Search user error:', error);
       return {

@@ -4,7 +4,7 @@ import {    sendFriendRequest,
             getFriendsList,
             deleteFriend,
             getSentRequests,
-            getReceivedRequests
+            getReceivedRequests,
         } 
 from "../controllers/Friend.controller.js";
 import { validateEnum } from "../middleware/validateEnum.middleware.js";
@@ -18,5 +18,4 @@ router.get('/friends', getFriendsList);
 router.get('/friends/sent-requests', getSentRequests);
 router.get('/friends/received-requests', getReceivedRequests);
 router.delete('/friends/:friend_id', deleteFriend);
-
 export default router;
