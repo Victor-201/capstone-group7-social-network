@@ -175,7 +175,7 @@ CREATE TABLE Notifications (
     id CHAR(36) PRIMARY KEY,
     sender_id CHAR(36) NOT NULL,
     receiver_id CHAR(36) NOT NULL,
-    action_type ENUM ('post', 'comment', 'like', 'friend_request', 'message', 'friend_respond') NOT NULL,
+    action_type ENUM ('post', 'comment', 'like', 'friend_request', 'message', 'friend_respond', 'reply_comment') NOT NULL,
     action_id CHAR(36) NOT NULL,
     is_read BOOLEAN DEFAULT FALSE,
     content VARCHAR(255) DEFAULT NULL,
