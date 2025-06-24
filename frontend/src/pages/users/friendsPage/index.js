@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { FaSpinner, FaExclamationTriangle, FaSearch, FaFilter, FaEllipsisH } from 'react-icons/fa';
 import FriendCard from '../../../components/friendCard';
 import Sidebar from './modals/Sidebar';
@@ -25,7 +25,6 @@ const FriendsPage = () => {
 
   const {
     receivedRequests,
-    sentRequests,
     loading: requestsLoading,
     error: requestsError,
     refetch: refetchRequests
@@ -55,26 +54,31 @@ const FriendsPage = () => {
   const [localActionLoading, setLocalActionLoading] = useState({});
   const [message, setMessage] = useState(null);
 
-  // Fetch data khi component mount
-  useEffect(() => {
-    fetchAllData();
-  }, [refetchFriends, refetchRequests, refetchFollow]);
-
   // Fetch tất cả dữ liệu
-  const fetchAllData = async () => {
-    await Promise.all([
+  const fetchAllData = useCallback(async () => {
+    console.log('test: fetchAllData called');
+    const results = await Promise.all([
       refetchFriends(),
       refetchRequests(),
       refetchFollow()
     ]);
-  };
+    console.log('test: fetchAllData results', results);
+  }, [refetchFriends, refetchRequests, refetchFollow]);
+
+  // Fetch data khi component mount
+  useEffect(() => {
+    console.log('test: friendsPage useEffect called');
+    fetchAllData();
+  }, [fetchAllData]);
 
   // Handle sending a friend request
   const handleSendRequest = async (userId) => {
+    console.log('test: handleSendRequest userId', userId);
     setLocalActionLoading(prev => ({ ...prev, [`add_${userId}`]: true }));
     
     try {
       const result = await sendFriendRequest(userId);
+      console.log('test: sendFriendRequest result', result);
       if (result.success) {
         setMessage('Đã gửi lời mời kết bạn thành công');
         // Refresh the data
@@ -83,6 +87,7 @@ const FriendsPage = () => {
         console.error('Error sending friend request:', result.message);
       }
     } catch (err) {
+      console.error('test: handleSendRequest error', err);
       console.error('Đã xảy ra lỗi. Vui lòng thử lại sau.');
     } finally {
       setLocalActionLoading(prev => ({ ...prev, [`add_${userId}`]: false }));
@@ -96,14 +101,17 @@ const FriendsPage = () => {
 
   // Handle accepting/declining a friend request
   const handleRequestResponse = async (requesterId, action) => {
+    console.log('test: handleRequestResponse', { requesterId, action });
     setLocalActionLoading(prev => ({ ...prev, [`${action}_${requesterId}`]: true }));
     
     try {
       let result;
       if (action === 'accept') {
         result = await acceptFriendRequest(requesterId);
+        console.log('test: acceptFriendRequest result', result);
       } else {
         result = await rejectFriendRequest(requesterId);
+        console.log('test: rejectFriendRequest result', result);
       }
       
       if (result.success) {
@@ -114,6 +122,7 @@ const FriendsPage = () => {
         console.error('Error handling friend request:', result.message);
       }
     } catch (err) {
+      console.error('test: handleRequestResponse error', err);
       console.error('Đã xảy ra lỗi. Vui lòng thử lại sau.');
     } finally {
       setLocalActionLoading(prev => ({ ...prev, [`${action}_${requesterId}`]: false }));
@@ -127,6 +136,7 @@ const FriendsPage = () => {
 
   // Handle removing a friend
   const handleRemoveFriend = async (friendId) => {
+    console.log('test: handleRemoveFriend friendId', friendId);
     if (!window.confirm('Bạn có chắc chắn muốn xóa người này khỏi danh sách bạn bè?')) {
       return;
     }
@@ -135,6 +145,7 @@ const FriendsPage = () => {
     
     try {
       const result = await removeFriend(friendId);
+      console.log('test: removeFriend result', result);
       if (result.success) {
         setMessage('Đã xóa khỏi danh sách bạn bè');
         // Friends list will be updated automatically by the hook
@@ -143,6 +154,7 @@ const FriendsPage = () => {
         console.error('Error removing friend:', result.message);
       }
     } catch (err) {
+      console.error('test: handleRemoveFriend error', err);
       console.error('Đã xảy ra lỗi. Vui lòng thử lại sau.');
     } finally {
       setLocalActionLoading(prev => ({ ...prev, [`remove_${friendId}`]: false }));
@@ -156,17 +168,20 @@ const FriendsPage = () => {
 
   // Handle follow/unfollow user
   const handleFollowToggle = async (userId, isFollowing) => {
+    console.log('test: handleFollowToggle', { userId, isFollowing });
     setLocalActionLoading(prev => ({ ...prev, [`follow_${userId}`]: true }));
     
     try {
       let result;
       if (isFollowing) {
         result = await unfollowUser(userId);
+        console.log('test: unfollowUser result', result);
         if (result.success) {
           setMessage('Đã hủy theo dõi người dùng');
         }
       } else {
         result = await followUser(userId);
+        console.log('test: followUser result', result);
         if (result.success) {
           setMessage('Đã theo dõi người dùng');
         }
@@ -176,6 +191,7 @@ const FriendsPage = () => {
         console.error('Error with follow action:', result.message);
       }
     } catch (err) {
+      console.error('test: handleFollowToggle error', err);
       console.error('Đã xảy ra lỗi. Vui lòng thử lại sau.');
     } finally {
       setLocalActionLoading(prev => ({ ...prev, [`follow_${userId}`]: false }));
@@ -233,6 +249,7 @@ const FriendsPage = () => {
                           </button>
                         </div>
                       </h2>
+                      {console.log('test: rendering friends list', friends)}
                       {friends.length === 0 ? (
                         <div className="empty-state">
                           <p>Bạn chưa có người bạn nào. Hãy tìm và kết bạn với mọi người!</p>
@@ -269,6 +286,7 @@ const FriendsPage = () => {
                           </button>
                         </div>
                       </h2>
+                      {console.log('test: rendering receivedRequests', receivedRequests)}
                       {receivedRequests.length === 0 ? (
                         <div className="empty-state">
                           <p>Không có lời mời kết bạn nào.</p>
@@ -304,6 +322,7 @@ const FriendsPage = () => {
                             <ThemedIcon icon={FaEllipsisH} />
                           </button>
                         </div></h2>
+                      {console.log('test: rendering followers', followers)}
                       {followers.length === 0 ? (
                         <div className="empty-state">
                           <p>Chưa có ai theo dõi bạn.</p>
@@ -338,6 +357,7 @@ const FriendsPage = () => {
                             <ThemedIcon icon={FaEllipsisH} />
                           </button>
                         </div></h2>
+                      {console.log('test: rendering following', following)}
                       {following.length === 0 ? (
                         <div className="empty-state">
                           <p>Bạn chưa theo dõi ai.</p>

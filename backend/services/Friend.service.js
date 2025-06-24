@@ -116,10 +116,6 @@ export default {
       ...received.map(f => f.Requester)
     ];
 
-    if (friends.length === 0) {
-      return { error: { code: 404, message: "No friends found" } };
-    }
-
     return { result: { friends } };
   },
 
@@ -144,5 +140,31 @@ export default {
 
     await friend.destroy();
     return { result: { message: "Friend deleted successfully" } };
-  }
+  },
+
+  async getSentRequests(user_id) {
+    const sentRequests = await Friend.findAll({
+      where: { user_id, status: 'pending' },
+      include: [{ 
+        model: UserInfo, 
+        as: 'Recipient', 
+        attributes: ['id', 'full_name', 'avatar'] 
+      }]
+    });
+
+    return { result: { requests: sentRequests } };
+  },
+
+  async getReceivedRequests(user_id) {
+    const receivedRequests = await Friend.findAll({
+      where: { friend_id: user_id, status: 'pending' },
+      include: [{ 
+        model: UserInfo, 
+        as: 'Requester', 
+        attributes: ['id', 'full_name', 'avatar'] 
+      }]
+    });
+
+    return { result: { requests: receivedRequests } };
+  },
 };

@@ -24,3 +24,30 @@ export const UnfollowUser = async (req, res) => {
   if (error) return res.status(error.code).json(error);
   return res.status(200).json(result);
 };
+
+export const getFollowers = async (req, res) => {
+  const { userId } = req.query;
+  const user_id = userId || req.user.id;
+
+  const { error, result } = await followService.getFollowers(user_id);
+  if (error) return res.status(error.code).json(error);
+  return res.status(200).json(result);
+};
+
+export const getFollowing = async (req, res) => {
+  const { userId } = req.query;
+  const user_id = userId || req.user.id;
+
+  const { error, result } = await followService.getFollowing(user_id);
+  if (error) return res.status(error.code).json(error);
+  return res.status(200).json(result);
+};
+
+export const getFollowStatus = async (req, res) => {
+  const follower_id = req.user.id;
+  const following_id = req.params.id;
+
+  const { error, result } = await followService.getFollowStatus(follower_id, following_id);
+  if (error) return res.status(error.code).json(error);
+  return res.status(200).json(result);
+};

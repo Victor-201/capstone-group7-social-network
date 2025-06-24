@@ -74,3 +74,19 @@ export const deleteFriend = async (req, res) => {
   if (error) return res.status(error.code).json(error);
   return res.status(200).json(result);
 };
+
+export const getSentRequests = async (req, res) => {
+  const user_id = req.user.id;
+
+  const { error, result } = await friendService.getSentRequests(user_id);
+  if (error) return res.status(error.code).json(error);
+  return res.status(200).json(result);
+};
+
+export const getReceivedRequests = async (req, res) => {
+  const user_id = req.user.id;
+
+  const { error, result } = await friendService.getReceivedRequests(user_id);
+  if (error) return res.status(error.code).json(error);
+  return res.status(200).json(result);
+};
