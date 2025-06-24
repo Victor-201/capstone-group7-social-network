@@ -1,13 +1,11 @@
 import { useState } from 'react';
 import { togglePostLike } from '../../api/likeApi';
 
-export const usePostLikes = (postId) => {
-  const [isLiked, setIsLiked] = useState(false);
-  const [likeCount, setLikeCount] = useState(0);
+export const usePostLikes = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const toggleLike = async () => {
+  const toggleLike = async (postId, isLike) => {
     const token = localStorage.getItem('token');
     if (!token) {
       setError("No token provided");
@@ -17,18 +15,10 @@ export const usePostLikes = (postId) => {
     try {
       setLoading(true);
       setError(null);
-
-      const data = await togglePostLike(token, postId);
-
-      // ✅ Giả định API trả về `{ liked: true/false }`
-      const nextLiked = data?.liked ?? !isLiked;
-
-      setIsLiked(nextLiked);
-      setLikeCount(prev => nextLiked ? prev + 1 : prev - 1);
-
+      const data = await togglePostLike(token, postId, isLike);
       return data;
     } catch (err) {
-      setError(err.message);
+      setError(err.message || "Lỗi không xác định");
       throw err;
     } finally {
       setLoading(false);
@@ -36,10 +26,8 @@ export const usePostLikes = (postId) => {
   };
 
   return {
-    isLiked,
-    likeCount,
+    toggleLike,
     loading,
-    error,
-    toggleLike
+    error
   };
 };

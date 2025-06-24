@@ -65,13 +65,13 @@ export const likeOrUnlike = async (req, res) => {
 
     return res
       .status(201)
-      .json({ message: result?.message || "Post liked successfully" });
+      .json({ message: result?.message || "Post liked successfully", isLike: true });
   } else {
     const { error, result } = await LikeService.unlikePost(user_id, post_id);
     if (error) return res.status(error.code).json(error);
 
     return res
       .status(200)
-      .json({ message: result?.message || "Post unliked successfully" });
+      .json({ message: result?.message || "Post unliked successfully", isLike: false });
   }
 };

@@ -1,5 +1,14 @@
-import { AiFillLike, AiOutlineLike, AiFillHeart } from "react-icons/ai";
-import { BiComment, BiShare, BiSmile } from "react-icons/bi";
+import { useState } from "react";
+import {
+  AiFillLike,
+  AiOutlineLike,
+  AiFillHeart
+} from "react-icons/ai";
+import {
+  BiComment,
+  BiShare,
+  BiSmile
+} from "react-icons/bi";
 import { BsThreeDots, BsCameraFill } from "react-icons/bs";
 import { FaGlobe } from "react-icons/fa";
 import { ImAttachment } from "react-icons/im";
@@ -7,10 +16,9 @@ import { HiOutlineDocumentText } from "react-icons/hi";
 
 import AvatarUser from "../avatarUser";
 import useCloudinaryFile from "../../hooks/useCloudinaryFile";
-import { usePostLikes } from "../../hooks/posts/usePostLikes"; // ✅ dùng hook mới
+import { usePostLikes } from "../../hooks/posts/usePostLikes";
 import "./style.scss";
 
-// ✅ Hiển thị ảnh hoặc video
 const MediaItem = ({ mediaUrl, mediaType }) => {
   const fileUrl = useCloudinaryFile(mediaUrl, mediaType);
   if (!fileUrl) return <p>Đang tải {mediaType}...</p>;
@@ -31,14 +39,18 @@ const MediaItem = ({ mediaUrl, mediaType }) => {
   );
 };
 
-const Post = ({ post, user, token }) => {
-  const {
-    isLiked,
-    likeCount,
-    toggleLike,
-    loading,
-    error,
-  } = usePostLikes(post.id, token); // ✅ truyền postId và token từ props
+const Post = ({ post, user }) => {
+  const [isLiked, setIsLiked] = useState(post.is_liked || false);
+  const { toggleLike, loading, error } = usePostLikes();
+
+  const handleLike = async () => {
+    try {
+      await toggleLike(post.id, !isLiked); // gửi trạng thái đảo
+      setIsLiked(!isLiked); // cập nhật UI
+    } catch (err) {
+      console.error("Lỗi like:", err);
+    }
+  };
 
   return (
     <div className="post__wrapper">
@@ -69,7 +81,7 @@ const Post = ({ post, user, token }) => {
         {/* Nội dung */}
         <div className="post__content">
           <p>{post.content}</p>
-          {post.media && post.media.length > 0 && (
+          {post.media?.length > 0 && (
             <div className="post__media-list">
               {post.media.map((media, index) => (
                 <MediaItem
@@ -89,7 +101,7 @@ const Post = ({ post, user, token }) => {
               <AiFillLike className="reaction-icon reaction-icon--like" />
               <AiFillHeart className="reaction-icon reaction-icon--love" />
             </div>
-            <span>{likeCount}</span>
+            <span>{post.countLike}</span>
           </div>
           <div className="post__comments-shares">
             <span>{post.comments} bình luận</span>
@@ -101,7 +113,7 @@ const Post = ({ post, user, token }) => {
         <div className="post__buttons">
           <button
             className={`post__button ${isLiked ? "post__button--active" : ""}`}
-            onClick={toggleLike}
+            onClick={handleLike}
             disabled={loading}
           >
             {isLiked ? <AiFillLike /> : <AiOutlineLike />} Thích
@@ -116,7 +128,6 @@ const Post = ({ post, user, token }) => {
           </button>
         </div>
 
-        {/* Hiển thị lỗi nếu có */}
         {error && (
           <p className="post__error" style={{ color: "red", marginLeft: "1rem" }}>
             Lỗi khi xử lý like: {error}

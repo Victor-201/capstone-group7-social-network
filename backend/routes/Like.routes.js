@@ -5,6 +5,6 @@ const router = Router();
 
 // router.post('/posts/:id/like', likePost);
 // router.delete('/posts/:id/unlike', unlikePost);
-router.post('/posts/:id/toggle-like', likeOrUnlike)
+router.post('/posts/:id/toggle-like/:isLike', likeOrUnlike)
 
 export default router;
