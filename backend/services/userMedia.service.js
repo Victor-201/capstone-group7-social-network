@@ -89,7 +89,7 @@ export default {
 
         return {
             result: {
-                name: `Upload${imageType.charAt(0).toUpperCase() + imageType.slice(1)}Success`,
+                name: `${imageType.charAt(0).toUpperCase() + imageType.slice(1)}Success`,
                 message: result
             }
         };
