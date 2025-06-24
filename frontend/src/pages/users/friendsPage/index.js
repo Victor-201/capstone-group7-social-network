@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { FaSpinner, FaExclamationTriangle, FaSearch, FaFilter, FaEllipsisH } from 'react-icons/fa';
 import FriendCard from '../../../components/friendCard';
-import Sidebar from './modals/Sidebar';
+import Sidebar from './modals/Sidebar/index';
 import { useFriends } from '../../../hooks/friends/useFriends';
 import { useFriendRequests } from '../../../hooks/friends/useFriendRequests';
 import { useFollow } from '../../../hooks/friends/useFollow';
@@ -25,7 +25,6 @@ const FriendsPage = () => {
 
   const {
     receivedRequests,
-    sentRequests,
     loading: requestsLoading,
     error: requestsError,
     refetch: refetchRequests
@@ -46,7 +45,7 @@ const FriendsPage = () => {
     sendRequest: sendFriendRequest,
     acceptRequest: acceptFriendRequest,
     rejectRequest: rejectFriendRequest,
-    removeFriend,
+    unfriendUser: removeFriend,
     loading: actionLoading,
     error: actionError
   } = useFriendActions();
@@ -54,20 +53,21 @@ const FriendsPage = () => {
   const [activeTab, setActiveTab] = useState('friends');
   const [localActionLoading, setLocalActionLoading] = useState({});
   const [message, setMessage] = useState(null);
-
-  // Fetch data khi component mount
-  useEffect(() => {
-    fetchAllData();
-  }, [refetchFriends, refetchRequests, refetchFollow]);
+  const [recentlyUnfriended, setRecentlyUnfriended] = useState(new Map());
 
   // Fetch tất cả dữ liệu
-  const fetchAllData = async () => {
-    await Promise.all([
+  const fetchAllData = useCallback(async () => {
+    const results = await Promise.all([
       refetchFriends(),
       refetchRequests(),
       refetchFollow()
     ]);
-  };
+  }, [refetchFriends, refetchRequests, refetchFollow]);
+
+  // Fetch data khi component mount
+  useEffect(() => {
+    fetchAllData();
+  }, [fetchAllData]);
 
   // Handle sending a friend request
   const handleSendRequest = async (userId) => {
@@ -77,13 +77,21 @@ const FriendsPage = () => {
       const result = await sendFriendRequest(userId);
       if (result.success) {
         setMessage('Đã gửi lời mời kết bạn thành công');
-        // Refresh the data
+        // Remove user from recently unfriended list
+        setRecentlyUnfriended(prev => {
+          const newMap = new Map(prev);
+          newMap.delete(userId);
+          return newMap;
+        });
+        // Now refetch to get updated data
         await fetchAllData();
       } else {
-        console.error('Error sending friend request:', result.message);
+        console.error('Error sending friend request:', result.message || 'Unknown error');
+        setMessage('Có lỗi xảy ra khi gửi lời mời kết bạn');
       }
     } catch (err) {
-      console.error('Đã xảy ra lỗi. Vui lòng thử lại sau.');
+      console.error('handleSendRequest error', err);
+      setMessage('Đã xảy ra lỗi. Vui lòng thử lại sau.');
     } finally {
       setLocalActionLoading(prev => ({ ...prev, [`add_${userId}`]: false }));
       
@@ -111,10 +119,12 @@ const FriendsPage = () => {
         // Refresh data after action
         await fetchAllData();
       } else {
-        console.error('Error handling friend request:', result.message);
+        console.error('Error handling friend request:', result.message || 'Unknown error');
+        setMessage('Có lỗi xảy ra khi xử lý lời mời kết bạn');
       }
     } catch (err) {
-      console.error('Đã xảy ra lỗi. Vui lòng thử lại sau.');
+      console.error('handleRequestResponse error', err);
+      setMessage('Đã xảy ra lỗi. Vui lòng thử lại sau.');
     } finally {
       setLocalActionLoading(prev => ({ ...prev, [`${action}_${requesterId}`]: false }));
       
@@ -131,19 +141,29 @@ const FriendsPage = () => {
       return;
     }
     
+    // Find friend info before removing
+    const friendInfo = friends?.find(f => f.id === friendId);
+    if (!friendInfo) {
+      console.error('Friend not found');
+      return;
+    }
+    
     setLocalActionLoading(prev => ({ ...prev, [`remove_${friendId}`]: true }));
     
     try {
       const result = await removeFriend(friendId);
       if (result.success) {
         setMessage('Đã xóa khỏi danh sách bạn bè');
-        // Friends list will be updated automatically by the hook
-        await fetchAllData();
+        // Store friend info temporarily so user can add them back
+        setRecentlyUnfriended(prev => new Map(prev.set(friendId, friendInfo)));
+        // Don't refetch immediately to avoid duplicate display
       } else {
-        console.error('Error removing friend:', result.message);
+        console.error('Error removing friend:', result.message || 'Unknown error');
+        setMessage('Có lỗi xảy ra khi xóa bạn bè');
       }
     } catch (err) {
-      console.error('Đã xảy ra lỗi. Vui lòng thử lại sau.');
+      console.error('handleRemoveFriend error', err);
+      setMessage('Đã xảy ra lỗi. Vui lòng thử lại sau.');
     } finally {
       setLocalActionLoading(prev => ({ ...prev, [`remove_${friendId}`]: false }));
       
@@ -173,10 +193,12 @@ const FriendsPage = () => {
       }
       
       if (!result.success) {
-        console.error('Error with follow action:', result.message);
+        console.error('Error with follow action:', result.message || 'Unknown error');
+        setMessage('Có lỗi xảy ra với thao tác theo dõi');
       }
     } catch (err) {
-      console.error('Đã xảy ra lỗi. Vui lòng thử lại sau.');
+      console.error('handleFollowToggle error', err);
+      setMessage('Đã xảy ra lỗi. Vui lòng thử lại sau.');
     } finally {
       setLocalActionLoading(prev => ({ ...prev, [`follow_${userId}`]: false }));
       
@@ -186,6 +208,29 @@ const FriendsPage = () => {
       }, 3000);
     }
   };
+
+  // Compute display list để tránh duplicate keys
+  const displayFriends = useMemo(() => {
+    // Filter out recently unfriended users from friends list
+    const currentFriends = (friends || []).filter(friend => !recentlyUnfriended.has(friend.id));
+    
+    // Create suggestion cards for recently unfriended users
+    const unfriendedCards = Array.from(recentlyUnfriended.entries()).map(([userId, userInfo]) => ({
+      ...userInfo,
+      id: `unfriended-${userId}`, // Change ID to avoid duplicate
+      originalId: userId, // Keep original ID for actions
+      isSuggestion: true
+    }));
+    
+    console.log('Current friends:', currentFriends.map(f => f.id));
+    console.log('Recently unfriended:', Array.from(recentlyUnfriended.keys()));
+    console.log('Unfriended cards:', unfriendedCards.map(f => f.id));
+    
+    const result = [...currentFriends, ...unfriendedCards];
+    console.log('Final display list:', result.map(f => f.id));
+    
+    return result;
+  }, [friends, recentlyUnfriended]);
 
   return (
     <div className="friends-page">
@@ -223,7 +268,7 @@ const FriendsPage = () => {
                   {activeTab === 'friends' && (
                     <div className="friends-list">
                       <h2>
-                        Danh sách bạn bè ({friends.length})
+                        Danh sách bạn bè ({(friends || []).length})
                         <div className="section-actions">
                           <button className="action-btn">
                             <ThemedIcon icon={FaFilter} />
@@ -233,27 +278,36 @@ const FriendsPage = () => {
                           </button>
                         </div>
                       </h2>
-                      {friends.length === 0 ? (
+                      {!(friends?.length) && !recentlyUnfriended.size ? (
                         <div className="empty-state">
                           <p>Bạn chưa có người bạn nào. Hãy tìm và kết bạn với mọi người!</p>
                         </div>
                       ) : (
                         <div className="cards-grid">
-                          {friends.map(friend => (
-                            <FriendCard
-                              key={friend.id}
-                              user={friend}
-                              type="friend"
-                              isFollowing={isUserFollowed(friend.id)}
-                              onRemove={() => handleRemoveFriend(friend.id)}
-                              onFollow={() => handleFollowToggle(friend.id, false)}
-                              onUnfollow={() => handleFollowToggle(friend.id, true)}
-                              loading={{
-                                remove: localActionLoading[`remove_${friend.id}`],
-                                follow: localActionLoading[`follow_${friend.id}`]
-                              }}
-                            />
-                          ))}
+                          {displayFriends.map((friend, index) => {
+                            const isSuggestion = friend.isSuggestion;
+                            const friendId = isSuggestion ? friend.originalId : friend.id;
+                            // Ensure absolutely unique keys using type prefix + id + index
+                            const uniqueKey = isSuggestion ? `suggestion-${friendId}-${index}` : `friend-${friend.id}-${index}`;
+                            
+                            return (
+                              <FriendCard
+                                key={uniqueKey}
+                                user={friend}
+                                type={isSuggestion ? "suggestion" : "friend"}
+                                isFollowing={!isSuggestion ? isUserFollowed(friend.id) : undefined}
+                                onRemove={!isSuggestion ? () => handleRemoveFriend(friendId) : undefined}
+                                onAdd={isSuggestion ? () => handleSendRequest(friendId) : undefined}
+                                onFollow={!isSuggestion ? () => handleFollowToggle(friendId, false) : undefined}
+                                onUnfollow={!isSuggestion ? () => handleFollowToggle(friendId, true) : undefined}
+                                loading={{
+                                  remove: !isSuggestion ? localActionLoading[`remove_${friendId}`] : false,
+                                  add: isSuggestion ? localActionLoading[`add_${friendId}`] : false,
+                                  follow: !isSuggestion ? localActionLoading[`follow_${friendId}`] : false
+                                }}
+                              />
+                            );
+                          })}
                         </div>
                       )}
                     </div>
@@ -262,35 +316,46 @@ const FriendsPage = () => {
                   {activeTab === 'requests' && (
                     <div className="requests-list">
                       <h2>
-                        Lời mời kết bạn ({receivedRequests.length})
+                        Lời mời kết bạn ({(receivedRequests || []).length})
                         <div className="section-actions">
                           <button className="action-btn">
                             <ThemedIcon icon={FaEllipsisH} />
                           </button>
                         </div>
                       </h2>
-                      {receivedRequests.length === 0 ? (
+                      {!(receivedRequests?.length) ? (
                         <div className="empty-state">
                           <p>Không có lời mời kết bạn nào.</p>
                         </div>
                       ) : (
                         <div className="cards-grid">
-                          {receivedRequests.map(request => (
-                            <FriendCard
-                              key={request.id}
-                              user={{
-                                ...request.requester,
-                                createdAt: request.createdAt
-                              }}
-                              type="request"
-                              onAccept={() => handleRequestResponse(request.requester.id, 'accept')}
-                              onReject={() => handleRequestResponse(request.requester.id, 'reject')}
-                              loading={{
-                                accept: localActionLoading[`accept_${request.requester.id}`],
-                                reject: localActionLoading[`reject_${request.requester.id}`]
-                              }}
-                            />
-                          ))}
+                          {(receivedRequests || []).map((request, index) => {
+                            // Safe access to request data with multiple fallbacks
+                            const requester = request?.Requester || request?.requester;
+                            
+                            // Ensure requester exists and has required properties
+                            if (!requester || !requester.id) {
+                              console.warn('Invalid request data:', request);
+                              return null;
+                            }
+                            
+                            return (
+                              <FriendCard
+                                key={`request-${requester.id}-${index}`}
+                                user={{
+                                  ...requester,
+                                  createdAt: request.created_at || request.createdAt
+                                }}
+                                type="request"
+                                onAccept={() => handleRequestResponse(requester.id, 'accept')}
+                                onReject={() => handleRequestResponse(requester.id, 'reject')}
+                                loading={{
+                                  accept: localActionLoading[`accept_${requester.id}`] || false,
+                                  reject: localActionLoading[`reject_${requester.id}`] || false
+                                }}
+                              />
+                            );
+                          }).filter(Boolean)}
                         </div>
                       )}
                     </div>
@@ -298,19 +363,19 @@ const FriendsPage = () => {
 
                   {activeTab === 'followers' && (
                     <div className="followers-list">
-                      <h2>Người theo dõi ({followers.length})
+                      <h2>Người theo dõi ({(followers || []).length})
                         <div className="section-actions">
                           <button className="action-btn">
                             <ThemedIcon icon={FaEllipsisH} />
                           </button>
                         </div></h2>
-                      {followers.length === 0 ? (
+                      {!(followers?.length) ? (
                         <div className="empty-state">
                           <p>Chưa có ai theo dõi bạn.</p>
                         </div>
                       ) : (
                         <div className="cards-grid">
-                          {followers.map(follower => (
+                          {(followers || []).map(follower => (
                             <FriendCard
                               key={follower.id}
                               user={follower}
@@ -332,19 +397,19 @@ const FriendsPage = () => {
 
                   {activeTab === 'following' && (
                     <div className="following-list">
-                      <h2>Đang theo dõi ({following.length})
+                      <h2>Đang theo dõi ({(following || []).length})
                         <div className="section-actions">
                           <button className="action-btn">
                             <ThemedIcon icon={FaEllipsisH} />
                           </button>
                         </div></h2>
-                      {following.length === 0 ? (
+                      {!(following?.length) ? (
                         <div className="empty-state">
                           <p>Bạn chưa theo dõi ai.</p>
                         </div>
                       ) : (
                         <div className="cards-grid">
-                          {following.map(followedUser => (
+                          {(following || []).map(followedUser => (
                             <FriendCard
                               key={followedUser.id}
                               user={followedUser}

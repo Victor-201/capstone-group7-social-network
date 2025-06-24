@@ -1,16 +1,15 @@
 import { API_BASE_URL } from "../config/apiConfig";
 
-const BASE_URL = `${API_BASE_URL}/user/follow`;
+const BASE_URL = `${API_BASE_URL}/user`;
 
 // Follow user
 export const followUser = async (token, userId) => {
-    const response = await fetch(`${BASE_URL}/follow`, {
-        method: 'POST',
+    const response = await fetch(`${BASE_URL}/follow/${userId}`, {
+        method: 'GET',
         headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ userId }),
     });
     
     if (!response.ok) {
@@ -23,13 +22,12 @@ export const followUser = async (token, userId) => {
 
 // Unfollow user
 export const unfollowUser = async (token, userId) => {
-    const response = await fetch(`${BASE_URL}/unfollow`, {
-        method: 'DELETE',
+    const response = await fetch(`${BASE_URL}/unfollow/${userId}`, {
+        method: 'GET',
         headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ userId }),
     });
     
     if (!response.ok) {

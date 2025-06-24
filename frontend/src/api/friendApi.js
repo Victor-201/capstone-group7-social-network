@@ -1,16 +1,16 @@
 import { API_BASE_URL } from "../config/apiConfig";
 
-const BASE_URL = `${API_BASE_URL}/user/friend`;
+const BASE_URL = `${API_BASE_URL}/user`;
 
 // Gửi lời mời kết bạn
 export const sendFriendRequest = async (token, userId) => {
-    const response = await fetch(`${BASE_URL}/request`, {
+    const response = await fetch(`${BASE_URL}/friends/request`, {
         method: 'POST',
         headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ userId }),
+        body: JSON.stringify({ friend_id: userId }),
     });
     
     if (!response.ok) {
@@ -22,14 +22,14 @@ export const sendFriendRequest = async (token, userId) => {
 };
 
 // Chấp nhận lời mời kết bạn
-export const acceptFriendRequest = async (token, requestId) => {
-    const response = await fetch(`${BASE_URL}/accept`, {
+export const acceptFriendRequest = async (token, requesterId) => {
+    const response = await fetch(`${BASE_URL}/friends/respond`, {
         method: 'PUT',
         headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ requestId }),
+        body: JSON.stringify({ friend_id: requesterId, status: 'accepted' }),
     });
     
     if (!response.ok) {
@@ -37,18 +37,19 @@ export const acceptFriendRequest = async (token, requestId) => {
         throw new Error(errorData.message || `HTTP ${response.status}`);
     }
 
-    return await response.json();
+    const result = await response.json();
+    return result;
 };
 
 // Từ chối lời mời kết bạn
-export const rejectFriendRequest = async (token, requestId) => {
-    const response = await fetch(`${BASE_URL}/reject`, {
+export const rejectFriendRequest = async (token, requesterId) => {
+    const response = await fetch(`${BASE_URL}/friends/respond`, {
         method: 'PUT',
         headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ requestId }),
+        body: JSON.stringify({ friend_id: requesterId, status: 'rejected' }),
     });
     
     if (!response.ok) {
@@ -80,13 +81,12 @@ export const cancelFriendRequest = async (token, requestId) => {
 
 // Hủy kết bạn
 export const unfriend = async (token, friendId) => {
-    const response = await fetch(`${BASE_URL}/unfriend`, {
+    const response = await fetch(`${BASE_URL}/friends/${friendId}`, {
         method: 'DELETE',
         headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ friendId }),
     });
     
     if (!response.ok) {
@@ -99,7 +99,7 @@ export const unfriend = async (token, friendId) => {
 
 // Lấy danh sách bạn bè
 export const getFriends = async (token, userId) => {
-    const response = await fetch(`${BASE_URL}/list${userId ? `?userId=${userId}` : ''}`, {
+    const response = await fetch(`${BASE_URL}/friends${userId ? `?userId=${userId}` : ''}`, {
         method: 'GET',
         headers: {
             Authorization: `Bearer ${token}`,
@@ -112,12 +112,13 @@ export const getFriends = async (token, userId) => {
         throw new Error(errorData.message || `HTTP ${response.status}`);
     }
 
-    return await response.json();
+    const result = await response.json();
+    return result;
 };
 
 // Lấy danh sách lời mời kết bạn đã gửi
 export const getSentRequests = async (token) => {
-    const response = await fetch(`${BASE_URL}/sent-requests`, {
+    const response = await fetch(`${BASE_URL}/friends/sent-requests`, {
         method: 'GET',
         headers: {
             Authorization: `Bearer ${token}`,
@@ -130,12 +131,13 @@ export const getSentRequests = async (token) => {
         throw new Error(errorData.message || `HTTP ${response.status}`);
     }
 
-    return await response.json();
+    const result = await response.json();
+    return result;
 };
 
 // Lấy danh sách lời mời kết bạn đã nhận
 export const getReceivedRequests = async (token) => {
-    const response = await fetch(`${BASE_URL}/received-requests`, {
+    const response = await fetch(`${BASE_URL}/friends/received-requests`, {
         method: 'GET',
         headers: {
             Authorization: `Bearer ${token}`,
@@ -148,7 +150,8 @@ export const getReceivedRequests = async (token) => {
         throw new Error(errorData.message || `HTTP ${response.status}`);
     }
 
-    return await response.json();
+    const result = await response.json();
+    return result;
 };
 
 // Kiểm tra trạng thái kết bạn

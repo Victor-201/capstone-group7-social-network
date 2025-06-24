@@ -2,7 +2,9 @@ import {    sendFriendRequest,
             respondToFriendRequest, 
             getMutualFriends,
             getFriendsList,
-            deleteFriend
+            deleteFriend,
+            getSentRequests,
+            getReceivedRequests
         } 
 from "../controllers/Friend.controller.js";
 import { validateEnum } from "../middleware/validateEnum.middleware.js";
@@ -13,6 +15,8 @@ router.post('/friends/request', sendFriendRequest);
 router.put('/friends/respond', validateEnum('Friend'), respondToFriendRequest);
 router.get('/friends/mutual/:friend_id', getMutualFriends);
 router.get('/friends', getFriendsList);
+router.get('/friends/sent-requests', getSentRequests);
+router.get('/friends/received-requests', getReceivedRequests);
 router.delete('/friends/:friend_id', deleteFriend);
 
 export default router;

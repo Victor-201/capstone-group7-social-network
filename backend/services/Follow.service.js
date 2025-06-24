@@ -37,5 +37,77 @@ export default {
         error: { code: 500, message: 'Internal server error', detail: error.message }
       };
     }
-  }
+  },
+
+  async getFollowers(user_id) {
+    try {
+      const { UserInfo } = models;
+      const followers = await Follow.findAll({
+        where: { following_id: user_id },
+        include: [{
+          model: UserInfo,
+          as: 'Follower',
+          attributes: ['id', 'full_name', 'avatar']
+        }]
+      });
+
+      return { 
+        result: { 
+          data: followers.map(f => f.Follower),
+          count: followers.length 
+        } 
+      };
+    } catch (error) {
+      console.error('Error getting followers:', error);
+      return {
+        error: { code: 500, message: 'Internal server error', detail: error.message }
+      };
+    }
+  },
+
+  async getFollowing(user_id) {
+    try {
+      const { UserInfo } = models;
+      const following = await Follow.findAll({
+        where: { follower_id: user_id },
+        include: [{
+          model: UserInfo,
+          as: 'Following',
+          attributes: ['id', 'full_name', 'avatar']
+        }]
+      });
+
+      return { 
+        result: { 
+          data: following.map(f => f.Following),
+          count: following.length 
+        } 
+      };
+    } catch (error) {
+      console.error('Error getting following:', error);
+      return {
+        error: { code: 500, message: 'Internal server error', detail: error.message }
+      };
+    }
+  },
+
+  async getFollowStatus(follower_id, following_id) {
+    try {
+      const follow = await Follow.findOne({
+        where: { follower_id, following_id }
+      });
+
+      return { 
+        result: { 
+          status: follow ? 'following' : 'not_following',
+          isFollowing: !!follow
+        } 
+      };
+    } catch (error) {
+      console.error('Error getting follow status:', error);
+      return {
+        error: { code: 500, message: 'Internal server error', detail: error.message }
+      };
+    }
+  },
 };

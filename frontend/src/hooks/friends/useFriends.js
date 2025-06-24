@@ -23,7 +23,13 @@ export const useFriends = (userId = null) => {
             const data = await getFriends(token, userId);
             setFriends(data.friends || []);
         } catch (err) {
-            setError(err.message);
+            // If it's a "No friends found" error, just set empty array
+            if (err.message.includes('No friends found')) {
+                setFriends([]);
+                setError(null);
+            } else {
+                setError(err.message);
+            }
         } finally {
             setLoading(false);
         }

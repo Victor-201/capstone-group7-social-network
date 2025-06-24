@@ -27,7 +27,7 @@ export default {
     }
 
     const friend = await Friend.create({ user_id, friend_id, status: 'pending' });
-    return { result: { message: "Friend request sent successfully", friend } };
+    return { result: { success: true, message: "Friend request sent successfully", friend } };
   },
   
   async respondToFriendRequest(user_id, friend_id, status) {
@@ -52,6 +52,7 @@ export default {
 
     return {
       result: {
+        success: true,
         message: `Friend request ${status}`,
         request,
         notify: {
@@ -116,10 +117,6 @@ export default {
       ...received.map(f => f.Requester)
     ];
 
-    if (friends.length === 0) {
-      return { error: { code: 404, message: "No friends found" } };
-    }
-
     return { result: { friends } };
   },
 
@@ -143,6 +140,32 @@ export default {
     }
 
     await friend.destroy();
-    return { result: { message: "Friend deleted successfully" } };
-  }
+    return { result: { success: true, message: "Friend deleted successfully" } };
+  },
+
+  async getSentRequests(user_id) {
+    const sentRequests = await Friend.findAll({
+      where: { user_id, status: 'pending' },
+      include: [{ 
+        model: UserInfo, 
+        as: 'Recipient', 
+        attributes: ['id', 'full_name', 'avatar'] 
+      }]
+    });
+
+    return { result: { requests: sentRequests } };
+  },
+
+  async getReceivedRequests(user_id) {
+    const receivedRequests = await Friend.findAll({
+      where: { friend_id: user_id, status: 'pending' },
+      include: [{ 
+        model: UserInfo, 
+        as: 'Requester', 
+        attributes: ['id', 'full_name', 'avatar'] 
+      }]
+    });
+
+    return { result: { requests: receivedRequests } };
+  },
 };
