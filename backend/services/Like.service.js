@@ -52,5 +52,10 @@ export default {
         } catch (err) {
             return { error: { code: 500, message: "Internal server error", detail: err.message } };
         }
+    },
+    async postLiked (user_id, post_id) {
+        if(!user_id || !post_id) {
+            return {error: {code: 400, message: "user_id or post_id is required"}}
+        }
     }
 }
