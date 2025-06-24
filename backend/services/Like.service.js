@@ -1,4 +1,7 @@
+import { Op } from "sequelize";
 import models from "../models/index.js";
+
+const { Like, Post } = models;
 
 export default {
     async likePost(user_id, post_id) {
@@ -53,9 +56,27 @@ export default {
             return { error: { code: 500, message: "Internal server error", detail: err.message } };
         }
     },
-    async postLiked (user_id, post_id) {
-        if(!user_id || !post_id) {
-            return {error: {code: 400, message: "user_id or post_id is required"}}
+    async postLiked(user_id) {
+        if (!user_id) {
+            return { error: { code: 400, message: "user_id is required" } };
+        }
+
+        try {
+            const postLiked = await Like.findAll({ where: { user_id } });
+            const postLikedId = postLiked.map(p => p.post_id);
+
+            if (postLikedId.length === 0) {
+                return { result: [] }; 
+            }
+
+            const postLikedInfo = await Post.findAll({
+                where: {
+                    id: { [Op.in]: postLikedId },
+                },
+            });
+            return { result: postLikedInfo };
+        } catch (error) {
+            return { error: { code: 500, message: "Internal server error", detail: error.message } };
         }
     }
 }

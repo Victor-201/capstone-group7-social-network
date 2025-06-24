@@ -1,10 +1,9 @@
-import { likePost, unlikePost, likeOrUnlike } from "../controllers/Like.controller.js";
+import { likeOrUnlike, postLiked } from "../controllers/Like.controller.js";
 import { Router } from "express";
 
 const router = Router();
 
-// router.post('/posts/:id/like', likePost);
-// router.delete('/posts/:id/unlike', unlikePost);
+router.get('/liked', postLiked);
 router.post('/posts/:id/toggle-like/:isLike', likeOrUnlike)
 
 export default router;
