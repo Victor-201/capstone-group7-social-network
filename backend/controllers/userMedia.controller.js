@@ -34,3 +34,10 @@ export const uploadCover = async (req, res) => {
   if (error) return res.status(error.code).json(error);
   return res.status(200).json(result);
 };
+
+export const getAllIamgesById = async (req, res) => {
+  const user_id = req.user.id;
+  const { error, result } = userMediaService.getAllImagesByUserId(user_id);
+  if (error) return res.status(error.code).json(error);
+  return res.status(200).json(result);
+}

@@ -55,6 +55,16 @@ export default {
         });
       }
 
+      resultWithMutual.sort((a, b) => {
+        // sort voi hai phan tu trong mang resultWithMutual
+        if (a.isFriend && !b.isFriend) return -1;
+        // neu a la ban thi se giua nguyen vi tri trong mang
+        if (!a.isFriend && b.isFriend) return 1;
+        // neu a false va b true thi se sort lai
+        return b.mutualFriendsCount - a.mutualFriendsCount;
+        // doi vi tri cua a va b neu ban cua b lon hon a
+      });
+      
       return { error: null, result: resultWithMutual };
 
     } catch (error) {
