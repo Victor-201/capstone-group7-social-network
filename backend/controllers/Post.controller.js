@@ -26,7 +26,7 @@ export const GetPosts = async (req, res) => {
 };
 
 export const PostDetail = async (req, res) => {
-  const { error, result } = await postService.getPostDetail(req.params.id);
+  const { error, result } = await postService.getPostDetail(req.user.id,req.params.id);
   if (error) return res.status(error.code).json(error);
   return res.status(200).json(result);
 };

@@ -52,7 +52,6 @@ export default {
                 }
             };
         }
-
         const result = uploadMedia(file);
         if (!result) {
             return {

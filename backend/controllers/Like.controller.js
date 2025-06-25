@@ -14,7 +14,7 @@ export const likeOrUnlike = async (req, res) => {
     if (result?.notify) {
       const { receiver_id, action_type, action_id, content } = result.notify;
 
-      const notifyResult = await notify(user_id, receiver_id, action_type, action_id, `${req.user.user_name} ${content}`);
+      const notifyResult = await notify(user_id, receiver_id, action_type, action_id, `${content}`);
       if (notifyResult?.error) {
         console.error("Send notification failed:", notifyResult.error);
       }

@@ -39,14 +39,14 @@ const MediaItem = ({ mediaUrl, mediaType }) => {
   );
 };
 
-const Post = ({ post, user }) => {
+const Post = ({ post, userInfo }) => {
   const [isLiked, setIsLiked] = useState(post.is_liked || false);
   const { toggleLike, loading, error } = usePostLikes();
 
   const handleLike = async () => {
     try {
-      await toggleLike(post.id, !isLiked); // gửi trạng thái đảo
-      setIsLiked(!isLiked); // cập nhật UI
+      await toggleLike(post.id, !isLiked);
+      setIsLiked(!isLiked);
     } catch (err) {
       console.error("Lỗi like:", err);
     }
@@ -59,10 +59,12 @@ const Post = ({ post, user }) => {
         <div className="post__header">
           <div className="post__author">
             <div className="post__avatar">
-              <AvatarUser user={user} />
+              <AvatarUser user={userInfo} />
             </div>
             <div className="post__info">
-              <h4 className="post__author-name">{post.author}</h4>
+              <h4 className="post__author-name">
+                {userInfo?.full_name || "Người dùng"}
+              </h4>
               <div className="post__meta">
                 <span className="post__time">{post.time}</span>
                 <span className="post__privacy">
@@ -138,7 +140,7 @@ const Post = ({ post, user }) => {
         <div className="post__comments">
           <div className="comment">
             <div className="comment__avatar">
-              <AvatarUser user={user} />
+              <AvatarUser user={userInfo} />
             </div>
             <div className="comment__box">
               <input type="text" placeholder="Viết bình luận..." />

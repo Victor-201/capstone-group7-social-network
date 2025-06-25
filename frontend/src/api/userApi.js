@@ -20,6 +20,44 @@ export const getUserInfo = async (token) => {
 
     return await response.json();
 };
+// Cập nhật thông tin profile (nội dung: job, education, ...)
+export const updateUserProfile = async (token, profileData) => {
+    const response = await fetch(`${BASE_URL}/profile`, {
+        method: 'PUT',
+        headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(profileData),
+    });
+
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || `HTTP ${response.status}`);
+    }
+
+    return await response.json();
+};
+
+// Cập nhật quyền hiển thị của từng trường
+export const updateProfileVisibility = async (token, visibilityList) => {
+    const response = await fetch(`${BASE_URL}/info`, {
+        method: 'PUT',
+        headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ visibilities: visibilityList }),
+    });
+
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || `HTTP ${response.status}`);
+    }
+
+    return await response.json();
+};
+
 
 // Lấy thông tin user theo ID
 export const getUserById = async (token, userId) => {
@@ -41,7 +79,7 @@ export const getUserById = async (token, userId) => {
 
 // Cập nhật thông tin user
 export const updateUserInfo = async (token, userData) => {
-    const response = await fetch(`${BASE_URL}/update`, {
+    const response = await fetch(`${BASE_URL}/info`, {
         method: 'PUT',
         headers: {
             Authorization: `Bearer ${token}`,
