@@ -117,7 +117,7 @@ export default {
       ...received.map(f => f.Requester)
     ];
 
-    return { result: { friends } };
+    return { result: friends };
   },
 
   async deleteFriend(user_id, friend_id) {
