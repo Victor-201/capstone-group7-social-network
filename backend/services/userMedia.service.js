@@ -94,4 +94,24 @@ export default {
             }
         };
     },
+    async getAllImagesByUserId(user_id) {
+        if (!user_id) {
+            return { error: { code: 400, message: "user_id is required" } };
+        }
+        try {
+            const getImagesId = await UserMedia.findAll({
+                where: {
+                    user_id,
+                    media_type: "image",
+                },
+                attributes: ['media_id', 'image_type']
+            });
+            if (getImagesId.length === 0) {
+                return { result: [] };
+            }
+            return { result: getImagesId };
+        } catch (error) {
+            return { error: { code: 500, message: "Error deleting media", detail: error.message } };
+        }
+    }
 };
