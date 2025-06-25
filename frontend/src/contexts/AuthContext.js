@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import { jwtDecode } from 'jwt-decode';
+import jwtDecode  from 'jwt-decode';
 
 const AuthContext = createContext();
 
@@ -37,11 +37,12 @@ export const AuthProvider = ({ children }) => {
     setIsLoading(false); // ✅ cập nhật sau khi kiểm tra xong
   }, []);
 
-  const login = (token) => {
-    localStorage.setItem('token', token);
-    const decoded = jwtDecode(token);
+  const login = (data) => {
+    localStorage.setItem('token', data.accessToken);
+    localStorage.setItem('refresh_token', data.refreshToken);
+    const decoded = jwtDecode(data.accessToken);
     setAuth({
-      token,
+      token: data.accessToken,
       id: decoded.id,
       user_name: decoded.user_name,
       email: decoded.email,
@@ -50,7 +51,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
-    localStorage.removeItem('token');
+    localStorage.clear();
     setAuth({
       token: null,
       id: null,

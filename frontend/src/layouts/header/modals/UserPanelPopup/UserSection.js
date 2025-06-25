@@ -1,20 +1,21 @@
 import React from 'react';
 import { FaCog, FaQuestionCircle, FaMoon, FaCommentDots, FaSignOutAlt } from 'react-icons/fa';
 import { FaChevronRight } from 'react-icons/fa';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import AvatarUser from '../../../../components/avatarUser';
-import useLogout from '../../../../hooks/useLogout';
 import { ROUTERS } from '../../../../utils/router';
+import { useAuth } from '../../../../contexts/AuthContext';
 
 const UserSection = ({ user, onClose }) => {
-    const logout = useLogout();
+    const {logout} = useAuth();
+    const navigator = useNavigate();
 
     const menuItems = [
         { icon: <FaCog />, label: 'Cài đặt & quyền riêng tư', onClick: () => {} },
         { icon: <FaQuestionCircle />, label: 'Trợ giúp & hỗ trợ', onClick: () => {} },
         { icon: <FaMoon />, label: 'Màn hình & trợ năng', onClick: () => {} },
         { icon: <FaCommentDots />, label: 'Đóng góp ý kiến', onClick: () => {} },
-        { icon: <FaSignOutAlt />, label: 'Đăng xuất', onClick: () => { logout(); onClose(); } },
+        { icon: <FaSignOutAlt />, label: 'Đăng xuất', onClick: () => { logout(); onClose(); navigator(ROUTERS.USER.HOME) } },
     ];
 
     return (

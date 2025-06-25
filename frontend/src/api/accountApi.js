@@ -1,7 +1,7 @@
 import { API_BASE_URL } from "../config/apiConfig";
 
 // Đăng nhập
-export const login = async (credentials) => {
+export const singin = async (credentials) => {
     const response = await fetch(`${API_BASE_URL}/public/login`, {
         method: 'POST',
         headers: {
