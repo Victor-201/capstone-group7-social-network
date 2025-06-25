@@ -1,9 +1,9 @@
 import React, { memo, useState, useEffect, useRef } from 'react';
 import { ROUTERS } from '../../utils/router';
-import { Link, NavLink } from 'react-router-dom';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { RiHome9Line, RiHome9Fill, RiGroupLine, RiGroupFill, RiFolderVideoLine, RiFolderVideoFill } from 'react-icons/ri';
 import { TiGroupOutline, TiGroup } from 'react-icons/ti';
-import { IoNotifications } from 'react-icons/io5';
+import { IoNotifications, IoArrowBack } from 'react-icons/io5';
 import { TbMessageCircleFilled } from 'react-icons/tb';
 import { FaSearch, FaCaretUp, FaCaretDown } from 'react-icons/fa';
 import './style.scss';
@@ -12,19 +12,22 @@ import AvatarUser from '../../components/avatarUser';
 import { useUnreadNotificationCount } from '../../hooks/notifications';
 import Logo from '../../assets/images/logo/logo.png';
 import useClickOutside from '../../hooks/useClickOutside';
-import {useUserInfo} from '../../hooks/user';
+import { useUserInfo } from '../../hooks/user';
+import { useSearch } from '../../hooks/search';
 import Loader from '../../components/loader';
 
 const Header = () => {
     const [activeUsePanelPopup, setActiveUsePanelPopup] = useState(null);
     const [isFocusedSearch, setIsFocusedSearch] = useState(false);
     const popupUserPanelRef = useRef(null);
+    const navigate = useNavigate();
     const searchRef = useRef(null);
     const userData = JSON.parse(localStorage.getItem("user"));
     const userId = userData?.id;
     const role = userData?.role;
     const [menus, setMenus] = useState([]);
     const { userInfo, loading, error } = useUserInfo();
+    const { loading: loadingSearch, error: errorSearch, results: searchResults, search } = useSearch();
     const { count: unreadCount, loading: loadingUnreadCount, error: errorUnreadCount } = useUnreadNotificationCount();
 
     // Set menu items based on role
@@ -53,6 +56,11 @@ const Header = () => {
         setIsFocusedSearch(false);
     });
 
+    const handleSearch = (query) => {
+        search(query, "users");
+    };
+
+
     return (
         <header className="header">
             <div className="header__container">
@@ -69,9 +77,37 @@ const Header = () => {
                             <input
                                 type="text"
                                 className="header__search-input"
+                                onChange={(e) => handleSearch(e.target.value)}
                                 placeholder="Tìm kiếm trên Nova"
                             />
                         </form>
+                        {isFocusedSearch && (
+                            <>
+                                <button className="header__search-close" onClick={() => setIsFocusedSearch(false)}>
+                                    <IoArrowBack />
+                                </button>
+                                {isFocusedSearch && (
+                                    <ul className="header__search-suggestions">
+                                        {searchResults.length > 0 && searchResults.map((user) => (
+                                            <li
+                                                key={user.id}
+                                                className="header__search-item"
+                                                onClick={() => navigate(ROUTERS.USER.PROFILE.replace(':id', user.id))}
+                                            >
+                                                <div className="search-item__info">
+                                                    <h3>{user.full_name}</h3>
+                                                    {user.isFriend ? <span className="search-item__is-friend">Bạn bè</span> : null}
+                                                    {user.mutualFriendsCount > 0 ? <span>{user.mutualFriendsCount} bạn chung</span> : null}
+                                                </div>
+                                                <div className="search-item__avatar">
+                                                    <AvatarUser user={user} />
+                                                </div>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
+                            </>
+                        )}
                     </div>
                 </div>
 
@@ -114,10 +150,10 @@ const Header = () => {
                             onClick={() => setActiveUsePanelPopup(activeUsePanelPopup === 'user' ? null : 'user')}
                         >
                             <div className="header__avatar">
-                            {loading ? (
-                                <Loader />
-                            ):(
-                                <AvatarUser user={userInfo} />
+                                {loading ? (
+                                    <Loader />
+                                ) : (
+                                    <AvatarUser user={userInfo} />
                                 )}
                             </div>
                             <span className="header__icon-badge header__avatar-badge">
@@ -136,7 +172,7 @@ const Header = () => {
             </div>
         </header>
     );
-    
+
 };
 
 export default memo(Header);

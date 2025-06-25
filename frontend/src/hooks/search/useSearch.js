@@ -1,76 +1,32 @@
-import { useState, useEffect, useCallback } from 'react';
-import { 
-    searchUsers, 
-    searchPosts, 
-    globalSearch
-} from '../../api/searchApi';
+import { useCallback, useState } from 'react';
+import { searchUsers, searchPosts } from '../../api/searchApi';
 
-export const useSearch = (query, type = 'all', page = 1, limit = 10) => {
+export const useSearch = () => {
     const [results, setResults] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    const [hasMore, setHasMore] = useState(true);
 
-    const performSearch = useCallback(async (searchQuery, searchType, pageNum = 1, isLoadMore = false) => {
-        if (!searchQuery.trim()) {
-            setResults([]);
-            setLoading(false);
-            return;
-        }
+    const token = localStorage.getItem('token');
 
-        const token = localStorage.getItem('token');
-        if (!token) {
-            setError("No token provided");
-            setLoading(false);
-            return;
-        }
-
+    const search = useCallback(async (query, type = "users") => {
+        setLoading(true);
+        setError(null);
         try {
-            if (!isLoadMore) setLoading(true);
-            setError(null);
-            
-            let data;
-            switch (searchType) {
-                case 'users':
-                    data = await searchUsers(token, searchQuery, pageNum, limit);
-                    break;
-                case 'posts':
-                    data = await searchPosts(token, searchQuery, pageNum, limit);
-                    break;
-                case 'all':
-                default:
-                    data = await globalSearch(token, searchQuery, searchType, pageNum, limit);
-                    break;
-            }
-            
-            if (isLoadMore) {
-                setResults(prev => [...prev, ...(data.results || data.users || data.posts || [])]);
+            let data = [];
+            if (type === "users") {
+                data = await searchUsers(token, query);
+            } else if (type === "posts") {
+                data = await searchPosts(token, query);
             } else {
-                setResults(data.results || data.users || data.posts || []);
+                throw new Error("Invalid search type");
             }
-            
-            setHasMore(data.hasMore || false);
+            setResults(data);
         } catch (err) {
             setError(err.message);
         } finally {
             setLoading(false);
         }
-    }, [limit]);
+    }, [token]);
 
-    useEffect(() => {
-        if (query) {
-            performSearch(query, type, page);
-        } else {
-            setResults([]);
-        }
-    }, [performSearch, query, type, page]);
-
-    const loadMore = () => {
-        if (hasMore && !loading && query) {
-            const nextPage = Math.floor(results.length / limit) + 1;
-            performSearch(query, type, nextPage, true);
-        }
-    };
-
-    return { results, loading, error, hasMore, loadMore };
+    return { results, loading, error, search };
 };

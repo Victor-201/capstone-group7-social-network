@@ -98,7 +98,7 @@ export default {
       attributes: ['id', 'full_name', 'avatar']
     });
 
-    return { result: { mutualFriends } };
+    return { result: { mutualFriends }, count: mutualIds.length};
   },
 
   async getFriendsList(user_id) {
@@ -169,6 +169,30 @@ export default {
     return { result: { requests: receivedRequests } };
   },
 
+  async isFriend(user_id, friend_id) {
+    if (!friend_id || user_id === friend_id) {
+      return { error: { code: 400, message: "Invalid user" } };
+    }
+
+    try {
+      const friend = await Friend.findOne({
+      where: {
+        status: 'accepted',
+        [Op.or]: [
+          { user_id, friend_id },
+          { user_id: friend_id, friend_id: user_id }
+        ]
+      }
+    });
+
+    if (!friend) {
+      return { isFriend: false };
+    }
+    return { isFriend: true };
+    } catch (error) {
+      return { error: { code: 500, message: "Server internal error" } };
+    }
+  },
   async getFriendSuggestions(user_id) {
     if (!user_id) {
       return { error: { code: 400, message: "user_id is required" } };

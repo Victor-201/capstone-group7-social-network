@@ -24,7 +24,6 @@ router.use('/public', routerAuth);
 router.use('/admin', verifyAdmin, routerAdmin);
 
 // Search
-router.use('/search', verifyToken, routerSearch);
 
 // Group toàn bộ /user vào 1 verifyToken
 router.use('/user', verifyToken);
@@ -40,6 +39,7 @@ router.use('/user', routerChat);
 router.use('/user', routerMessage);
 router.use('/user', routerNotification);
 router.use('/user', routerLike);
+router.use('/user/search', verifyToken, routerSearch);
 
 
 export default router;

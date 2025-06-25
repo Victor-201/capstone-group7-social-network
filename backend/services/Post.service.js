@@ -2,7 +2,7 @@ import models from '../models/index.js';
 import { uploadMultipleMedia } from '../helpers/multer.helper.js';
 import friendService from './Friend.service.js';
 
-const { Post, PostMedia, Friend, Follow } = models;
+const { Post, PostMedia, Friend, Like, Follow } = models;
 
 export default {
   async createPost(user_id, body, files) {
@@ -57,22 +57,55 @@ export default {
     try {
       const posts = await Post.findAll({
         where: { user_id },
-        include: [{ model: PostMedia, as: 'media', attributes: ['media_url', 'media_type'] }],
+        include: [
+          {
+            model: PostMedia,
+            as: 'media',
+            attributes: ['media_url', 'media_type']
+          }
+        ],
         order: [['created_at', 'DESC']],
       });
-      return { result: posts };
+
+      if (posts.length === 0) {
+        return { result: [] };
+      }
+      const postIds = posts.map(post => post.id);
+
+      const likedRecords = await Like.findAll({
+        where: {
+          user_id,
+          post_id: postIds
+        },
+        attributes: ['post_id']
+      });
+      const likedPostIds = new Set(likedRecords.map(l => l.post_id));
+
+      const result = posts.map(post => {
+        return {
+          ...post.toJSON(),
+          isLiked: likedPostIds.has(post.id)
+        };
+      });
+
+      return { result };
     } catch (error) {
       return { error: { code: 500, message: 'Error fetching posts', detail: error.message } };
     }
   },
-  async getPostDetail(postId) {
+  async getPostDetail(user_id, postId) {
     try {
       const post = await Post.findOne({
         where: { id: postId },
         include: [{ model: PostMedia, as: 'media', attributes: ['media_url', 'media_type'] }],
       });
       if (!post) return { error: { code: 404, message: 'Post not found' } };
-      return { result: post };
+      const likePost = await Like.findOne({ where: { post_id: postId, user_id } });
+      var isLiked = false;
+      if (likePost) {
+        isLiked = true;
+      }
+      return { result: { post, isLiked } };
     } catch (error) {
       return { error: { code: 500, message: 'Error fetching post detail', detail: error.message } };
     }
@@ -161,8 +194,25 @@ export default {
         })
       ]);
 
-      return { result: posts, total, page, limit };
+      const postIds = posts.map(p => p.id);
+      const likedPosts = await Like.findAll({
+        where: { user_id, post_id: postIds },
+        attributes: ['post_id']
+      });
+      const likedPostIds = new Set(likedPosts.map(lp => lp.post_id));
 
+      const postsWithLikes = posts.map(post => {
+        const postData = post.toJSON();
+        postData.isLiked = likedPostIds.has(post.id);
+        return postData;
+      });
+
+      return {
+        result: postsWithLikes,
+        total,
+        page,
+        limit
+      };
     } catch (error) {
       return { error: { code: 500, message: 'Error fetching related posts', detail: error.message } };
     }
