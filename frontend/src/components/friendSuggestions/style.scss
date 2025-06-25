@@ -4,6 +4,8 @@
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   margin-bottom: 20px;
+  position: relative;
+  z-index: 1; /* Đảm bảo không đè lên các element khác */
 
   .suggestions-header {
     display: flex;
@@ -94,6 +96,9 @@
     justify-content: center;
     padding: 40px;
     color: #65676b;
+    position: static; /* Đảm bảo không có position absolute */
+    width: 100%;
+    box-sizing: border-box;
 
     .suggestions-icon {
       font-size: 48px;
@@ -104,6 +109,7 @@
     p {
       font-size: 16px;
       margin: 0;
+      text-align: center;
     }
   }
 }

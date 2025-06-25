@@ -2,42 +2,74 @@
 
 .friends-sidebar {
   width: 100%;
-  border-radius: 8px;
-  background-color: get-theme-color("primary-color");
+  border-radius: 16px;
+  background: linear-gradient(145deg, 
+    get-theme-color("primary-color") 0%, 
+    rgba(get-theme-color("primary-color"), 0.98) 100%);
   overflow: hidden;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-  padding: 8px 0; /* Giảm padding từ 12px xuống 8px */
-
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), 
+              0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(get-theme-color("tertiary-color"), 0.12);
+  backdrop-filter: blur(10px);
+  
   .sidebar-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 6px 12px 12px;
-    margin-bottom: 2px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    padding: 16px 20px;
+    background: linear-gradient(135deg, 
+      rgba(get-theme-color("tertiary-color"), 0.05) 0%, 
+      rgba(get-theme-color("tertiary-color"), 0.02) 100%);
+    border-bottom: 1px solid rgba(get-theme-color("tertiary-color"), 0.1);
 
     h3 {
-      font-size: 1.25rem;
+      font-size: 1.5rem;
       font-weight: 700;
       color: get-theme-color("text-primary");
       margin: 0;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, 
+        get-theme-color("text-primary") 0%, 
+        get-theme-color("tertiary-color") 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
 
     .settings-button {
-      background: get-theme-color("background-color-light");
+      background: rgba(get-theme-color("tertiary-color"), 0.1);
       border: none;
-      width: 32px;
-      height: 32px;
+      width: 36px;
+      height: 36px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      color: get-theme-color("text-primary");
-      transition: background 0.2s ease;
+      color: get-theme-color("tertiary-color");
+      transition: all 0.3s ease;
+      position: relative;
+      
+      &::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+        background: linear-gradient(135deg, 
+          rgba(get-theme-color("tertiary-color"), 0.1),
+          rgba(get-theme-color("tertiary-color"), 0.05));
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
 
       &:hover {
-        background: darken(get-theme-color("background-color-light"), 5%);
+        background: rgba(get-theme-color("tertiary-color"), 0.15);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(get-theme-color("tertiary-color"), 0.2);
+        
+        &::before {
+          opacity: 1;
+        }
       }
     }
   }
@@ -45,40 +77,113 @@
   ul {
     list-style: none;
     margin: 0;
-    padding: 0;
+    padding: 12px 8px;
 
     li {
-      padding: 6px 12px; /* Giảm padding để nén sidebar lại */
+      padding: 14px 18px;
       cursor: pointer;
-      border-radius: 6px;
-      margin: 2px 8px;
+      border-radius: 12px;
+      margin: 4px 0;
       color: get-theme-color("text-primary");
       font-weight: 500;
-      font-size: 0.95rem;
-      transition: background 0.2s ease;
+      font-size: 1.05rem;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       display: flex;
       align-items: center;
+      position: relative;
+      overflow: hidden;
+      
+      &::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 3px;
+        height: 0;
+        background: get-theme-color("tertiary-color");
+        border-radius: 2px;
+        transition: height 0.3s ease;
+      }
 
       .icon {
-        margin-right: 12px;
-        color: get-theme-color("tertiary-color");
+        margin-right: 16px;
+        color: get-theme-color("text-secondary");
         display: flex;
         align-items: center;
-        font-size: 1.2rem;
+        font-size: 1.4rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        padding: 6px;
+        border-radius: 8px;
+        background: linear-gradient(135deg, 
+          rgba(get-theme-color("tertiary-color"), 0.05) 0%, 
+          rgba(get-theme-color("tertiary-color"), 0.02) 100%);
       }
 
       &.active {
-        background-color: rgba(get-theme-color("tertiary-color"), 0.1);
+        background: linear-gradient(135deg, 
+          rgba(get-theme-color("tertiary-color"), 0.18) 0%, 
+          rgba(get-theme-color("tertiary-color"), 0.1) 100%);
         color: get-theme-color("tertiary-color");
         font-weight: 600;
+        transform: translateX(6px);
+        box-shadow: 0 4px 16px rgba(get-theme-color("tertiary-color"), 0.2),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+
+        &::before {
+          height: 24px;
+        }
+
+        &::after {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: linear-gradient(90deg, 
+            rgba(get-theme-color("tertiary-color"), 0.1) 0%, 
+            transparent 50%);
+          pointer-events: none;
+        }
 
         .icon {
           color: get-theme-color("tertiary-color");
+          background: linear-gradient(135deg, 
+            rgba(get-theme-color("tertiary-color"), 0.15) 0%, 
+            rgba(get-theme-color("tertiary-color"), 0.08) 100%);
+          transform: scale(1.1);
+          box-shadow: 0 2px 8px rgba(get-theme-color("tertiary-color"), 0.2);
         }
       }
 
       &:hover:not(.active) {
-        background-color: get-theme-color("background-color-light");
+        background: linear-gradient(135deg, 
+          rgba(get-theme-color("background-color-light"), 1) 0%, 
+          rgba(get-theme-color("background-color-light"), 0.9) 100%);
+        transform: translateX(3px);
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        
+        &::after {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: linear-gradient(90deg, 
+            rgba(get-theme-color("tertiary-color"), 0.05) 0%, 
+            transparent 70%);
+          pointer-events: none;
+        }
+        
+        .icon {
+          color: get-theme-color("tertiary-color");
+          transform: scale(1.05);
+          background: linear-gradient(135deg, 
+            rgba(get-theme-color("tertiary-color"), 0.1) 0%, 
+            rgba(get-theme-color("tertiary-color"), 0.05) 100%);
+        }
       }
     }
   }

@@ -18,96 +18,172 @@
   .friends-wrapper {
     display: flex;
     align-items: flex-start;
-    gap: 6px; /* Giảm khoảng cách giữa sidebar và main content */
-    margin-top: 0.25rem; /* Giảm margin trên đầu */
-    position: relative; /* Đảm bảo có vị trí chính xác */
-    z-index: 1; /* Đảm bảo hiển thị trên các phần tử khác */
+    gap: 12px; /* Tăng từ 6px lên 12px */
+    margin-top: 0.5rem; /* Tăng margin */
+    position: relative;
+    z-index: 1;
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      flex-direction: column;
+      gap: 0;
+    }
 
     .friends-sidebar {
-      width: 320px; /* Giảm độ rộng sidebar xuống */
+      width: 340px; /* Tăng từ 320px lên 340px để có nhiều không gian hơn */
       flex-shrink: 0;
       position: sticky;
-      top: calc(60px + 5px); /* Header height + độ lề nhỏ hơn */
-      max-height: calc(100vh - 60px - 5px); /* 100vh - header height - độ lề */
+      top: calc(60px + 8px); /* Tăng margin top */
+      max-height: calc(100vh - 60px - 8px);
       overflow-y: auto;
+      
+      /* Custom scrollbar */
+      &::-webkit-scrollbar {
+        width: 4px;
+      }
+      
+      &::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      
+      &::-webkit-scrollbar-thumb {
+        background: rgba(get-theme-color("tertiary-color"), 0.2);
+        border-radius: 2px;
+        
+        &:hover {
+          background: rgba(get-theme-color("tertiary-color"), 0.3);
+        }
+      }
+      
+      /* Responsive */
+      @media (max-width: 768px) {
+        width: 100%;
+        position: static;
+        margin-bottom: 1rem;
+      }
     }
 
     .friends-main {
       flex: 1;
-      background-color: get-theme-color("primary-color");
-      border-radius: 8px;
-      padding: 0.5rem;
+      background: linear-gradient(145deg, 
+        get-theme-color("primary-color") 0%, 
+        rgba(get-theme-color("primary-color"), 0.98) 100%);
+      border-radius: 16px;
+      padding: 1rem;
       min-height: 400px;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), 
+                  0 2px 8px rgba(0, 0, 0, 0.08);
+      border: 1px solid rgba(get-theme-color("tertiary-color"), 0.08);
+      backdrop-filter: blur(10px);
+      
+      .content {
+        width: 100%;
+        max-width: 100%;
+        overflow: hidden; /* Ngăn content tràn ra ngoài */
+      }
     }
   }
 
   .page-title {
     color: get-theme-color("text-primary");
-    font-size: 1.4rem;
-    margin-bottom: 0.25rem;
+    font-size: 1.6rem;
+    margin-bottom: 0.5rem;
     font-weight: 700;
+    background: linear-gradient(135deg, 
+      get-theme-color("text-primary") 0%, 
+      get-theme-color("tertiary-color") 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: -0.02em;
   }
 
   .search-friends {
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem; /* Tăng margin */
     position: relative;
     
     .search-input {
       width: 100%;
-      max-width: 300px;
-      padding: 6px 36px 6px 36px;
-      border-radius: 20px;
-      border: none;
-      background-color: get-theme-color("background-color-light");
+      max-width: 380px; /* Tăng từ 350px lên 380px */
+      padding: 12px 45px 12px 45px; /* Tăng padding */
+      border-radius: 30px; /* Tăng border-radius */
+      border: 1px solid rgba(get-theme-color("tertiary-color"), 0.15);
+      background: linear-gradient(145deg, 
+        get-theme-color("background-color-light") 0%, 
+        rgba(get-theme-color("background-color-light"), 0.9) 100%);
       color: get-theme-color("text-primary");
-      font-size: 0.875rem;
-      transition: all 0.2s ease;
+      font-size: 1rem; /* Tăng từ 0.95rem lên 1rem */
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08),
+                  inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
 
       &::placeholder {
         color: get-theme-color("text-secondary");
+        font-weight: 400;
       }
 
       &:focus {
         outline: none;
-        background-color: darken(get-theme-color("background-color-light"), 5%);
+        background: linear-gradient(145deg, 
+          get-theme-color("primary-color") 0%, 
+          rgba(get-theme-color("primary-color"), 0.95) 100%);
+        border-color: get-theme-color("tertiary-color");
+        box-shadow: 0 0 0 4px rgba(get-theme-color("tertiary-color"), 0.15),
+                    0 8px 25px rgba(0, 0, 0, 0.12);
+        transform: translateY(-2px);
       }
     }
     
     .search-icon {
       position: absolute;
-      left: 12px;
+      left: 16px; /* Tăng từ 14px */
       top: 50%;
       transform: translateY(-50%);
       color: get-theme-color("text-secondary");
-      font-size: 0.9rem;
+      font-size: 1.1rem; /* Tăng từ 1rem */
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    &:focus-within .search-icon {
+      color: get-theme-color("tertiary-color");
     }
   }
 
   .message {
-    padding: 6px 10px;
-    border-radius: 8px;
-    margin-bottom: 0.5rem;
-    font-size: 0.85rem;
+    padding: 16px 20px; /* Tăng padding */
+    border-radius: 14px; /* Tăng border-radius */
+    margin-bottom: 1.5rem; /* Tăng margin */
+    font-size: 1rem; /* Tăng từ 0.95rem lên 1rem */
     display: flex;
     align-items: center;
+    font-weight: 500;
+    backdrop-filter: blur(10px);
     
     &.success-message {
-      background-color: rgba(get-theme-color("secondary-color"), 0.2);
+      background: linear-gradient(135deg, 
+        rgba(get-theme-color("secondary-color"), 0.18) 0%, 
+        rgba(get-theme-color("secondary-color"), 0.1) 100%);
       color: get-theme-color("tertiary-color");
-      border: none;
+      border: 1px solid rgba(get-theme-color("tertiary-color"), 0.25);
+      box-shadow: 0 4px 16px rgba(get-theme-color("tertiary-color"), 0.15),
+                  inset 0 1px 0 rgba(255, 255, 255, 0.1);
     }
     
     &.error-message {
-      background-color: rgba(get-theme-color("red-color"), 0.1);
+      background: linear-gradient(135deg, 
+        rgba(get-theme-color("red-color"), 0.12) 0%, 
+        rgba(get-theme-color("red-color"), 0.06) 100%);
       color: get-theme-color("red-color");
-      border: none;
+      border: 1px solid rgba(get-theme-color("red-color"), 0.25);
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: 1rem; /* Tăng gap */
+      box-shadow: 0 4px 16px rgba(get-theme-color("red-color"), 0.15),
+                  inset 0 1px 0 rgba(255, 255, 255, 0.1);
       
       .error-icon {
-        font-size: 1rem;
+        font-size: 1.2rem; /* Tăng từ 1.1rem */
       }
     }
   }
@@ -158,33 +234,49 @@
   .content {
     h2 {
       color: get-theme-color("text-primary");
-      font-size: 1.25rem;
-      margin-bottom: 0.5rem;
-      font-weight: 600;
+      font-size: 1.6rem; /* Tăng từ 1.4rem lên 1.6rem */
+      font-weight: 700;
+      margin: 0 0 1.5rem 0; /* Tăng margin bottom */
       display: flex;
       justify-content: space-between;
       align-items: center;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, 
+        get-theme-color("text-primary") 0%, 
+        get-theme-color("tertiary-color") 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
       
       .section-actions {
         display: flex;
-        gap: 6px;
+        gap: 0.5rem;
         
         .action-btn {
-          background-color: get-theme-color("background-color-light");
-          border: none;
-          width: 32px;
-          height: 32px;
+          background: linear-gradient(135deg, 
+            get-theme-color("background-color-light") 0%, 
+            rgba(get-theme-color("background-color-light"), 0.9) 100%);
+          border: 1px solid rgba(get-theme-color("tertiary-color"), 0.1);
           border-radius: 50%;
+          width: 40px; /* Tăng từ 36px lên 40px */
+          height: 40px;
           display: flex;
           align-items: center;
           justify-content: center;
           cursor: pointer;
-          color: get-theme-color("text-primary");
-          font-size: 0.9rem;
-          transition: background 0.2s ease;
+          color: get-theme-color("text-secondary");
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          font-size: 1.1rem; /* Tăng kích thước icon */
+          backdrop-filter: blur(10px);
           
           &:hover {
-            background-color: darken(get-theme-color("background-color-light"), 5%);
+            background: linear-gradient(135deg, 
+              darken(get-theme-color("background-color-light"), 5%) 0%, 
+              darken(get-theme-color("background-color-light"), 10%) 100%);
+            color: get-theme-color("tertiary-color");
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+            border-color: rgba(get-theme-color("tertiary-color"), 0.2);
           }
         }
       }
@@ -192,28 +284,28 @@
 
     .cards-grid {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 16px; /* Tăng khoảng cách giữa các card */
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
       padding: 8px 0;
       
-      @media (min-width: 500px) {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 18px; /* Tăng khoảng cách cho màn hình lớn hơn */
-      }
-
-      @media (min-width: 768px) {
-        grid-template-columns: repeat(3, 1fr);
-        gap: 20px; /* Tăng khoảng cách cho màn hình trung bình */
-      }
-
-      @media (min-width: 992px) {
-        grid-template-columns: repeat(4, 1fr);
-        gap: 16px; /* Tăng khoảng cách cho màn hình lớn */
-      }
-
       @media (min-width: 1200px) {
-        grid-template-columns: repeat(5, 1fr);
-        gap: 8px;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+      }
+      
+      @media (min-width: 992px) and (max-width: 1199px) {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+      }
+      
+      @media (min-width: 768px) and (max-width: 991px) {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+      }
+
+      @media (max-width: 767px) {
+        grid-template-columns: 1fr;
+        gap: 10px;
       }
     }
 
@@ -240,15 +332,21 @@
 
   .empty-state {
     text-align: center;
-    padding: 1.5rem 1rem;
+    padding: 3rem 2rem; /* Tăng padding */
     color: get-theme-color("text-secondary");
-    background-color: get-theme-color("primary-color");
-    border-radius: 8px;
-    border: none;
+    background: linear-gradient(145deg, 
+      get-theme-color("primary-color") 0%, 
+      rgba(get-theme-color("primary-color"), 0.95) 100%);
+    border-radius: 16px; /* Tăng border-radius */
+    border: 1px solid rgba(get-theme-color("tertiary-color"), 0.1);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
     
     p {
-      font-size: 0.875rem;
+      font-size: 1.1rem; /* Tăng từ 1rem lên 1.1rem */
       margin-bottom: 1rem;
+      line-height: 1.6;
+      font-weight: 400;
     }
   }
 
@@ -257,18 +355,130 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 1.5rem 1rem;
+    padding: 3rem 2rem; /* Tăng padding */
     color: get-theme-color("text-secondary");
+    background: linear-gradient(145deg, 
+      get-theme-color("primary-color") 0%, 
+      rgba(get-theme-color("primary-color"), 0.95) 100%);
+    border-radius: 16px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
 
     .spinner {
       animation: spin 1s linear infinite;
-      font-size: 1.5rem;
-      margin-bottom: 0.5rem;
+      font-size: 2rem; /* Tăng từ 1.8rem lên 2rem */
+      margin-bottom: 1rem; /* Tăng margin */
       color: get-theme-color("tertiary-color");
+      filter: drop-shadow(0 2px 4px rgba(get-theme-color("tertiary-color"), 0.3));
     }
 
     p {
-      font-size: 0.875rem;
+      font-size: 1.1rem; /* Tăng từ 1rem lên 1.1rem */
+      line-height: 1.6;
+      font-weight: 400;
+    }
+  }
+
+  // Suggestions section styling
+  .suggestions-section {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    
+    .friend-suggestions {
+      margin: 0;
+      background: transparent;
+      box-shadow: none;
+      padding: 1rem 0;
+      
+      &.empty {
+        background: linear-gradient(145deg, 
+          get-theme-color("primary-color") 0%, 
+          rgba(get-theme-color("primary-color"), 0.95) 100%);
+        border-radius: 16px; /* Tăng border-radius */
+        margin: 1rem 0;
+        padding: 3rem; /* Tăng padding */
+        border: 1px solid rgba(get-theme-color("tertiary-color"), 0.1);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+        
+        .suggestions-icon {
+          color: get-theme-color("text-secondary");
+          font-size: 4rem; /* Tăng từ 3.5rem lên 4rem */
+          margin-bottom: 1.5rem; /* Tăng margin */
+          filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+        }
+        
+        p {
+          color: get-theme-color("text-secondary");
+          font-size: 1.2rem; /* Tăng từ 1.1rem lên 1.2rem */
+          margin: 0;
+          line-height: 1.6;
+          font-weight: 400;
+        }
+      }
+      
+      &.loading {
+        background: linear-gradient(145deg, 
+          get-theme-color("primary-color") 0%, 
+          rgba(get-theme-color("primary-color"), 0.95) 100%);
+        border-radius: 16px; /* Tăng border-radius */
+        margin: 1rem 0;
+        padding: 3rem; /* Tăng padding */
+        backdrop-filter: blur(10px);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+        
+        .suggestions-icon.spinner {
+          color: get-theme-color("tertiary-color");
+          font-size: 2.2rem; /* Tăng kích thước spinner */
+          filter: drop-shadow(0 2px 4px rgba(get-theme-color("tertiary-color"), 0.3));
+        }
+        
+        p {
+          color: get-theme-color("text-secondary");
+          font-size: 1.1rem; /* Tăng kích thước chữ */
+          line-height: 1.6;
+          font-weight: 400;
+        }
+      }
+      
+      &.error {
+        background: linear-gradient(145deg, 
+          get-theme-color("primary-color") 0%, 
+          rgba(get-theme-color("primary-color"), 0.95) 100%);
+        border-radius: 16px; /* Tăng border-radius */
+        margin: 1rem 0;
+        padding: 3rem; /* Tăng padding */
+        backdrop-filter: blur(10px);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+        
+        p {
+          color: get-theme-color("red-color");
+          font-size: 1.1rem; /* Tăng kích thước chữ */
+          line-height: 1.6;
+          font-weight: 400;
+        }
+        
+        button {
+          background: linear-gradient(135deg, 
+            get-theme-color("tertiary-color") 0%, 
+            darken(get-theme-color("tertiary-color"), 10%) 100%);
+          color: get-theme-color("text-quaternary");
+          padding: 12px 24px; /* Tăng padding cho button */
+          font-size: 1rem; /* Tăng kích thước chữ button */
+          border-radius: 10px;
+          margin-top: 1.2rem;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          border: none;
+          font-weight: 500;
+          box-shadow: 0 4px 12px rgba(get-theme-color("tertiary-color"), 0.3);
+          
+          &:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 6px 20px rgba(get-theme-color("tertiary-color"), 0.4);
+          }
+        }
+      }
     }
   }
 }

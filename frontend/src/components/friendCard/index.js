@@ -1,5 +1,5 @@
-import React from 'react';
-import { FaSpinner, FaEllipsisH, FaUserMinus, FaUserPlus } from 'react-icons/fa';
+import React, { useState, useEffect, useRef } from 'react';
+import { FaSpinner, FaEllipsisH, FaUserMinus, FaUserPlus, FaEyeSlash, FaFlag, FaBan } from 'react-icons/fa';
 import AvatarUser from '../avatarUser';
 import "./style.scss";
 
@@ -33,9 +33,28 @@ const FriendCard = ({
   onReject,
   onRemove,
   onAdd,
+  onUnfollow,
+  onBlock,
+  onReport,
   loading = {},
   mutualFriendsCount = 0,
 }) => {
+  const [showDropdown, setShowDropdown] = useState(false);
+  const dropdownRef = useRef(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
   // Safety check for user object
   if (!user) {
     console.warn('FriendCard: user prop is null or undefined');
@@ -69,7 +88,7 @@ const FriendCard = ({
       case 'suggestion':
       case 'not-friend':
         return (
-          <div className="action-buttons">
+          <div className="action-buttons suggestion-actions">
             <button 
               className="action-button add-button"
               onClick={onAdd}
@@ -78,9 +97,48 @@ const FriendCard = ({
               {loading.add ? <FriendCardIcon icon={FaSpinner} className="spinner" /> : <FriendCardIcon icon={FaUserPlus} />}
               Thêm bạn bè
             </button>
-            <button className="action-button more-button">
-              <FriendCardIcon icon={FaEllipsisH} />
-            </button>
+            <div className="more-options" ref={dropdownRef}>
+              <button 
+                className="action-button more-button"
+                onClick={() => setShowDropdown(!showDropdown)}
+              >
+                <FriendCardIcon icon={FaEllipsisH} />
+              </button>
+              {showDropdown && (
+                <div className="dropdown-menu">
+                  <button 
+                    className="dropdown-item"
+                    onClick={() => {
+                      onUnfollow?.();
+                      setShowDropdown(false);
+                    }}
+                  >
+                    <FriendCardIcon icon={FaEyeSlash} />
+                    Huỷ theo dõi
+                  </button>
+                  <button 
+                    className="dropdown-item"
+                    onClick={() => {
+                      onBlock?.();
+                      setShowDropdown(false);
+                    }}
+                  >
+                    <FriendCardIcon icon={FaBan} />
+                    Chặn
+                  </button>
+                  <button 
+                    className="dropdown-item"
+                    onClick={() => {
+                      onReport?.();
+                      setShowDropdown(false);
+                    }}
+                  >
+                    <FriendCardIcon icon={FaFlag} />
+                    Báo cáo
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         );
 
@@ -94,20 +152,59 @@ const FriendCard = ({
               disabled={loading.remove}
             >
               {loading.remove ? <FriendCardIcon icon={FaSpinner} className="spinner" /> : <FriendCardIcon icon={FaUserMinus} />}
-              Gỡ
+              Huỷ kết bạn
             </button>
-            <button className="action-button more-button">
-              <FriendCardIcon icon={FaEllipsisH} />
-            </button>
+            <div className="more-options">
+              <button 
+                className="action-button more-button"
+                onClick={() => setShowDropdown(!showDropdown)}
+              >
+                <FriendCardIcon icon={FaEllipsisH} />
+              </button>
+              {showDropdown && (
+                <div className="dropdown-menu">
+                  <button 
+                    className="dropdown-item"
+                    onClick={() => {
+                      onUnfollow?.();
+                      setShowDropdown(false);
+                    }}
+                  >
+                    <FriendCardIcon icon={FaEyeSlash} />
+                    Huỷ theo dõi
+                  </button>
+                  <button 
+                    className="dropdown-item"
+                    onClick={() => {
+                      onBlock?.();
+                      setShowDropdown(false);
+                    }}
+                  >
+                    <FriendCardIcon icon={FaBan} />
+                    Chặn
+                  </button>
+                  <button 
+                    className="dropdown-item"
+                    onClick={() => {
+                      onReport?.();
+                      setShowDropdown(false);
+                    }}
+                  >
+                    <FriendCardIcon icon={FaFlag} />
+                    Báo cáo
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         );
     }
   };
 
   return (
-    <div className="friend-card horizontal">
+    <div className="friend-card facebook-style">
       <div className="friend-avatar">
-        <AvatarUser user={user} size="medium" />
+        <AvatarUser user={user} size="large" />
       </div>
       
       <div className="friend-info">
@@ -118,13 +215,21 @@ const FriendCard = ({
           )}
         </div>
         
+        
         <div className="mutual-info">
           {mutualFriendsCount > 0 ? (
-            <span className="mutual-count">
-              {mutualFriendsCount} bạn chung
-            </span>
+            <div className="mutual-friends-display">
+              <div className="mutual-avatars">
+                {/* Placeholder for mutual friends avatars - có thể bổ sung sau */}
+                <div className="avatar-placeholder"></div>
+                <div className="avatar-placeholder"></div>
+              </div>
+              <span className="mutual-count">
+                {mutualFriendsCount} bạn chung
+              </span>
+            </div>
           ) : (
-            <span className="mutual-count">
+            <span className="mutual-count no-mutual">
               Chưa có bạn chung
             </span>
           )}
