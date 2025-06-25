@@ -48,7 +48,7 @@ export const socketVerifyToken = (socket, next) => {
             return next(new Error('Invalid token'));
         }
         socket.user = data;
-        console.log(`✅ Token verified for user: ${data.id}`);
+        console.log(`Token verified for user: ${data.id}`);
         next();
     });
 }

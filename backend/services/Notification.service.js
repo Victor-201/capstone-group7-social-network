@@ -89,6 +89,10 @@ export default {
             return { error: { code: 400, message: "Missing required fields" } };
         }
 
+        if(receiver_id === user_id && action_type !== "system") {
+            return { error: { code: 400, message: "You can't send system notification to yourself" } };
+        }
+
         try {
             const isExist = await Notification.findOne({
                 where: {
@@ -101,7 +105,6 @@ export default {
             if (isExist) {
                 return {error: {code: 400, message: "This notification is exist"}};
             }
-
             const notification = await Notification.create({
                 sender_id: user_id,
                 receiver_id,

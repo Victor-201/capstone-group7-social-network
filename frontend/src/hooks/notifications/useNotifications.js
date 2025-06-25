@@ -1,43 +1,61 @@
-import { useState, useEffect, useCallback } from 'react';
-import { getNotifications } from '../../api/notificationApi';
+// useNotifications.js
+import { useEffect, useState } from "react";
+import useSocket from "../../socket";
+import { getNotifications, getUnreadCount } from "../../api/notificationApi";
+import { useAuth } from "../../contexts/AuthContext";
 
-export const useNotifications = (filter = 'all') => {
-    const [notifications, setNotifications] = useState([]);
-    const [filteredNotis, setFilteredNotis] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+export const useNotifications = () => {
+  const { auth } = useAuth();
+  const socket = useSocket();
 
-    const fetchData = useCallback(async () => {
-        setLoading(true);
-        setError(null);
+  const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
 
-        const token = localStorage.getItem('token');
-        if (!token) {
-            setError('No token provided');
-            setLoading(false);
-            return;
-        }
+  useEffect(() => {
+    if (!auth.token) return;
 
-        try {
-            const data = await getNotifications(token);
-            setNotifications(data);
+    // Gán token trước khi kết nối
+    socket.auth = { token: auth.token };
+    socket.connect();
 
-            const filtered =
-                filter === 'unread'
-                    ? data.filter(n => !n.is_read)
-                    : data;
-            setFilteredNotis(filtered);
-        } catch (err) {
-            console.error('Error fetching notifications:', err);
-            setError(err.message || 'Something went wrong');
-        } finally {
-            setLoading(false);
-        }
-    }, [filter]);
+    socket.emit("joinNotification");
 
-    useEffect(() => {
-        fetchData();
-    }, [fetchData]);
+    loadNotifications();
+    loadUnreadCount();
 
-    return { notifications: filteredNotis, loading, error };
+    socket.on("newNotification", (data) => {
+      setNotifications((prev) => [data, ...prev]);
+      setUnreadCount((prev) => prev + 1);
+    });
+
+    socket.on("connect_error", (err) => {
+      console.error("Socket connect error:", err.message);
+    });
+
+    return () => {
+      socket.off("newNotification");
+      socket.disconnect();
+    };
+  }, [auth.token]);
+
+  const loadNotifications = async () => {
+    const data = await getNotifications(auth.token);
+    setNotifications(data);
+  };
+
+  const loadUnreadCount = async () => {
+    const data = await getUnreadCount(auth.token);
+    setUnreadCount(data);
+  };
+
+  return {
+    notifications,
+    unreadCount,
+    setNotifications,
+    setUnreadCount,
+    reload: () => {
+      loadNotifications();
+      loadUnreadCount();
+    },
+  };
 };

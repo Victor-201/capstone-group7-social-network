@@ -1,45 +1,38 @@
 import express from 'express';
-import router from './routes/app.routes.js';
-import sequelize from './configs/database.config.js';
 import http from 'http';
 import cors from 'cors';
 import { Server } from 'socket.io';
-import {
-  messageHandler,
-  notificationHandler
-} from './socket.js';
-import { PORT } from "./configs/env.config.js";
+
+import router from './routes/app.routes.js';
+import sequelize from './configs/database.config.js';
+import { PORT } from './configs/env.config.js';
+import { messageHandler, notificationHandler } from './socket.js';
 import { socketVerifyToken } from './middleware/authorization.middleware.js';
 
-
-
 const app = express();
+const server = http.createServer(app);
+
+app.use(cors({
+  origin: 'http://localhost:3000',  
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true,
+}));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-
-const server = http.createServer(app);
-
-
 const io = new Server(server, {
   cors: {
-    origin: 'http://localhost:3000/',
+    origin: 'http://localhost:3000',
     methods: ['GET', 'POST'],
-  },
+    credentials: true,
+  }
 });
-
 
 app.use((req, res, next) => {
   req.io = io;
   next();
 });
-
-app.use(cors({
-  origin: 'http://localhost:3000',
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  credentials: true,
-}));
 
 app.use('/api', router);
 
@@ -65,9 +58,8 @@ io.on('connection', (socket) => {
   }
 })();
 
-// Lắng nghe port
 server.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  console.log(`Server is running on http://localhost:${PORT}`);
 });
 
 export { server, app };

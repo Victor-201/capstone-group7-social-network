@@ -1,8 +1,7 @@
-import { useState } from "react";
+import useTimeAgo from "../../hooks/useTimeAgo";
 import {
   AiFillLike,
   AiOutlineLike,
-  AiFillHeart
 } from "react-icons/ai";
 import {
   BiComment,
@@ -40,13 +39,18 @@ const MediaItem = ({ mediaUrl, mediaType }) => {
 };
 
 const Post = ({ post, userInfo }) => {
-  const [isLiked, setIsLiked] = useState(post.is_liked || false);
   const { toggleLike, loading, error } = usePostLikes();
 
   const handleLike = async () => {
     try {
-      await toggleLike(post.id, !isLiked);
-      setIsLiked(!isLiked);
+      await toggleLike(post.id, !post.isLiked);
+      if (post.isLiked === false) {
+        post.like_count++;
+      }
+      else {
+        post.like_count--;
+      }
+      post.isLiked = !post.isLiked;
     } catch (err) {
       console.error("Lỗi like:", err);
     }
@@ -66,7 +70,7 @@ const Post = ({ post, userInfo }) => {
                 {userInfo?.full_name || "Người dùng"}
               </h4>
               <div className="post__meta">
-                <span className="post__time">{post.time}</span>
+                <span className="post__time">{useTimeAgo(post.created_at)}</span>
                 <span className="post__privacy">
                   <FaGlobe />
                 </span>
@@ -98,12 +102,16 @@ const Post = ({ post, userInfo }) => {
 
         {/* Stats */}
         <div className="post__stats">
+
           <div className="post__reactions">
+            {post.like_count !== 0 && (
+              <>
             <div className="post__reaction-icons">
               <AiFillLike className="reaction-icon reaction-icon--like" />
-              <AiFillHeart className="reaction-icon reaction-icon--love" />
             </div>
-            <span>{post.countLike}</span>
+            <span>{post.like_count}</span>
+              </>
+            )}
           </div>
           <div className="post__comments-shares">
             <span>{post.comments} bình luận</span>
@@ -114,11 +122,11 @@ const Post = ({ post, userInfo }) => {
         {/* Buttons */}
         <div className="post__buttons">
           <button
-            className={`post__button ${isLiked ? "post__button--active" : ""}`}
+            className={`post__button ${post.isLiked ? "post__button--active" : ""}`}
             onClick={handleLike}
             disabled={loading}
           >
-            {isLiked ? <AiFillLike /> : <AiOutlineLike />} Thích
+            {post.isLiked ? <AiFillLike /> : <AiOutlineLike />} Thích
           </button>
           <button className="post__button">
             <BiComment />

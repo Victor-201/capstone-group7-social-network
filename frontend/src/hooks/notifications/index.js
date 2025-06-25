@@ -3,4 +3,3 @@ export { useMarkAsRead } from './useMarkAsRead';
 export { useMarkAllAsRead } from './useMarkAllAsRead';
 export { useMarkAsUnRead } from './useMarkAsUnread';
 export { useDeleteReadNotifications } from './useDeleteReadNotifications';
-export { useUnreadNotificationCount } from './useUnreadNotificationCount';

@@ -9,28 +9,32 @@ import { FaSearch, FaCaretUp, FaCaretDown } from 'react-icons/fa';
 import './style.scss';
 import UserPanelPopup from './modals/UserPanelPopup';
 import AvatarUser from '../../components/avatarUser';
-import { useUnreadNotificationCount } from '../../hooks/notifications';
 import Logo from '../../assets/images/logo/logo.png';
 import useClickOutside from '../../hooks/useClickOutside';
 import { useUserInfo } from '../../hooks/user';
 import { useSearch } from '../../hooks/search';
 import Loader from '../../components/loader';
 import { useAuth } from '../../contexts/AuthContext';
+import { useNotifications } from '../../hooks/notifications';
 
 
 const Header = () => {
-    const {auth} = useAuth();
+    const { auth } = useAuth();
     const [activeUsePanelPopup, setActiveUsePanelPopup] = useState(null);
     const [isFocusedSearch, setIsFocusedSearch] = useState(false);
     const popupUserPanelRef = useRef(null);
     const navigate = useNavigate();
     const searchRef = useRef(null);
-    const userData = JSON.parse(localStorage.getItem("user"));
     const [menus, setMenus] = useState([]);
     const { userInfo, loading, error } = useUserInfo();
     const { loading: loadingSearch, error: errorSearch, results: searchResults, search } = useSearch();
-    const { count: unreadCount, loading: loadingUnreadCount, error: errorUnreadCount } = useUnreadNotificationCount();
-
+    const {
+        notifications,
+        unreadCount,
+        setNotifications,
+        setUnreadCount,
+        reload,
+    } = useNotifications();
     // Set menu items based on role
     useEffect(() => {
         const baseMenus = [
@@ -47,6 +51,9 @@ const Header = () => {
         setMenus(baseMenus);
     }, [auth.role]);
 
+    useEffect(() => {
+        setUnreadCount(0);
+    }, []);
     // Handle clicks outside to close popups
     useClickOutside(popupUserPanelRef, () => {
         setActiveUsePanelPopup(null);
@@ -144,7 +151,7 @@ const Header = () => {
                         </div>
                         <div className="header__icon" onClick={() => setActiveUsePanelPopup('noti')}>
                             <IoNotifications />
-                            {unreadCount > 0 && <span className="header__icon-badge">{unreadCount}</span>}
+                            {unreadCount > 0 && <span className="header__icon-badge">{unreadCount > 99 ? '99+' : unreadCount}</span>}
                         </div>
                         <div
                             className="header__icon"
