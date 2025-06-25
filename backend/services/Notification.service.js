@@ -88,8 +88,20 @@ export default {
         if (!user_id || !receiver_id || !action_id || !action_type || !content) {
             return { error: { code: 400, message: "Missing required fields" } };
         }
-        
+
         try {
+            const isExist = await Notification.findOne({
+                where: {
+                    sender_id: user_id,
+                    receiver_id,
+                    action_type,
+                    action_id,
+                },
+            });
+            if (isExist) {
+                return {error: {code: 400, message: "This notification is exist"}};
+            }
+
             const notification = await Notification.create({
                 sender_id: user_id,
                 receiver_id,
@@ -97,11 +109,12 @@ export default {
                 action_id,
                 content,
             });
-
             return { result: notification };
         } catch (err) {
             console.error("Error creating notification:", err);
-            return { error: { code: 500, message: "Internal server error" } };
+            return {
+                error: { code: 500, message: "Internal server error" },
+            };
         }
     },
     async unRead(id) {
@@ -119,14 +132,14 @@ export default {
             return { error: { code: 500, message: "Server error", detail: err.message } };
         }
     },
-    async countUnreadNotifications (receiver_id) {
-        if(!receiver_id){
-            return {error: {code: 400, message: "receiver_id is required"}};
+    async countUnreadNotifications(receiver_id) {
+        if (!receiver_id) {
+            return { error: { code: 400, message: "receiver_id is required" } };
         }
-        try{
-            const unreadCount = await Notification.count({where: {receiver_id, is_read: false}});
-            return {result: unreadCount};
-        }catch (error){
+        try {
+            const unreadCount = await Notification.count({ where: { receiver_id, is_read: false } });
+            return { result: unreadCount };
+        } catch (error) {
             return { error: { code: 500, message: "Server error", detail: error.message } };
         }
     }
