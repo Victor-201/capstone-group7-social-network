@@ -17,12 +17,12 @@ export const uploadMedia = (file) => {
     throw new Error('Invalid file object');
   }
 
-  const public_id = file.filename.split('/')[1];
   return {
     url: file.path,
-    public_id
+    public_id: file.filename
   };
 };
+
 
 export const uploadMultipleMedia = (files) => {
   if (!Array.isArray(files)) return [];

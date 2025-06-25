@@ -2,7 +2,7 @@ import models from '../models/index.js';
 import { uploadMultipleMedia } from '../helpers/multer.helper.js';
 import friendService from './Friend.service.js';
 
-const { Post, PostMedia, Friend, Follow } = models;
+const { Post, PostMedia, Friend, Like, Follow } = models;
 
 export default {
   async createPost(user_id, body, files) {
