@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { FaSpinner, FaExclamationTriangle, FaSearch, FaFilter, FaEllipsisH } from 'react-icons/fa';
 import FriendCard from '../../../components/friendCard';
+import UserCard from '../../../components/userCard';
+import FriendSuggestions from '../../../components/friendSuggestions';
 import Sidebar from './modals/Sidebar/index';
 import { useFriends } from '../../../hooks/friends/useFriends';
 import { useFriendRequests } from '../../../hooks/friends/useFriendRequests';
@@ -57,7 +59,7 @@ const FriendsPage = () => {
 
   // Fetch tất cả dữ liệu
   const fetchAllData = useCallback(async () => {
-    const results = await Promise.all([
+    await Promise.all([
       refetchFriends(),
       refetchRequests(),
       refetchFollow()
@@ -295,21 +297,24 @@ const FriendsPage = () => {
                                 key={uniqueKey}
                                 user={friend}
                                 type={isSuggestion ? "suggestion" : "friend"}
-                                isFollowing={!isSuggestion ? isUserFollowed(friend.id) : undefined}
-                                onRemove={!isSuggestion ? () => handleRemoveFriend(friendId) : undefined}
+                                onRemove={isSuggestion ? undefined : () => handleRemoveFriend(friendId)}
                                 onAdd={isSuggestion ? () => handleSendRequest(friendId) : undefined}
-                                onFollow={!isSuggestion ? () => handleFollowToggle(friendId, false) : undefined}
-                                onUnfollow={!isSuggestion ? () => handleFollowToggle(friendId, true) : undefined}
                                 loading={{
-                                  remove: !isSuggestion ? localActionLoading[`remove_${friendId}`] : false,
-                                  add: isSuggestion ? localActionLoading[`add_${friendId}`] : false,
-                                  follow: !isSuggestion ? localActionLoading[`follow_${friendId}`] : false
+                                  remove: localActionLoading[`remove_${friendId}`],
+                                  add: localActionLoading[`add_${friendId}`]
                                 }}
+                                mutualFriendsCount={friend.mutualFriendsCount || 0}
                               />
                             );
                           })}
                         </div>
                       )}
+                    </div>
+                  )}
+
+                  {activeTab === 'suggestions' && (
+                    <div className="suggestions-section">
+                      <FriendSuggestions />
                     </div>
                   )}
 
@@ -328,7 +333,7 @@ const FriendsPage = () => {
                           <p>Không có lời mời kết bạn nào.</p>
                         </div>
                       ) : (
-                        <div className="cards-grid">
+                        <div className="requests-cards-grid">
                           {(receivedRequests || []).map((request, index) => {
                             // Safe access to request data with multiple fallbacks
                             const requester = request?.Requester || request?.requester;
@@ -340,19 +345,22 @@ const FriendsPage = () => {
                             }
                             
                             return (
-                              <FriendCard
+                              <UserCard
                                 key={`request-${requester.id}-${index}`}
                                 user={{
                                   ...requester,
                                   createdAt: request.created_at || request.createdAt
                                 }}
-                                type="request"
-                                onAccept={() => handleRequestResponse(requester.id, 'accept')}
-                                onReject={() => handleRequestResponse(requester.id, 'reject')}
+                                onPrimaryAction={() => handleRequestResponse(requester.id, 'accept')}
+                                onSecondaryAction={() => handleRequestResponse(requester.id, 'reject')}
                                 loading={{
-                                  accept: localActionLoading[`accept_${requester.id}`] || false,
-                                  reject: localActionLoading[`reject_${requester.id}`] || false
+                                  primary: localActionLoading[`accept_${requester.id}`] || false,
+                                  secondary: localActionLoading[`reject_${requester.id}`] || false
                                 }}
+                                mutualFriendsCount={requester.mutualFriendsCount || 0}
+                                primaryButtonText="Xác nhận"
+                                secondaryButtonText="Xóa"
+                                type="request"
                               />
                             );
                           }).filter(Boolean)}

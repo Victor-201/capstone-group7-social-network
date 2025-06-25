@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaSpinner, FaEllipsisH } from 'react-icons/fa';
+import { FaSpinner, FaEllipsisH, FaUserMinus, FaUserPlus } from 'react-icons/fa';
 import AvatarUser from '../avatarUser';
 import "./style.scss";
 
@@ -9,23 +9,38 @@ const FriendCardIcon = ({ icon: Icon, className }) => {
   return <Icon className={themeClass} />;
 };
 
+// Helper function to get display name
+const getDisplayName = (user) => {
+  return user.fullName || user.full_name || user.user_name || user.userName || user.name || 'Người dùng';
+};
+
+// Helper function to get username
+const getUserName = (user) => {
+  const displayName = getDisplayName(user);
+  const username = user.user_name || user.userName;
+  
+  // Only show username if it's different from display name
+  if (username && username !== displayName && !displayName.toLowerCase().includes(username.toLowerCase())) {
+    return username;
+  }
+  return null;
+};
+
 const FriendCard = ({ 
   user, 
-  type = 'friend', // friend, request, suggestion, follower, following
-  isFollowing,
+  type = 'friend', // friend, request, suggestion, not-friend
   onAccept,
   onReject,
-  onAdd,
   onRemove,
-  onFollow,
-  onUnfollow,
+  onAdd,
   loading = {},
+  mutualFriendsCount = 0,
 }) => {
   const renderActions = () => {
     switch (type) {
       case 'request':
         return (
-          <>
+          <div className="action-buttons">
             <button 
               className="action-button accept-button"
               onClick={onAccept}
@@ -42,93 +57,80 @@ const FriendCard = ({
               {loading.reject ? <FriendCardIcon icon={FaSpinner} className="spinner" /> : null}
               Xóa
             </button>
-          </>
+          </div>
         );
 
       case 'suggestion':
-      case 'follower':
+      case 'not-friend':
         return (
-          <>
+          <div className="action-buttons">
             <button 
               className="action-button add-button"
               onClick={onAdd}
               disabled={loading.add}
             >
-              {loading.add ? <FriendCardIcon icon={FaSpinner} className="spinner" /> : null}
+              {loading.add ? <FriendCardIcon icon={FaSpinner} className="spinner" /> : <FriendCardIcon icon={FaUserPlus} />}
               Thêm bạn bè
             </button>
-            <button className="action-button more-options-button">
+            <button className="action-button more-button">
               <FriendCardIcon icon={FaEllipsisH} />
             </button>
-          </>
+          </div>
         );
 
       case 'friend':
+      default:
         return (
-          <>
+          <div className="action-buttons">
             <button 
               className="action-button remove-button"
               onClick={onRemove}
               disabled={loading.remove}
             >
-              {loading.remove ? <FriendCardIcon icon={FaSpinner} className="spinner" /> : null}
-              Hủy kết bạn
+              {loading.remove ? <FriendCardIcon icon={FaSpinner} className="spinner" /> : <FriendCardIcon icon={FaUserMinus} />}
+              Gỡ
             </button>
-            {isFollowing !== undefined && (
-              <button 
-                className={`action-button ${isFollowing ? 'unfollow-button' : 'follow-button'}`}
-                onClick={isFollowing ? onUnfollow : onFollow}
-                disabled={loading.follow}
-              >
-                {loading.follow ? <FriendCardIcon icon={FaSpinner} className="spinner" /> : null}
-                {isFollowing ? 'Hủy theo dõi' : 'Theo dõi'}
-              </button>
-            )}
-            <button className="action-button more-options-button">
+            <button className="action-button more-button">
               <FriendCardIcon icon={FaEllipsisH} />
             </button>
-          </>
+          </div>
         );
-
-      case 'following':
-        return (
-          <>
-            <button 
-              className="action-button add-button"
-              onClick={onAdd}
-              disabled={loading.add}
-            >
-              {loading.add ? <FriendCardIcon icon={FaSpinner} className="spinner" /> : null}
-              Thêm bạn bè
-            </button>
-            <button className="action-button more-options-button">
-              <FriendCardIcon icon={FaEllipsisH} />
-            </button>
-          </>
-        );
-
-      default:
-        return null;
     }
   };
 
   return (
-    <div className="friend-card">
-      <div className="avatar">
-        <AvatarUser user={user} />
+    <div className="friend-card horizontal">
+      <div className="friend-avatar">
+        <AvatarUser user={user} size="medium" />
       </div>
-      <div className="info">
-        <h1>{user.fullName}</h1>
-        {user.mutualFriends !== undefined && (
-          <p className="mutual-friends">{user.mutualFriends} bạn chung</p>
-        )}
-        {type === 'request' && user.createdAt && (
-          <p className="request-time">
-            Đã gửi lời mời: {new Date(user.createdAt).toLocaleDateString()}
-          </p>
-        )}
+      
+      <div className="friend-info">
+        <div className="friend-name">
+          <h3>{getDisplayName(user)}</h3>
+          {getUserName(user) && (
+            <span className="username">@{getUserName(user)}</span>
+          )}
+        </div>
+        
+        <div className="mutual-info">
+          {mutualFriendsCount > 0 ? (
+            <span className="mutual-count">
+              {mutualFriendsCount} bạn chung
+            </span>
+          ) : (
+            <span className="mutual-count">
+              Chưa có bạn chung
+            </span>
+          )}
+          {type === 'request' && user.createdAt && (
+            <span className="request-time">
+              {new Date(user.createdAt).toLocaleDateString('vi-VN')}
+            </span>
+          )}
+        </div>
       </div>
-      <div className="actions">
+
+      <div className="friend-actions">
         {renderActions()}
       </div>
     </div>

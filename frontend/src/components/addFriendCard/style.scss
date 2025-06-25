@@ -1,0 +1,446 @@
+// AddFriendCard - Horizontal layout for friend suggestions
+.add-friend-card.horizontal {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  background: #ffffff;
+  border-radius: 8px;
+  border: 1px solid #dddfe2;
+  margin-bottom: 8px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+
+  &:hover {
+    background: #f8f9fa;
+    border-color: #c1c7d0;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .friend-avatar {
+    flex-shrink: 0;
+    margin-right: 12px;
+
+    img {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #dddfe2;
+    }
+  }
+
+  .friend-info {
+    flex: 1;
+    min-width: 0; // Allow text truncation
+    margin-right: 12px;
+
+    .friend-name {
+      h3 {
+        margin: 0;
+        font-size: 15px;
+        font-weight: 600;
+        color: #1c1e21;
+        white-space: nowrap;
+        overflow: hidden;
+        text-decoration: none;
+        text-overflow: ellipsis;
+        cursor: pointer;
+        line-height: 1.3;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+
+      .username {
+        display: block;
+        font-size: 13px;
+        color: #65676b;
+        font-weight: 400;
+        margin-top: 2px;
+      }
+    }
+
+    .mutual-info {
+      margin-top: 4px;
+
+      .mutual-count {
+        font-size: 13px;
+        color: #65676b;
+        font-weight: 400;
+      }
+    }
+  }
+
+  .friend-actions {
+    flex-shrink: 0;
+
+    .action-buttons {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+
+      .action-button {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 12px;
+        border: none;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        white-space: nowrap;
+
+        .add-friend-card-icon {
+          font-size: 14px;
+
+          &.spinner {
+            animation: spin 1s linear infinite;
+          }
+        }
+
+        &.add-button {
+          background: #1877f2;
+          color: white;
+
+          &:hover:not(:disabled) {
+            background: #166fe5;
+          }
+
+          &:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+          }
+        }
+
+        &.remove-suggestion-button {
+          background: #f0f2f5;
+          color: #65676b;
+          padding: 8px;
+          border-radius: 50%;
+          width: 36px;
+          height: 36px;
+          justify-content: center;
+
+          &:hover:not(:disabled) {
+            background: #ffebee;
+            color: #f02849;
+          }
+
+          &:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+          }
+        }
+      }
+    }
+  }
+
+  // Responsive design
+  @media (max-width: 768px) {
+    padding: 10px 12px;
+
+    .friend-avatar {
+      margin-right: 10px;
+
+      img {
+        width: 50px;
+        height: 50px;
+      }
+    }
+
+    .friend-info {
+      .friend-name h3 {
+        font-size: 15px;
+      }
+
+      .friend-name .username {
+        font-size: 12px;
+      }
+
+      .mutual-info {
+        .mutual-count {
+          font-size: 12px;
+        }
+      }
+    }
+
+    .friend-actions {
+      .action-buttons {
+        gap: 6px;
+
+        .action-button {
+          padding: 6px 10px;
+          font-size: 13px;
+
+          &.remove-suggestion-button {
+            width: 32px;
+            height: 32px;
+            padding: 6px;
+          }
+        }
+      }
+    }
+  }
+
+  @media (max-width: 576px) {
+    padding: 8px 12px;
+
+    .friend-avatar {
+      margin-right: 8px;
+
+      img {
+        width: 45px;
+        height: 45px;
+      }
+    }
+
+    .friend-info {
+      .friend-name {
+        h3 {
+          font-size: 14px;
+          line-height: 1.2;
+        }
+
+        .username {
+          font-size: 11px;
+        }
+      }
+
+      .mutual-info {
+        .mutual-count {
+          font-size: 11px;
+        }
+      }
+    }
+
+    .friend-actions {
+      .action-buttons {
+        .action-button {
+          &.add-button {
+            width: 100%;
+            justify-content: center;
+            font-size: 12px;
+            padding: 6px 8px;
+          }
+
+          &.remove-suggestion-button {
+            width: 28px;
+            height: 28px;
+            padding: 4px;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Compact layout (vertical) for friend request cards
+.add-friend-card.compact {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 16px;
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #dddfe2;
+  margin-bottom: 12px;
+  transition: all 0.2s ease;
+  max-width: 200px;
+  width: 100%;
+
+  &:hover {
+    background: #f8f9fa;
+    border-color: #c1c7d0;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .friend-avatar {
+    margin-bottom: 12px;
+
+    img {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid #dddfe2;
+    }
+  }
+
+  .friend-info {
+    margin-bottom: 16px;
+    width: 100%;
+
+    .friend-name {
+      h3 {
+        margin: 0 0 4px 0;
+        font-size: 16px;
+        font-weight: 600;
+        color: #1c1e21;
+        line-height: 1.2;
+        word-wrap: break-word;
+      }
+
+      .username {
+        display: block;
+        font-size: 13px;
+        color: #65676b;
+        font-weight: 400;
+        margin-bottom: 4px;
+      }
+    }
+
+    .mutual-info {
+      .mutual-count {
+        font-size: 13px;
+        color: #65676b;
+        font-weight: 400;
+      }
+    }
+  }
+
+  .friend-actions {
+    width: 100%;
+
+    .action-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      width: 100%;
+
+      .action-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 10px 16px;
+        border: none;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        width: 100%;
+
+        .add-friend-card-icon {
+          font-size: 14px;
+
+          &.spinner {
+            animation: spin 1s linear infinite;
+          }
+        }
+
+        &.add-button {
+          background: #1877f2;
+          color: white;
+
+          &:hover:not(:disabled) {
+            background: #166fe5;
+            transform: translateY(-1px);
+          }
+
+          &:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+          }
+        }
+
+        &.remove-button {
+          background: #f0f2f5;
+          color: #65676b;
+
+          &:hover:not(:disabled) {
+            background: #e4e6ea;
+            transform: translateY(-1px);
+          }
+
+          &:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+          }
+        }
+      }
+    }
+  }
+
+  // Responsive for compact layout
+  @media (max-width: 768px) {
+    max-width: 160px;
+    padding: 12px;
+
+    .friend-avatar {
+      margin-bottom: 10px;
+
+      img {
+        width: 70px;
+        height: 70px;
+      }
+    }
+
+    .friend-info {
+      margin-bottom: 12px;
+
+      .friend-name h3 {
+        font-size: 14px;
+      }
+
+      .friend-name .username {
+        font-size: 12px;
+      }
+
+      .mutual-info .mutual-count {
+        font-size: 12px;
+      }
+    }
+
+    .friend-actions .action-buttons .action-button {
+      padding: 8px 12px;
+      font-size: 13px;
+    }
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// Dark theme support
+@media (prefers-color-scheme: dark) {
+  .add-friend-card.horizontal {
+    --bg-primary: #242526;
+    --bg-secondary: #3a3b3c;
+    --bg-hover: #4e4f50;
+    --border-color: #3e4042;
+    --border-hover: #5c5e61;
+    --text-primary: #e4e6ea;
+    --text-secondary: #b0b3b8;
+    --primary-color: #2d88ff;
+    --primary-hover: #1c6bd8;
+    --error-color: #f02849;
+    --error-bg: #2a1f20;
+  }
+
+  .add-friend-card.compact {
+    --bg-primary: #242526;
+    --bg-secondary: #3a3b3c;
+    --bg-hover: #4e4f50;
+    --border-color: #3e4042;
+    --border-hover: #5c5e61;
+    --text-primary: #e4e6ea;
+    --text-secondary: #b0b3b8;
+    --primary-color: #2d88ff;
+    --primary-hover: #1c6bd8;
+    --error-color: #f02849;
+    --error-bg: #2a1f20;
+  }
+}

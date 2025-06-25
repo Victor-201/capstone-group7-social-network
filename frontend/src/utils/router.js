@@ -2,6 +2,7 @@ export const ROUTERS = {
     USER: {
         HOME: "/",
         FRIENDS: "/friends",
+        FRIEND_SUGGESTIONS: "/friends/suggestions",
         WATCH: "/watch",
         GROUPS: "/groups",
         PROFILE: "/:id"

@@ -12,7 +12,7 @@ export const useFriends = (userId = null) => {
     const fetchFriends = useCallback(async () => {
         const token = localStorage.getItem('token');
         if (!token) {
-            setError("No token provided");
+            setError("Vui lòng đăng nhập để xem danh sách bạn bè");
             setLoading(false);
             return;
         }
@@ -55,7 +55,7 @@ export const useFriendshipStatus = (userId) => {
 
         const token = localStorage.getItem('token');
         if (!token) {
-            setError("No token provided");
+            setError("Vui lòng đăng nhập để kiểm tra trạng thái kết bạn");
             setLoading(false);
             return;
         }

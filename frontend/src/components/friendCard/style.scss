@@ -2,6 +2,301 @@
 @use "sass:color";
 @import '../../styles/pages/theme';
 
+// FriendCard - Horizontal layout for friends and requests
+.friend-card.horizontal {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  background: #ffffff;
+  border-radius: 8px;
+  border: 1px solid #dddfe2;
+  margin-bottom: 8px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+
+  &:hover {
+    background: #f8f9fa;
+    border-color: #c1c7d0;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .friend-avatar {
+    flex-shrink: 0;
+    margin-right: 12px;
+
+    img {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #dddfe2;
+    }
+  }
+
+  .friend-info {
+    flex: 1;
+    min-width: 0; // Allow text truncation
+    margin-right: 12px;
+
+    .friend-name {
+      h3 {
+        margin: 0;
+        font-size: 15px;
+        font-weight: 600;
+        color: #1c1e21;
+        white-space: nowrap;
+        overflow: hidden;
+        text-decoration: none;
+        text-overflow: ellipsis;
+        cursor: pointer;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+
+      .username {
+        display: block;
+        font-size: 13px;
+        color: var(--text-secondary, #65676b);
+        font-weight: 400;
+        margin-top: 2px;
+      }
+    }
+
+    .mutual-info {
+      margin-top: 4px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+
+      .mutual-count {
+        font-size: 13px;
+        color: var(--text-secondary, #65676b);
+        font-weight: 400;
+      }
+
+      .request-time {
+        font-size: 12px;
+        color: var(--text-tertiary, #8a8d91);
+        font-weight: 400;
+      }
+    }
+  }
+
+  .friend-actions {
+    flex-shrink: 0;
+
+    .action-buttons {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+
+      .action-button {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 12px;
+        border: none;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        white-space: nowrap;
+
+        .friend-card-icon {
+          font-size: 14px;
+
+          &.spinner {
+            animation: spin 1s linear infinite;
+          }
+        }
+
+        &.accept-button {
+          background: var(--success-color, #42b883);
+          color: white;
+
+          &:hover:not(:disabled) {
+            background: var(--success-hover, #369870);
+          }
+
+          &:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+          }
+        }
+
+        &.reject-button {
+          background: var(--bg-secondary, #f0f2f5);
+          color: var(--text-secondary, #65676b);
+
+          &:hover:not(:disabled) {
+            background: var(--bg-hover, #e4e6ea);
+          }
+
+          &:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+          }
+        }
+
+        &.add-button {
+          background: var(--primary-color, #1877f2);
+          color: white;
+
+          &:hover:not(:disabled) {
+            background: var(--primary-hover, #166fe5);
+          }
+
+          &:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+          }
+        }
+
+        &.remove-button {
+          background: var(--bg-secondary, #f0f2f5);
+          color: var(--text-secondary, #65676b);
+
+          &:hover:not(:disabled) {
+            background: var(--error-bg, #ffebee);
+            color: var(--error-color, #f02849);
+          }
+
+          &:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+          }
+        }
+
+        &.more-button {
+          background: var(--bg-secondary, #f0f2f5);
+          color: var(--text-secondary, #65676b);
+          padding: 8px;
+          border-radius: 50%;
+          width: 36px;
+          height: 36px;
+          justify-content: center;
+
+          &:hover:not(:disabled) {
+            background: var(--bg-hover, #e4e6ea);
+          }
+        }
+      }
+    }
+  }
+
+  // Responsive design
+  @media (max-width: 768px) {
+    padding: 10px 12px;
+
+    .friend-avatar {
+      margin-right: 10px;
+
+      img {
+        width: 50px;
+        height: 50px;
+      }
+    }
+
+    .friend-info {
+      .friend-name h3 {
+        font-size: 15px;
+      }
+
+      .friend-name .username {
+        font-size: 12px;
+      }
+
+      .mutual-info {
+        .mutual-count {
+          font-size: 12px;
+        }
+
+        .request-time {
+          font-size: 11px;
+        }
+      }
+    }
+
+    .friend-actions {
+      .action-buttons {
+        gap: 6px;
+
+        .action-button {
+          padding: 6px 10px;
+          font-size: 13px;
+
+          &.more-button {
+            width: 32px;
+            height: 32px;
+            padding: 6px;
+          }
+        }
+      }
+    }
+  }
+
+  @media (max-width: 576px) {
+    padding: 8px 12px;
+
+    .friend-avatar {
+      margin-right: 8px;
+
+      img {
+        width: 45px;
+        height: 45px;
+      }
+    }
+
+    .friend-info {
+      .friend-name {
+        h3 {
+          font-size: 14px;
+          line-height: 1.2;
+        }
+
+        .username {
+          font-size: 11px;
+        }
+      }
+
+      .mutual-info {
+        .mutual-count {
+          font-size: 11px;
+        }
+
+        .request-time {
+          font-size: 10px;
+        }
+      }
+    }
+
+    .friend-actions {
+      .action-buttons {
+        flex-direction: column;
+        gap: 4px;
+
+        .action-button {
+          width: 100%;
+          justify-content: center;
+          padding: 6px 8px;
+          font-size: 12px;
+
+          &.more-button {
+            width: 28px;
+            height: 28px;
+            padding: 4px;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Legacy styles (keep for backward compatibility)
 .friend-card {
   background-color: get-theme-color("primary-color");
   border-radius: 6px; /* Giảm border-radius */

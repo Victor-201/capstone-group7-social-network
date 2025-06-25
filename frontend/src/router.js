@@ -3,6 +3,7 @@ import PersonalPage from './pages/users/personalPage';
 import WatchPage from './pages/users/watchPage';
 import ForgotPasswordPage from './pages/users/forgotPasswordPage';
 import FriendsPage from './pages/users/friendsPage';
+import FriendSuggestionsPage from './pages/users/friendSuggestionsPage';
 import GroupsPage from './pages/users/groupsPage';
 import MasterLayout from './layouts/masterLayout';
 import TermsOfServicePage from './pages/users/termsOfServicePage';
@@ -19,6 +20,10 @@ const renderUserRouter = () => {
     {
       path: ROUTERS.USER.FRIENDS,
       Component: <FriendsPage />,
+    },
+    {
+      path: ROUTERS.USER.FRIEND_SUGGESTIONS,
+      Component: <FriendSuggestionsPage />,
     },
     {
       path: ROUTERS.USER.WATCH,

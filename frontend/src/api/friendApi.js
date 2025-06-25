@@ -171,3 +171,41 @@ export const getFriendshipStatus = async (token, userId) => {
 
     return await response.json();
 };
+
+// Lấy gợi ý kết bạn
+export const getFriendSuggestions = async (token) => {
+    const response = await fetch(`${BASE_URL}/friends/suggest`, {
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+        },
+    });
+    
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || `HTTP ${response.status}`);
+    }
+
+    const result = await response.json();
+    return result;
+};
+
+// Lấy danh sách bạn chung
+export const getMutualFriends = async (token, friendId) => {
+    const response = await fetch(`${BASE_URL}/friends/mutual/${friendId}`, {
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+        },
+    });
+    
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || `HTTP ${response.status}`);
+    }
+
+    const result = await response.json();
+    return result;
+};

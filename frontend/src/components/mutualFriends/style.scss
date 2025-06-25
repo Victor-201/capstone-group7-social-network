@@ -1,0 +1,91 @@
+.mutual-friends {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+
+  .mutual-friends-avatars {
+    display: flex;
+    align-items: center;
+    gap: -4px; // Overlap avatars slightly
+
+    .mutual-friend-avatar {
+      position: relative;
+      border: 2px solid var(--bg-primary, #ffffff);
+      border-radius: 50%;
+      margin-left: -4px;
+
+      &:first-child {
+        margin-left: 0;
+      }
+
+      img {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+      }
+    }
+
+    .more-count {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 20px;
+      background: var(--bg-secondary, #f0f2f5);
+      border: 2px solid var(--bg-primary, #ffffff);
+      border-radius: 50%;
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-secondary, #65676b);
+      margin-left: -4px;
+    }
+  }
+
+  .mutual-friends-text {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    color: var(--text-secondary, #65676b);
+
+    .mutual-friends-icon {
+      font-size: 10px;
+    }
+  }
+
+  &.loading {
+    .mutual-friends-icon.spinner {
+      animation: spin 1s linear infinite;
+      color: var(--primary-color, #1877f2);
+    }
+  }
+
+  &.error {
+    p {
+      font-size: 12px;
+      color: var(--error-color, #f02849);
+      margin: 0;
+    }
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// Dark theme support
+@media (prefers-color-scheme: dark) {
+  .mutual-friends {
+    --bg-primary: #242526;
+    --bg-secondary: #3a3b3c;
+    --text-secondary: #b0b3b8;
+    --primary-color: #2d88ff;
+    --error-color: #f02849;
+  }
+}

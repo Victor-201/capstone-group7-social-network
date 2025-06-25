@@ -1,0 +1,217 @@
+// UserCard - Vertical layout for user cards (friend requests/suggestions)
+.user-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 16px;
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #dddfe2;
+  margin-bottom: 12px;
+  transition: all 0.2s ease;
+  max-width: 200px;
+  width: 100%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+
+  &:hover {
+    background: #f8f9fa;
+    border-color: #c1c7d0;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .user-avatar {
+    margin-bottom: 12px;
+
+    img {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid #dddfe2;
+    }
+  }
+
+  .user-info {
+    margin-bottom: 16px;
+    width: 100%;
+
+    .user-name {
+      h3 {
+        margin: 0 0 4px 0;
+        font-size: 16px;
+        font-weight: 600;
+        color: #1c1e21;
+        line-height: 1.2;
+        word-wrap: break-word;
+      }
+
+      .username {
+        display: block;
+        font-size: 13px;
+        color: #65676b;
+        font-weight: 400;
+        margin-bottom: 4px;
+      }
+    }
+
+    .mutual-info {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+
+      .mutual-friends {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        
+        .user-card-icon {
+          font-size: 12px;
+          color: #65676b;
+        }
+
+        .mutual-count {
+          font-size: 13px;
+          color: #65676b;
+          font-weight: 400;
+        }
+      }
+    }
+  }
+
+  .user-actions {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    .action-button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      width: 100%;
+
+      .user-card-icon {
+        font-size: 14px;
+
+        &.spinner {
+          animation: spin 1s linear infinite;
+        }
+      }        &.primary-button {
+          background: #42b883;
+          color: white;
+
+          &:hover:not(:disabled) {
+            background: #369870;
+            transform: translateY(-1px);
+          }
+
+          &:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+          }
+        }
+
+        &.secondary-button {
+          background: #f0f2f5;
+          color: #65676b;
+
+          &:hover:not(:disabled) {
+            background: #e4e6ea;
+            transform: translateY(-1px);
+          }
+
+          &:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+          }
+        }
+    }
+  }
+
+  // Responsive for mobile
+  @media (max-width: 768px) {
+    max-width: 160px;
+    padding: 12px;
+
+    .user-avatar {
+      margin-bottom: 10px;
+
+      img {
+        width: 70px;
+        height: 70px;
+      }
+    }
+
+    .user-info {
+      margin-bottom: 12px;
+
+      .user-name h3 {
+        font-size: 14px;
+      }
+
+      .user-name .username {
+        font-size: 12px;
+      }
+
+      .mutual-info {
+        .mutual-friends .mutual-count {
+          font-size: 12px;
+        }
+      }
+    }
+
+    .user-actions .action-button {
+      padding: 8px 12px;
+      font-size: 13px;
+    }
+  }
+
+  @media (max-width: 576px) {
+    max-width: 140px;
+    padding: 10px;
+
+    .user-avatar {
+      img {
+        width: 60px;
+        height: 60px;
+      }
+    }
+
+    .user-info {
+      .user-name h3 {
+        font-size: 13px;
+      }
+
+      .user-name .username {
+        font-size: 11px;
+      }
+
+      .mutual-info {
+        .mutual-friends .mutual-count {
+          font-size: 11px;
+        }
+      }
+    }
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
