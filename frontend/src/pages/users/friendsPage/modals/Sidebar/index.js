@@ -1,10 +1,11 @@
 import React from 'react';
-import { FaUserFriends, FaUserPlus, FaHistory, FaBirthdayCake, FaListUl, FaCog } from 'react-icons/fa';
+import { FaUserFriends, FaUserPlus, FaHistory, FaBirthdayCake, FaListUl, FaCog, FaUsers } from 'react-icons/fa';
 import './style.scss';
 
 const Sidebar = ({ activeTab, onTabChange }) => {
   const tabs = [
     { key: 'friends', label: 'Tất cả bạn bè', icon: <FaUserFriends /> },
+    { key: 'suggestions', label: 'Gợi ý kết bạn', icon: <FaUsers /> },
     { key: 'requests', label: 'Lời mời kết bạn', icon: <FaUserPlus /> },
     { key: 'recent', label: 'Gần đây', icon: <FaHistory /> },
     { key: 'birthdays', label: 'Sinh nhật', icon: <FaBirthdayCake /> },
