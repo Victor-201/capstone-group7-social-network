@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { FaSpinner, FaExclamationTriangle, FaSearch, FaFilter, FaEllipsisH } from 'react-icons/fa';
 import FriendCard from '../../../components/friendCard';
 import UserCard from '../../../components/userCard';
@@ -17,6 +18,8 @@ const ThemedIcon = ({ icon: Icon, className }) => {
 };
 
 const FriendsPage = () => {
+  const [searchParams] = useSearchParams();
+  
   // Sử dụng hooks từ friends/ folder
   const {
     friends,
@@ -52,7 +55,11 @@ const FriendsPage = () => {
     error: actionError
   } = useFriendActions();
 
-  const [activeTab, setActiveTab] = useState('friends');
+  const [activeTab, setActiveTab] = useState(() => {
+    // Check URL params for initial tab
+    const tabParam = searchParams.get('tab');
+    return tabParam || 'friends';
+  });
   const [localActionLoading, setLocalActionLoading] = useState({});
   const [message, setMessage] = useState(null);
   const [recentlyUnfriended, setRecentlyUnfriended] = useState(new Map());
@@ -68,8 +75,20 @@ const FriendsPage = () => {
 
   // Fetch data khi component mount
   useEffect(() => {
+    console.log('FriendsPage: Fetching initial data...');
     fetchAllData();
   }, [fetchAllData]);
+
+  // Debug logging for state changes
+  useEffect(() => {
+    console.log('FriendsPage state update:', {
+      friendsCount: friends?.length || 0,
+      requestsCount: receivedRequests?.length || 0,
+      followersCount: followers?.length || 0,
+      followingCount: following?.length || 0,
+      activeTab
+    });
+  }, [friends, receivedRequests, followers, following, activeTab]);
 
   // Handle sending a friend request
   const handleSendRequest = async (userId) => {
@@ -213,16 +232,23 @@ const FriendsPage = () => {
 
   // Compute display list để tránh duplicate keys
   const displayFriends = useMemo(() => {
+    // Ensure friends is always an array
+    const friendsList = Array.isArray(friends) ? friends : [];
+    
     // Filter out recently unfriended users from friends list
-    const currentFriends = (friends || []).filter(friend => !recentlyUnfriended.has(friend.id));
+    const currentFriends = friendsList.filter(friend => 
+      friend && friend.id && !recentlyUnfriended.has(friend.id)
+    );
     
     // Create suggestion cards for recently unfriended users
-    const unfriendedCards = Array.from(recentlyUnfriended.entries()).map(([userId, userInfo]) => ({
-      ...userInfo,
-      id: `unfriended-${userId}`, // Change ID to avoid duplicate
-      originalId: userId, // Keep original ID for actions
-      isSuggestion: true
-    }));
+    const unfriendedCards = Array.from(recentlyUnfriended.entries())
+      .filter(([userId, userInfo]) => userId && userInfo)
+      .map(([userId, userInfo]) => ({
+        ...userInfo,
+        id: `unfriended-${userId}`, // Change ID to avoid duplicate
+        originalId: userId, // Keep original ID for actions
+        isSuggestion: true
+      }));
     
     console.log('Current friends:', currentFriends.map(f => f.id));
     console.log('Recently unfriended:', Array.from(recentlyUnfriended.keys()));
@@ -286,7 +312,13 @@ const FriendsPage = () => {
                         </div>
                       ) : (
                         <div className="cards-grid">
-                          {displayFriends.map((friend, index) => {
+                          {displayFriends.length > 0 ? displayFriends.map((friend, index) => {
+                            // Validate friend object
+                            if (!friend || !friend.id) {
+                              console.warn('Invalid friend object:', friend);
+                              return null;
+                            }
+                            
                             const isSuggestion = friend.isSuggestion;
                             const friendId = isSuggestion ? friend.originalId : friend.id;
                             // Ensure absolutely unique keys using type prefix + id + index
@@ -306,7 +338,11 @@ const FriendsPage = () => {
                                 mutualFriendsCount={friend.mutualFriendsCount || 0}
                               />
                             );
-                          })}
+                          }).filter(Boolean) : (
+                            <div className="empty-state">
+                              <p>Đang tải danh sách bạn bè...</p>
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>
@@ -336,7 +372,7 @@ const FriendsPage = () => {
                         <div className="requests-cards-grid">
                           {(receivedRequests || []).map((request, index) => {
                             // Safe access to request data with multiple fallbacks
-                            const requester = request?.Requester || request?.requester;
+                            const requester = request?.Requester || request?.requester || request?.user;
                             
                             // Ensure requester exists and has required properties
                             if (!requester || !requester.id) {
@@ -349,6 +385,7 @@ const FriendsPage = () => {
                                 key={`request-${requester.id}-${index}`}
                                 user={{
                                   ...requester,
+                                  full_name: requester.full_name || requester.fullName || requester.name,
                                   createdAt: request.created_at || request.createdAt
                                 }}
                                 onPrimaryAction={() => handleRequestResponse(requester.id, 'accept')}

@@ -108,7 +108,7 @@ export const getFriends = async (token, userId) => {
     });
     
     if (!response.ok) {
-        const errorData = await response.json();
+        const errorData = await response.json().catch(() => ({}));
         throw new Error(errorData.message || `HTTP ${response.status}`);
     }
 

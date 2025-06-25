@@ -21,14 +21,24 @@ export const useFriends = (userId = null) => {
             setLoading(true);
             setError(null);
             const data = await getFriends(token, userId);
-            setFriends(data.friends || []);
+            // Handle multiple possible response formats
+            let friendsList = [];
+            if (data.result && Array.isArray(data.result)) {
+                friendsList = data.result;
+            } else if (data.friends && Array.isArray(data.friends)) {
+                friendsList = data.friends;
+            } else if (Array.isArray(data)) {
+                friendsList = data;
+            }
+            setFriends(friendsList);
         } catch (err) {
             // If it's a "No friends found" error, just set empty array
-            if (err.message.includes('No friends found')) {
+            if (err.message.includes('No friends found') || err.message.includes('not found') || err.status === 404) {
                 setFriends([]);
                 setError(null);
             } else {
                 setError(err.message);
+                console.error('Error fetching friends:', err);
             }
         } finally {
             setLoading(false);

@@ -29,7 +29,7 @@ const FriendSuggestions = ({ limit = 6 }) => {
   };
 
   const handleSeeAll = () => {
-    navigate(ROUTERS.USER.FRIEND_SUGGESTIONS);
+    navigate(`${ROUTERS.USER.FRIENDS}?tab=suggestions`);
   };
 
   if (loading) {

@@ -36,6 +36,12 @@ const FriendCard = ({
   loading = {},
   mutualFriendsCount = 0,
 }) => {
+  // Safety check for user object
+  if (!user) {
+    console.warn('FriendCard: user prop is null or undefined');
+    return null;
+  }
+
   const renderActions = () => {
     switch (type) {
       case 'request':

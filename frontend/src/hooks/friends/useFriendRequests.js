@@ -25,10 +25,16 @@ export const useFriendRequests = () => {
                 getSentRequests(token),
                 getReceivedRequests(token)
             ]);
-            setSentRequests(sentData.requests || []);
-            setReceivedRequests(receivedData.requests || []);
+            
+            // Handle different response formats
+            setSentRequests(sentData.requests || sentData.result || sentData || []);
+            setReceivedRequests(receivedData.requests || receivedData.result || receivedData || []);
         } catch (err) {
+            console.error('Error fetching friend requests:', err);
             setError(err.message);
+            // Set empty arrays on error instead of keeping previous state
+            setSentRequests([]);
+            setReceivedRequests([]);
         } finally {
             setLoading(false);
         }
