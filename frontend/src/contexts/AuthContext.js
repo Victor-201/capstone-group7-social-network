@@ -1,32 +1,67 @@
-// src/contexts/AuthContext.jsx
-import { createContext, useContext, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { createContext, useContext, useState, useEffect } from 'react';
+import { jwtDecode } from 'jwt-decode';
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const navigate = useNavigate();
-  const [token, setToken] = useState(() => localStorage.getItem('token'));
+  const [auth, setAuth] = useState({
+    token: null,
+    id: null,
+    user_name: null,
+    email: null,
+    role: null,
+  });
+  const [isLoading, setIsLoading] = useState(true); // ✅ thêm trạng thái loading
+
+  const isTokenExpired = (token) => {
+    try {
+      const decoded = jwtDecode(token);
+      return decoded.exp * 1000 < Date.now();
+    } catch {
+      return true;
+    }
+  };
 
   useEffect(() => {
-    if (!token) {
-      navigate('/auth/login'); // hoặc ROUTERS.AUTH.LOGIN nếu bạn đã import
+    const token = localStorage.getItem('token');
+    if (token && !isTokenExpired(token)) {
+      const decoded = jwtDecode(token);
+      setAuth({
+        token,
+        id: decoded.id,
+        user_name: decoded.user_name,
+        email: decoded.email,
+        role: decoded.role,
+      });
     }
-  }, [token, navigate]);
+    setIsLoading(false); // ✅ cập nhật sau khi kiểm tra xong
+  }, []);
 
-  const login = (newToken) => {
-    localStorage.setItem('token', newToken);
-    setToken(newToken);
+  const login = (token) => {
+    localStorage.setItem('token', token);
+    const decoded = jwtDecode(token);
+    setAuth({
+      token,
+      id: decoded.id,
+      user_name: decoded.user_name,
+      email: decoded.email,
+      role: decoded.role,
+    });
   };
 
   const logout = () => {
     localStorage.removeItem('token');
-    setToken(null);
-    navigate('/auth/login');
+    setAuth({
+      token: null,
+      id: null,
+      user_name: null,
+      email: null,
+      role: null,
+    });
   };
 
   return (
-    <AuthContext.Provider value={{ token, login, logout }}>
+    <AuthContext.Provider value={{ auth, login, logout, isLoading }}>
       {children}
     </AuthContext.Provider>
   );

@@ -1,36 +1,42 @@
+import { Route, Routes } from 'react-router-dom';
 import HomePage from './pages/users/homePage';
 import PersonalPage from './pages/users/personalPage';
 import WatchPage from './pages/users/watchPage';
 import ForgotPasswordPage from './pages/users/forgotPasswordPage';
 import FriendsPage from './pages/users/friendsPage';
 import GroupsPage from './pages/users/groupsPage';
-import MasterLayout from './layouts/masterLayout';
 import TermsOfServicePage from './pages/users/termsOfServicePage';
-import { ROUTERS } from './utils/router';
-import { Route, Routes } from 'react-router-dom';
 import AuthPage from './pages/users/authPage';
+import MasterLayout from './layouts/masterLayout';
+import PrivateRoute from './components/privateRoute';
+import { ROUTERS } from './utils/router';
 
 const renderUserRouter = () => {
   const userRouters = [
     {
       path: ROUTERS.USER.HOME,
       Component: <HomePage />,
+      roles: ['user', 'admin'],
     },
     {
       path: ROUTERS.USER.FRIENDS,
       Component: <FriendsPage />,
+      roles: ['user', 'admin'],
     },
     {
       path: ROUTERS.USER.WATCH,
       Component: <WatchPage />,
+      roles: ['user', 'admin'],
     },
     {
       path: ROUTERS.USER.GROUPS,
       Component: <GroupsPage />,
+      roles: ['user', 'admin'],
     },
     {
       path: ROUTERS.USER.PROFILE,
       Component: <PersonalPage />,
+      roles: ['user', 'admin'],
     },
   ];
 
@@ -64,7 +70,9 @@ const renderUserRouter = () => {
           key={key}
           path={item.path}
           element={
+            <PrivateRoute roles={item.roles}>
               <MasterLayout>{item.Component}</MasterLayout>
+            </PrivateRoute>
           }
         />
       ))}

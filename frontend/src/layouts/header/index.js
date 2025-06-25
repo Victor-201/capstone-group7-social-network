@@ -15,16 +15,17 @@ import useClickOutside from '../../hooks/useClickOutside';
 import { useUserInfo } from '../../hooks/user';
 import { useSearch } from '../../hooks/search';
 import Loader from '../../components/loader';
+import { useAuth } from '../../contexts/AuthContext';
+
 
 const Header = () => {
+    const {auth} = useAuth();
     const [activeUsePanelPopup, setActiveUsePanelPopup] = useState(null);
     const [isFocusedSearch, setIsFocusedSearch] = useState(false);
     const popupUserPanelRef = useRef(null);
     const navigate = useNavigate();
     const searchRef = useRef(null);
     const userData = JSON.parse(localStorage.getItem("user"));
-    const userId = userData?.id;
-    const role = userData?.role;
     const [menus, setMenus] = useState([]);
     const { userInfo, loading, error } = useUserInfo();
     const { loading: loadingSearch, error: errorSearch, results: searchResults, search } = useSearch();
@@ -39,12 +40,12 @@ const Header = () => {
             { name: 'Nhóm', icon: <TiGroupOutline />, iconActive: <TiGroup />, path: ROUTERS.USER.GROUPS },
         ];
 
-        if (role === 'ROLE_ADMIN') {
+        if (auth.role === 'ROLE_ADMIN') {
             baseMenus.push({ name: 'Quản lý', path: ROUTERS.ADMIN });
         }
 
         setMenus(baseMenus);
-    }, [role, userId]);
+    }, [auth.role]);
 
     // Handle clicks outside to close popups
     useClickOutside(popupUserPanelRef, () => {
