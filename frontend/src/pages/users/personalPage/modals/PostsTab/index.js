@@ -12,7 +12,7 @@ import { useUserPosts } from "../../../../../hooks/posts/useUserPosts";
 import { useEditDetails } from "../../../../../hooks/profile/useEditDetails";
 import { getUserInfo } from "../../../../../api/userApi";
 import { useUserImages } from "../../../../../hooks/media/useUserImages";
-import useCloudinaryFile from "../../hooks/useCloudinaryFile";
+import MediaCard from "../../../../../components/mediaCard";
 
 const relationshipOptions = [
   { label: "Độc thân", value: "single" },
@@ -162,32 +162,25 @@ const PostsTab = ({ userInfo, isOwner }) => {
             )}
           </div>
 
-         <div className="photos-card">
-  <div className="photos-card__header">
-    <h3>Ảnh</h3>
-    <a href="#photos" className="photos-card__see-all">Xem tất cả ảnh</a>
-  </div>
-  <div className="photos-card__grid">
-    {loadingImages ? (
-      <p>Đang tải ảnh...</p>
-    ) : images.length === 0 ? (
-      <p>Chưa có ảnh nào</p>
-    ) : (
-      images.map((img) => (
-        <img
-          src={img.media_id}
-          alt="Ảnh người dùng"
-          style={{ objectFit: "cover", width: "100%", height: "100%" }}
-        />
-      ))
-    )}
-  </div>
-</div>
-
-
-
-
-
+          <div className="photos-card">
+            <div className="photos-card__header">
+              <h3>Ảnh</h3>
+              <a href="#photos" className="photos-card__see-all">Xem tất cả ảnh</a>
+            </div>
+            <div className="photos-card__grid">
+              {loadingImages ? (
+                <p>Đang tải ảnh...</p>
+              ) : images.length === 0 ? (
+                <p>Chưa có ảnh nào</p>
+              ) : (
+                images.map((img) => (
+                  <div className="photos-card__item">
+                    <MediaCard media_id={img.media_id} media_type={"image"} />
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
           <div className="friends-card">
             <div className="friends-card__header">
               <h3>Bạn bè</h3>
