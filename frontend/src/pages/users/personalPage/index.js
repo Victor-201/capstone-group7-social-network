@@ -12,10 +12,10 @@ const PersonalPage = () => {
   const [activeTab, setActiveTab] = useState("posts");
   const tabsRef = useRef(null);
   const { userInfo, isLoading } = useUserInfo(); // Lấy thông tin người dùng từ hook
-  const { viewedUser } = useParams(); // user đang đăng nhập
+  const { user_name } = useParams(); // user đang đăng nhập
 
-  const isOwner = auth.user_name === viewedUser; // Kiểm tra xem người dùng có phải là chủ sở hữu trang cá nhân không
-  console.log("isOwner", auth.user_name, viewedUser, isOwner);
+  const isOwner = auth.user_name === user_name; // Kiểm tra xem người dùng có phải là chủ sở hữu trang cá nhân không
+  console.log("isOwner", auth.user_name, user_name, isOwner);
   const handleTabClick = (tabId) => {
     setActiveTab(tabId);
   };

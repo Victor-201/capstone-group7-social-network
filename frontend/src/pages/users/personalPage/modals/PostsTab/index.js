@@ -11,6 +11,8 @@ import "./style.scss";
 import { useUserPosts } from "../../../../../hooks/posts/useUserPosts";
 import { useEditDetails } from "../../../../../hooks/profile/useEditDetails";
 import { getUserInfo } from "../../../../../api/userApi";
+import { useUserImages } from "../../../../../hooks/media/useUserImages";
+import useCloudinaryFile from "../../hooks/useCloudinaryFile";
 
 const relationshipOptions = [
   { label: "Độc thân", value: "single" },
@@ -19,9 +21,12 @@ const relationshipOptions = [
   { label: "Đã kết hôn", value: "married" },
 ];
 
-const PostsTab = ({ userInfo }) => {
+const PostsTab = ({ userInfo, isOwner }) => {
   const { posts } = useUserPosts();
   const totalPosts = posts?.length || 0;
+  const { images, loading: loadingImages } = useUserImages(userInfo?.id);
+
+
 
   const getVisible = (field, data) =>
     data?.ProfileDetails?.visibleFields?.find((f) => f.field_name === field)?.is_visible ?? true;
@@ -30,6 +35,10 @@ const PostsTab = ({ userInfo }) => {
   const [isEditingBio, setIsEditingBio] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [profileDetails, setProfileDetails] = useState({});
+
+  const [provinceList, setProvinceList] = useState([]);
+  const [filteredProvinces, setFilteredProvinces] = useState([]);
+  const [focusedField, setFocusedField] = useState(null);
 
   const { saveProfileDetails, loading, error } = useEditDetails();
 
@@ -53,6 +62,13 @@ const PostsTab = ({ userInfo }) => {
   useEffect(() => {
     loadProfileDetails();
   }, []);
+
+  useEffect(() => {
+    fetch("https://provinces.open-api.vn/api/p/")
+      .then((res) => res.json())
+      .then((data) => setProvinceList(data));
+  }, []);
+
   const handleEditModalOpen = async () => {
     await loadProfileDetails();
     setIsEditModalOpen(true);
@@ -66,6 +82,21 @@ const PostsTab = ({ userInfo }) => {
         [key]: value,
       },
     }));
+  };
+
+  const handleProvinceInput = (field, input) => {
+    handleChangeDetail(field, "value", input);
+    const filtered = provinceList.filter((province) =>
+      province.name.toLowerCase().includes(input.toLowerCase())
+    );
+    setFilteredProvinces(filtered);
+    setFocusedField(field);
+  };
+
+  const handleSelectProvince = (field, name) => {
+    handleChangeDetail(field, "value", name);
+    setFilteredProvinces([]);
+    setFocusedField(null);
   };
 
   const handleSaveDetails = async () => {
@@ -98,7 +129,7 @@ const PostsTab = ({ userInfo }) => {
           <div className="about-card">
             <h3>Giới thiệu</h3>
             <div className="about-card__bio-wrapper">
-              {isEditingBio ? (
+              {isEditingBio && isOwner ? (
                 <textarea
                   className="about-card__bio-input"
                   value={bio}
@@ -109,9 +140,11 @@ const PostsTab = ({ userInfo }) => {
               ) : (
                 <p className="about-card__bio">
                   {bio || "Chưa có tiểu sử"}
-                  <button className="about-card__edit-btn" onClick={() => setIsEditingBio(true)}>
-                    <FiEdit2 />
-                  </button>
+                  {isOwner && (
+                    <button className="about-card__edit-btn" onClick={() => setIsEditingBio(true)}>
+                      <FiEdit2 />
+                    </button>
+                  )}
                 </p>
               )}
             </div>
@@ -122,22 +155,38 @@ const PostsTab = ({ userInfo }) => {
               {renderVisibleItem("hometown", "Đến từ", IoIosLocate)}
               {renderVisibleItem("relationship_status", "Tình trạng", FaHeart)}
             </ul>
-            <button className="btn btn--secondary btn--full-width" onClick={handleEditModalOpen}>
-              Chỉnh sửa chi tiết
-            </button>
+            {isOwner && (
+              <button className="btn btn--secondary btn--full-width" onClick={handleEditModalOpen}>
+                Chỉnh sửa chi tiết
+              </button>
+            )}
           </div>
 
-          <div className="photos-card">
-            <div className="photos-card__header">
-              <h3>Ảnh</h3>
-              <a href="#photos" className="photos-card__see-all">Xem tất cả ảnh</a>
-            </div>
-            <div className="photos-card__grid">
-              {[photo1Image, photo2Image].map((img, idx) => (
-                <img key={idx} src={img} alt="Ảnh" />
-              ))}
-            </div>
-          </div>
+         <div className="photos-card">
+  <div className="photos-card__header">
+    <h3>Ảnh</h3>
+    <a href="#photos" className="photos-card__see-all">Xem tất cả ảnh</a>
+  </div>
+  <div className="photos-card__grid">
+    {loadingImages ? (
+      <p>Đang tải ảnh...</p>
+    ) : images.length === 0 ? (
+      <p>Chưa có ảnh nào</p>
+    ) : (
+      images.map((img) => (
+        <img
+          src={img.media_id}
+          alt="Ảnh người dùng"
+          style={{ objectFit: "cover", width: "100%", height: "100%" }}
+        />
+      ))
+    )}
+  </div>
+</div>
+
+
+
+
 
           <div className="friends-card">
             <div className="friends-card__header">
@@ -157,7 +206,7 @@ const PostsTab = ({ userInfo }) => {
         </div>
 
         <div className="content__main">
-          <CreatePost userInfo={userInfo} />
+          {isOwner && <CreatePost userInfo={userInfo} />}
           <div className="posts">
             {totalPosts === 0 ? <p>Chưa có bài đăng nào</p> : posts.map((post) => (
               <PostCard key={post.id} post={post} userInfo={userInfo} />
@@ -166,7 +215,7 @@ const PostsTab = ({ userInfo }) => {
         </div>
       </div>
 
-      {isEditModalOpen && (
+      {isOwner && isEditModalOpen && (
         <div className="edit-details-modal">
           <div className="edit-details-modal__overlay" onClick={() => setIsEditModalOpen(false)} />
           <div className="edit-details-modal__panel">
@@ -217,6 +266,28 @@ const PostsTab = ({ userInfo }) => {
                       <option key={opt.value} value={opt.value}>{opt.label}</option>
                     ))}
                   </select>
+                ) : ["location", "hometown"].includes(field) ? (
+                  <div className="relative">
+                    <input
+                      className="edit-details-modal__input"
+                      value={value}
+                      onChange={(e) => handleProvinceInput(field, e.target.value)}
+                      placeholder={`Nhập ${field === "location" ? "nơi sống" : "quê quán"}...`}
+                    />
+                    {focusedField === field && filteredProvinces.length > 0 && (
+                      <ul className="autocomplete-dropdown">
+                        {filteredProvinces.map((p) => (
+                          <li
+                            key={p.code}
+                            className="autocomplete-option"
+                            onClick={() => handleSelectProvince(field, p.name)}
+                          >
+                            {p.name}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
                 ) : (
                   <input
                     className="edit-details-modal__input"

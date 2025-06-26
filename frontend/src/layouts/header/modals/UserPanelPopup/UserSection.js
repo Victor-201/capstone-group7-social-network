@@ -21,7 +21,7 @@ const UserSection = ({ user, onClose }) => {
     return (
         <section className="popup__section popup__section--user">
             <header className="popup__user-header">
-                <Link  to={ROUTERS.USER.PROFILE.replace(':id', user.userAccount.user_name)} className="popup__user-info" onClick={onClose}>
+                <Link  to={ROUTERS.USER.PROFILE.replace(':user_name', user.userAccount.user_name)} className="popup__user-info" onClick={onClose}>
                     <div className="popup__avatar">
                         <AvatarUser user={user} />
                     </div>

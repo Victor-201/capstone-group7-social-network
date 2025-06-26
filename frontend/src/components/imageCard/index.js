@@ -1,14 +1,17 @@
-import { RiEdit2Fill } from "react-icons/ri";
-import './style.scss';
-const ImageCard = ({ image, alt = "Preview" }) => {
+import "./style.scss";
+import avatarDefault from "../../assets/images/default_avatar/default_avatar.jpg";
+import { useCloudinaryFile } from "../../hooks/useCloudinaryFile";
+
+export const imageUser = ({ image }) => {
+  const blobUrl = useCloudinaryFile(image.media_id, "image");
+  
   return (
-    <div className="image-card">
-      <img src={image} alt={alt} className="image-card__image" />
-      <span className="image-card__edit">
-        <RiEdit2Fill className='edit-icon'/>
-      </span>
-    </div>
+    <img
+      src={blobUrl || avatarDefault}
+      alt="avatar"
+      className="avatar-user"
+    />
   );
 };
 
-export default ImageCard;
+export default AvatarUser;

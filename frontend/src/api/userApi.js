@@ -132,3 +132,10 @@ export const uploadAvatar = async (token, formData) => {
 
     return await response.json();
 };
+export const getUserInfoByUsername = async (username) => {
+  const res = await fetch(`${API_BASE_URL}/user/profile/${username}`);
+  if (!res.ok) {
+    throw new Error("Không tìm thấy người dùng");
+  }
+  return res.json();
+};
