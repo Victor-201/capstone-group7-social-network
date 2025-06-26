@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { FaSpinner, FaExclamationTriangle, FaSearch, FaFilter, FaEllipsisH } from 'react-icons/fa';
 import FriendCard from '../../../components/friendCard';
 import UserCard from '../../../components/userCard';
@@ -19,6 +19,7 @@ const ThemedIcon = ({ icon: Icon, className }) => {
 
 const FriendsPage = () => {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   
   // Sử dụng hooks từ friends/ folder
   const {
@@ -184,9 +185,12 @@ const FriendsPage = () => {
     try {
       const result = await removeFriend(friendId);
       if (result.success) {
-        setMessage('Đã xóa khỏi danh sách bạn bè');
+        setMessage('Đã xóa khỏi danh sách bạn bè. Chuyển sang tab "Gợi ý kết bạn" để thêm lại.');
         // Store friend info temporarily so user can add them back
         setRecentlyUnfriended(prev => new Map(prev.set(friendId, friendInfo)));
+        // Auto switch to suggestions tab
+        setActiveTab('suggestions');
+        navigate('/friends?tab=suggestions');
         // Don't refetch immediately to avoid duplicate display
       } else {
         console.error('Error removing friend:', result.message || 'Unknown error');
@@ -326,25 +330,26 @@ const FriendsPage = () => {
       friend && friend.id && !recentlyUnfriended.has(friend.id)
     );
     
-    // Create suggestion cards for recently unfriended users
-    const unfriendedCards = Array.from(recentlyUnfriended.entries())
-      .filter(([userId, userInfo]) => userId && userInfo)
-      .map(([userId, userInfo]) => ({
-        ...userInfo,
-        id: `unfriended-${userId}`, // Change ID to avoid duplicate
-        originalId: userId, // Keep original ID for actions
-        isSuggestion: true
-      }));
+    // For suggestions tab, show recently unfriended as suggestions
+    // For friends tab, only show current friends
+    if (activeTab === 'suggestions') {
+      const unfriendedSuggestions = Array.from(recentlyUnfriended.entries())
+        .filter(([userId, userInfo]) => userId && userInfo)
+        .map(([userId, userInfo]) => ({
+          ...userInfo,
+          id: userId, // Keep original ID
+          isSuggestion: true
+        }));
+      
+      console.log('Suggestions mode - unfriended as suggestions:', unfriendedSuggestions.map(f => f.id));
+      return unfriendedSuggestions;
+    }
     
-    console.log('Current friends:', currentFriends.map(f => f.id));
-    console.log('Recently unfriended:', Array.from(recentlyUnfriended.keys()));
-    console.log('Unfriended cards:', unfriendedCards.map(f => f.id));
+    console.log('Friends mode - current friends only:', currentFriends.map(f => f.id));
+    console.log('Recently unfriended (hidden):', Array.from(recentlyUnfriended.keys()));
     
-    const result = [...currentFriends, ...unfriendedCards];
-    console.log('Final display list:', result.map(f => f.id));
-    
-    return result;
-  }, [friends, recentlyUnfriended]);
+    return currentFriends;
+  }, [friends, recentlyUnfriended, activeTab]);
 
   return (
     <div className="friends-page">
@@ -406,7 +411,7 @@ const FriendsPage = () => {
                             }
                             
                             const isSuggestion = friend.isSuggestion;
-                            const friendId = isSuggestion ? friend.originalId : friend.id;
+                            const friendId = friend.id; // Use the actual ID
                             // Ensure absolutely unique keys using type prefix + id + index
                             const uniqueKey = isSuggestion ? `suggestion-${friendId}-${index}` : `friend-${friend.id}-${index}`;
                             
@@ -450,7 +455,39 @@ const FriendsPage = () => {
                           </button>
                         </div>
                       </h2>
-                      <FriendSuggestions />
+                      
+                      {/* Show recently unfriended users first */}
+                      {recentlyUnfriended.size > 0 && (
+                        <div className="recent-unfriended">
+                          <h3>Người bạn vừa xóa kết bạn</h3>
+                          <div className="cards-grid">
+                            {displayFriends.map((friend, index) => (
+                              <FriendCard
+                                key={`recent-${friend.id}-${index}`}
+                                user={friend}
+                                type="suggestion"
+                                onAdd={() => handleSendRequest(friend.id)}
+                                onUnfollow={() => handleUnfollowUser(friend.id)}
+                                onBlock={() => handleBlockUser(friend.id)}
+                                onReport={() => handleReportUser(friend.id)}
+                                loading={{
+                                  add: localActionLoading[`add_${friend.id}`],
+                                  unfollow: localActionLoading[`unfollow_${friend.id}`],
+                                  block: localActionLoading[`block_${friend.id}`],
+                                  report: localActionLoading[`report_${friend.id}`]
+                                }}
+                                mutualFriendsCount={friend.mutualFriendsCount || 0}
+                              />
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      
+                      {/* Show regular suggestions */}
+                      <div className="regular-suggestions">
+                        {recentlyUnfriended.size > 0 && <h3>Gợi ý khác</h3>}
+                        <FriendSuggestions />
+                      </div>
                     </div>
                   )}
 

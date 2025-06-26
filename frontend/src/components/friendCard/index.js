@@ -217,7 +217,7 @@ const FriendCard = ({
         
         
         <div className="mutual-info">
-          {mutualFriendsCount > 0 ? (
+          {mutualFriendsCount > 0 && (
             <div className="mutual-friends-display">
               <div className="mutual-avatars">
                 {/* Placeholder for mutual friends avatars - có thể bổ sung sau */}
@@ -228,10 +228,6 @@ const FriendCard = ({
                 {mutualFriendsCount} bạn chung
               </span>
             </div>
-          ) : (
-            <span className="mutual-count no-mutual">
-              Chưa có bạn chung
-            </span>
           )}
           {type === 'request' && user.createdAt && (
             <span className="request-time">

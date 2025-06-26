@@ -50,13 +50,9 @@ const AddFriendCard = ({
         </div>
         
         <div className="mutual-info">
-          {mutualFriendsCount > 0 ? (
+          {mutualFriendsCount > 0 && (
             <span className="mutual-count">
               {mutualFriendsCount} bạn chung
-            </span>
-          ) : (
-            <span className="mutual-count">
-              Chưa có bạn chung
             </span>
           )}
         </div>

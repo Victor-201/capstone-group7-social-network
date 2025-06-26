@@ -285,46 +285,47 @@
     .cards-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 16px;
-      padding: 8px 0;
+      gap: 8px; // Reduce from 16px to 8px for tighter layout
+      padding: 4px 0; // Reduce padding
       
       @media (min-width: 1200px) {
         grid-template-columns: repeat(4, 1fr);
-        gap: 16px;
+        gap: 8px;
       }
       
       @media (min-width: 992px) and (max-width: 1199px) {
         grid-template-columns: repeat(3, 1fr);
-        gap: 14px;
+        gap: 6px;
       }
       
       @media (min-width: 768px) and (max-width: 991px) {
         grid-template-columns: repeat(2, 1fr);
-        gap: 12px;
+        gap: 6px;
       }
 
       @media (max-width: 767px) {
         grid-template-columns: 1fr;
-        gap: 10px;
+        gap: 4px;
       }
     }
 
-    // Friend requests grid layout for compact cards
+    // Friend requests grid layout for compact cards - Facebook style
     .requests-list {
       .requests-cards-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-        gap: 16px;
-        margin-top: 16px;
+        gap: 8px; // Reduce gap to match Facebook's tight spacing
+        margin-top: 8px; // Reduce top margin
+        padding-top: 0;
 
         @media (max-width: 768px) {
           grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-          gap: 12px;
+          gap: 6px;
         }
 
         @media (max-width: 576px) {
           grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-          gap: 8px;
+          gap: 4px;
         }
       }
     }
