@@ -23,6 +23,21 @@ const FriendsPage = () => {
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   
+  // Search and filter states
+  const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
+  const [sortBy, setSortBy] = useState('name'); // name, recent, online
+  const [filterBy, setFilterBy] = useState('all'); // all, online, recent
+
+  // Debounce search query
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+  
   // Sử dụng hooks từ friends/ folder
   const {
     friends,
@@ -75,6 +90,20 @@ const FriendsPage = () => {
     }
   }, [searchParams]);
 
+  // Close filter dropdown when clicking outside - NOT NEEDED ANYMORE
+  // useEffect(() => {
+  //   const handleClickOutside = (event) => {
+  //     if (filterOpen && !event.target.closest('.filter-dropdown')) {
+  //       setFilterOpen(false);
+  //     }
+  //   };
+
+  //   document.addEventListener('mousedown', handleClickOutside);
+  //   return () => {
+  //     document.removeEventListener('mousedown', handleClickOutside);
+  //   };
+  // }, [filterOpen]);
+
   // Prepare friend IDs for batch mutual friends fetching
   const allFriendIds = useMemo(() => {
     const ids = new Set();
@@ -108,14 +137,12 @@ const FriendsPage = () => {
   // Fetch mutual friends counts for all users
   const {
     mutualCounts,
-    loading: mutualLoading,
     error: mutualError
   } = useBatchMutualFriends(allFriendIds);
 
   // Fetch detailed mutual friends data for all tabs that need it
   const {
     mutualFriendsData,
-    loading: mutualDetailedLoading,
     error: mutualDetailedError
   } = useBatchMutualFriendsDetailed(allFriendIds);
 
@@ -395,6 +422,109 @@ const FriendsPage = () => {
     return currentFriends;
   }, [friends, recentlyUnfriended, activeTab]);
 
+  // Search and filter logic
+  const filterAndSearchUsers = useCallback((userList, query = debouncedSearchQuery) => {
+    if (!Array.isArray(userList)) return [];
+    
+    let filtered = [...userList];
+    
+    // Apply search filter
+    if (query.trim()) {
+      const searchLower = query.toLowerCase().trim();
+      filtered = filtered.filter(user => 
+        user?.full_name?.toLowerCase().includes(searchLower) ||
+        user?.email?.toLowerCase().includes(searchLower) ||
+        user?.bio?.toLowerCase().includes(searchLower)
+      );
+    }
+    
+    // Apply status filter
+    if (filterBy === 'online') {
+      filtered = filtered.filter(user => user?.isOnline === true);
+    } else if (filterBy === 'recent') {
+      // Sort by most recent interaction/creation
+      filtered = filtered.filter(user => {
+        const daysDiff = user?.created_at ? 
+          (Date.now() - new Date(user.created_at)) / (1000 * 60 * 60 * 24) : 
+          Infinity;
+        return daysDiff <= 7; // Recent within 7 days
+      });
+    }
+    
+    // Apply sorting
+    filtered.sort((a, b) => {
+      switch (sortBy) {
+        case 'name':
+          return (a?.full_name || '').localeCompare(b?.full_name || '');
+        case 'recent':
+          return new Date(b?.created_at || 0) - new Date(a?.created_at || 0);
+        case 'online':
+          if (a?.isOnline && !b?.isOnline) return -1;
+          if (!a?.isOnline && b?.isOnline) return 1;
+          return (a?.full_name || '').localeCompare(b?.full_name || '');
+        default:
+          return 0;
+      }
+    });
+    
+    return filtered;
+  }, [debouncedSearchQuery, filterBy, sortBy]);
+
+  // Apply filters to each list
+  const filteredFriends = useMemo(() => 
+    filterAndSearchUsers(displayFriends), 
+    [displayFriends, filterAndSearchUsers]
+  );
+  
+  const filteredRequests = useMemo(() => {
+    const requestUsers = (receivedRequests || []).map(request => {
+      const requester = request?.Requester || request?.requester || request?.user;
+      return requester ? {
+        ...requester,
+        created_at: request.created_at || request.createdAt,
+        requestData: request
+      } : null;
+    }).filter(Boolean);
+    
+    return filterAndSearchUsers(requestUsers);
+  }, [receivedRequests, filterAndSearchUsers]);
+  
+  const filteredFollowers = useMemo(() => 
+    filterAndSearchUsers(followers || []), 
+    [followers, filterAndSearchUsers]
+  );
+  
+  const filteredFollowing = useMemo(() => 
+    filterAndSearchUsers(following || []), 
+    [following, filterAndSearchUsers]
+  );
+
+  // Handle search input change
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+  };
+
+  // Handle filter toggle - NOT NEEDED ANYMORE
+  // const handleFilterToggle = () => {
+  //   setFilterOpen(!filterOpen);
+  // };
+
+  // Handle filter option change
+  const handleSortChange = (newSortBy) => {
+    setSortBy(newSortBy);
+  };
+
+  const handleFilterChange = (newFilterBy) => {
+    setFilterBy(newFilterBy);
+  };
+
+  // Clear search and filters
+  const clearFilters = () => {
+    setSearchQuery('');
+    setFilterBy('all');
+    setSortBy('name');
+  };
+
   return (
     <div className="friends-page">
       <div className="container">
@@ -445,10 +575,25 @@ const FriendsPage = () => {
                   type="text" 
                   placeholder="Tìm kiếm bạn bè" 
                   className="search-input"
+                  value={searchQuery}
+                  onChange={handleSearchChange}
                 />
                 <div className="search-icon">
-                  <ThemedIcon icon={FaSearch} />
+                  {searchQuery && searchQuery !== debouncedSearchQuery ? (
+                    <ThemedIcon icon={FaSpinner} className="spinner" />
+                  ) : (
+                    <ThemedIcon icon={FaSearch} />
+                  )}
                 </div>
+                {searchQuery && (
+                  <button 
+                    className="clear-search"
+                    onClick={() => setSearchQuery('')}
+                    title="Xóa tìm kiếm"
+                  >
+                    <ThemedIcon icon={FaTimes} />
+                  </button>
+                )}
               </div>
               
               {(friendsLoading || requestsLoading || followLoading || actionLoading) ? (
@@ -461,23 +606,78 @@ const FriendsPage = () => {
                   {activeTab === 'friends' && (
                     <div className="friends-list">
                       <h2>
-                        Danh sách bạn bè ({(friends || []).length})
+                        Danh sách bạn bè ({filteredFriends.length})
                         <div className="section-actions">
-                          <button className="action-btn">
-                            <ThemedIcon icon={FaFilter} />
-                          </button>
                           <button className="action-btn">
                             <ThemedIcon icon={FaEllipsisH} />
                           </button>
                         </div>
                       </h2>
-                      {!(friends?.length) && !recentlyUnfriended.size ? (
+                      
+                      {/* Beautiful inline filter controls */}
+                      <div className="search-controls">
+                        <div className="search-row">
+                          <div className="filter-buttons">
+                            <span className="section-label">Lọc:</span>
+                            <button 
+                              className={`filter-btn ${filterBy === 'all' ? 'active' : ''}`}
+                              onClick={() => handleFilterChange('all')}
+                            >
+                              Tất cả
+                            </button>
+                            <button 
+                              className={`filter-btn ${filterBy === 'online' ? 'active' : ''}`}
+                              onClick={() => handleFilterChange('online')}
+                            >
+                              Online
+                            </button>
+                            <button 
+                              className={`filter-btn ${filterBy === 'recent' ? 'active' : ''}`}
+                              onClick={() => handleFilterChange('recent')}
+                            >
+                              Gần đây
+                            </button>
+                          </div>
+                          
+                          <div className="sort-buttons">
+                            <span className="section-label">Sắp xếp:</span>
+                            <button 
+                              className={`sort-btn ${sortBy === 'name' ? 'active' : ''}`}
+                              onClick={() => handleSortChange('name')}
+                            >
+                              Tên A-Z
+                            </button>
+                            <button 
+                              className={`sort-btn ${sortBy === 'recent' ? 'active' : ''}`}
+                              onClick={() => handleSortChange('recent')}
+                            >
+                              Gần đây
+                            </button>
+                            <button 
+                              className={`sort-btn ${sortBy === 'online' ? 'active' : ''}`}
+                              onClick={() => handleSortChange('online')}
+                            >
+                              Online
+                            </button>
+                          </div>
+                          
+                          {(filterBy !== 'all' || sortBy !== 'name') && (
+                            <button 
+                              className="clear-all-btn"
+                              onClick={clearFilters}
+                            >
+                              ✨ Xóa bộ lọc
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                      {!filteredFriends.length && !recentlyUnfriended.size ? (
                         <div className="empty-state">
-                          <p>Bạn chưa có người bạn nào. Hãy tìm và kết bạn với mọi người!</p>
+                          <p>{debouncedSearchQuery ? 'Không tìm thấy bạn bè nào phù hợp.' : 'Bạn chưa có người bạn nào. Hãy tìm và kết bạn với mọi người!'}</p>
                         </div>
                       ) : (
                         <div className="cards-grid">
-                          {displayFriends.length > 0 ? displayFriends.map((friend, index) => {
+                          {filteredFriends.length > 0 ? filteredFriends.map((friend, index) => {
                             // Validate friend object
                             if (!friend || !friend.id) {
                               console.warn('Invalid friend object:', friend);
@@ -570,45 +770,42 @@ const FriendsPage = () => {
                   {activeTab === 'requests' && (
                     <div className="requests-list">
                       <h2>
-                        Lời mời kết bạn ({(receivedRequests || []).length})
+                        Lời mời kết bạn ({filteredRequests.length})
                         <div className="section-actions">
                           <button className="action-btn">
                             <ThemedIcon icon={FaEllipsisH} />
                           </button>
                         </div>
                       </h2>
-                      {!(receivedRequests?.length) ? (
+                      {!filteredRequests.length ? (
                         <div className="empty-state">
-                          <p>Không có lời mời kết bạn nào.</p>
+                          <p>{debouncedSearchQuery ? 'Không tìm thấy lời mời kết bạn nào phù hợp.' : 'Không có lời mời kết bạn nào.'}</p>
                         </div>
                       ) : (
                         <div className="requests-cards-grid">
-                          {(receivedRequests || []).map((request, index) => {
-                            // Safe access to request data with multiple fallbacks
-                            const requester = request?.Requester || request?.requester || request?.user;
-                            
-                            // Ensure requester exists and has required properties
-                            if (!requester || !requester.id) {
-                              console.warn('Invalid request data:', request);
+                          {filteredRequests.map((requestUser, index) => {
+                            // Use the processed request user data
+                            if (!requestUser || !requestUser.id) {
+                              console.warn('Invalid request user data:', requestUser);
                               return null;
                             }
                             
                             return (
                               <UserCard
-                                key={`request-${requester.id}-${index}`}
+                                key={`request-${requestUser.id}-${index}`}
                                 user={{
-                                  ...requester,
-                                  full_name: requester.full_name || requester.fullName || requester.name,
-                                  createdAt: request.created_at || request.createdAt
+                                  ...requestUser,
+                                  full_name: requestUser.full_name || requestUser.fullName || requestUser.name,
+                                  createdAt: requestUser.created_at || requestUser.createdAt
                                 }}
-                                onPrimaryAction={() => handleRequestResponse(requester.id, 'accept')}
-                                onSecondaryAction={() => handleRequestResponse(requester.id, 'reject')}
+                                onPrimaryAction={() => handleRequestResponse(requestUser.id, 'accept')}
+                                onSecondaryAction={() => handleRequestResponse(requestUser.id, 'reject')}
                                 loading={{
-                                  primary: localActionLoading[`accept_${requester.id}`] || false,
-                                  secondary: localActionLoading[`reject_${requester.id}`] || false
+                                  primary: localActionLoading[`accept_${requestUser.id}`] || false,
+                                  secondary: localActionLoading[`reject_${requestUser.id}`] || false
                                 }}
-                                mutualFriendsCount={mutualCounts[requester.id] || 0}
-                                mutualFriendsData={mutualFriendsData[requester.id]?.mutualFriends || []}
+                                mutualFriendsCount={mutualCounts[requestUser.id] || 0}
+                                mutualFriendsData={mutualFriendsData[requestUser.id]?.mutualFriends || []}
                                 primaryButtonText="Xác nhận"
                                 secondaryButtonText="Xóa"
                                 type="request"
@@ -622,19 +819,19 @@ const FriendsPage = () => {
 
                   {activeTab === 'followers' && (
                     <div className="followers-list">
-                      <h2>Người theo dõi ({(followers || []).length})
+                      <h2>Người theo dõi ({filteredFollowers.length})
                         <div className="section-actions">
                           <button className="action-btn">
                             <ThemedIcon icon={FaEllipsisH} />
                           </button>
                         </div></h2>
-                      {!(followers?.length) ? (
+                      {!filteredFollowers.length ? (
                         <div className="empty-state">
-                          <p>Chưa có ai theo dõi bạn.</p>
+                          <p>{debouncedSearchQuery ? 'Không tìm thấy người theo dõi nào phù hợp.' : 'Chưa có ai theo dõi bạn.'}</p>
                         </div>
                       ) : (
                         <div className="cards-grid">
-                          {(followers || []).map(follower => (
+                          {filteredFollowers.map(follower => (
                             <FriendCard
                               key={follower.id}
                               user={follower}
@@ -663,19 +860,19 @@ const FriendsPage = () => {
 
                   {activeTab === 'following' && (
                     <div className="following-list">
-                      <h2>Đang theo dõi ({(following || []).length})
+                      <h2>Đang theo dõi ({filteredFollowing.length})
                         <div className="section-actions">
                           <button className="action-btn">
                             <ThemedIcon icon={FaEllipsisH} />
                           </button>
                         </div></h2>
-                      {!(following?.length) ? (
+                      {!filteredFollowing.length ? (
                         <div className="empty-state">
-                          <p>Bạn chưa theo dõi ai.</p>
+                          <p>{debouncedSearchQuery ? 'Không tìm thấy ai bạn đang theo dõi phù hợp.' : 'Bạn chưa theo dõi ai.'}</p>
                         </div>
                       ) : (
                         <div className="cards-grid">
-                          {(following || []).map(followedUser => (
+                          {filteredFollowing.map(followedUser => (
                             <FriendCard
                               key={followedUser.id}
                               user={followedUser}

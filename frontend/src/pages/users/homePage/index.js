@@ -2,22 +2,32 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { FaExclamationTriangle } from 'react-icons/fa';
 import CreatePost from '../../../components/createPost';
 import Post from '../../../components/postCard';
-import FriendCard from '../../../components/friendCard';
 import AddFriendCard from '../../../components/addFriendCard';
 import { useFriendSuggestions } from '../../../hooks/friends/useFriendSuggestions';
 import { useBatchMutualFriends, useBatchMutualFriendsDetailed } from '../../../hooks/friends/useMutualFriends';
+import { useFriendActions } from '../../../hooks/friends/useFriendActions';
 import photo1Image from "../../../assets/images/logo192.png"
 import './style.scss';
 
 const HomePage = () => {
   const [posts, setPosts] = useState([]);
+  const [message, setMessage] = useState('');
+  const [removedSuggestions, setRemovedSuggestions] = useState(new Set());
   
   // Hook để lấy friend suggestions từ database
   const { 
     suggestions: realFriendSuggestions, 
     loading: suggestionsLoading, 
-    error: suggestionsError 
+    error: suggestionsError,
+    refetch: refetchSuggestions
   } = useFriendSuggestions();
+  
+  // Hook cho friend actions
+  const {
+    sendRequest,
+    loading: friendActionLoading,
+    error: friendActionError
+  } = useFriendActions();
   
   // Prepare friend IDs for mutual friends
   const friendSuggestionIds = useMemo(() => {
@@ -26,15 +36,15 @@ const HomePage = () => {
 
   // Fetch mutual friends counts và detailed data
   const {
-    mutualCounts,
-    loading: mutualLoading,
-    error: mutualError
+    mutualCounts
+    // loading: mutualLoading,
+    // error: mutualError
   } = useBatchMutualFriends(friendSuggestionIds);
 
   const {
-    mutualFriendsData,
-    loading: mutualDetailedLoading,
-    error: mutualDetailedError
+    mutualFriendsData
+    // loading: mutualDetailedLoading,
+    // error: mutualDetailedError
   } = useBatchMutualFriendsDetailed(friendSuggestionIds);
   
   // Tạo ref để giữ vị trí random, không bị random lại mỗi lần render
@@ -167,11 +177,36 @@ const HomePage = () => {
     if (suggestionsLoading || !realFriendSuggestions) {
       return [];
     }
-    // Shuffle và giới hạn số lượng hiển thị
+    // Filter out removed suggestions và shuffle
     return [...realFriendSuggestions]
+      .filter(user => !removedSuggestions.has(user.id))
       .sort(() => Math.random() - 0.5)
       .slice(0, 10); // Hiển thị tối đa 10 suggestions
-  }, [realFriendSuggestions, suggestionsLoading]);
+  }, [realFriendSuggestions, suggestionsLoading, removedSuggestions]);
+
+  // Handler cho thêm bạn bè
+  const handleAddFriend = async (user) => {
+    try {
+      await sendRequest(user.id);
+      setMessage(`Đã gửi lời mời kết bạn đến ${user.fullName || user.full_name || user.user_name}`);
+      
+      // Remove from suggestions after successful send
+      setRemovedSuggestions(prev => new Set([...prev, user.id]));
+      
+      // Clear message after 3 seconds
+      setTimeout(() => setMessage(''), 3000);
+    } catch (error) {
+      setMessage(`Lỗi khi gửi lời mời: ${error.message}`);
+      setTimeout(() => setMessage(''), 5000);
+    }
+  };
+
+  // Handler cho xóa suggestion
+  const handleRemoveSuggestion = (user) => {
+    setRemovedSuggestions(prev => new Set([...prev, user.id]));
+    setMessage(`Đã xóa gợi ý kết bạn với ${user.fullName || user.full_name || user.user_name}`);
+    setTimeout(() => setMessage(''), 3000);
+  };
 
   const renderPostsWithSuggestions = () => {
     if (!posts.length) return null;
@@ -204,6 +239,12 @@ const HomePage = () => {
                       type="compact"
                       mutualFriendsCount={mutualCounts[user.id] || 0}
                       mutualFriendsData={mutualFriendsData[user.id]?.mutualFriends || []}
+                      onAdd={() => handleAddFriend(user)}
+                      onRemove={() => handleRemoveSuggestion(user)}
+                      loading={{ 
+                        add: friendActionLoading,
+                        remove: false 
+                      }}
                     />
                   ))
                 ) : (
@@ -223,6 +264,13 @@ const HomePage = () => {
   return (
     <div className="container">
       <article className="home-page">
+        {/* Message display */}
+        {message && (
+          <div className={`message ${friendActionError ? 'error-message' : 'success-message'}`}>
+            {message}
+          </div>
+        )}
+        
         {/* Create Post Section */}
         <div className="create-post-section">
           <CreatePost />
