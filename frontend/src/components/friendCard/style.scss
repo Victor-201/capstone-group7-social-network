@@ -319,18 +319,43 @@
   }
 
   // Responsive design
-  @media (max-width: 576px) {
-    max-width: 100%;
+  @media (max-width: 768px) {
+    max-width: 160px;
 
     .friend-info {
       padding: 10px 12px 6px 12px;
 
       .friend-name h3 {
-        font-size: 16px; /* Tăng từ 15px lên 16px cho mobile */
+        font-size: 16px;
+      }
+
+      .mutual-info .mutual-count {
+        font-size: 13px;
+      }
+    }
+
+    .friend-actions {
+      padding: 0 12px 12px 12px;
+
+      .action-buttons .action-button {
+        padding: 9px 14px;
+        font-size: 15px;
+      }
+    }
+  }
+
+  @media (max-width: 576px) {
+    max-width: 140px;
+
+    .friend-info {
+      padding: 8px 10px 6px 10px;
+
+      .friend-name h3 {
+        font-size: 15px;
       }
 
       .friend-name .username {
-        font-size: 13px; /* Tăng từ 12px lên 13px cho mobile */
+        font-size: 12px;
       }
 
       .mutual-info {
@@ -343,43 +368,45 @@
           }
 
           .mutual-count {
-            font-size: 13px; /* Tăng từ 12px lên 13px cho mobile */
+            font-size: 12px;
           }
         }
 
         .mutual-count.no-mutual {
-          font-size: 13px; /* Tăng từ 12px lên 13px cho mobile */
+          font-size: 12px;
         }
 
         .request-time {
-          font-size: 12px; /* Tăng từ 11px lên 12px cho mobile */
+          font-size: 11px;
         }
       }
     }
 
     .friend-actions {
-      padding: 0 12px 12px 12px;
+      padding: 0 10px 10px 10px;
 
       .action-buttons {
         .action-button {
-          padding: 9px 12px; /* Tăng từ 8px lên 9px cho mobile */
-          font-size: 15px; /* Tăng từ 14px lên 15px cho mobile */
+          padding: 8px 12px;
+          font-size: 14px;
 
           .friend-card-icon {
-            font-size: 16px; /* Tăng từ 15px lên 16px cho mobile */
+            font-size: 15px;
           }
         }
 
         &.suggestion-actions {
           .more-options .more-button {
-            width: 36px;
-            height: 36px;
+            width: 32px;
+            height: 32px;
           }
         }
       }
     }
   }
 }
+
+// ...existing code...
 
 @keyframes spin {
   from {

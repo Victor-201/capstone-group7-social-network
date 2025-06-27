@@ -285,27 +285,32 @@
     .cards-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 8px; // Reduce from 16px to 8px for tighter layout
-      padding: 4px 0; // Reduce padding
+      gap: 12px; // Increase from 8px to 12px for better spacing
+      padding: 8px 0;
       
       @media (min-width: 1200px) {
         grid-template-columns: repeat(4, 1fr);
-        gap: 8px;
+        gap: 12px;
       }
       
       @media (min-width: 992px) and (max-width: 1199px) {
         grid-template-columns: repeat(3, 1fr);
-        gap: 6px;
+        gap: 10px;
       }
       
       @media (min-width: 768px) and (max-width: 991px) {
         grid-template-columns: repeat(2, 1fr);
-        gap: 6px;
+        gap: 10px;
       }
 
       @media (max-width: 767px) {
-        grid-template-columns: 1fr;
-        gap: 4px;
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 8px;
+      }
+
+      @media (max-width: 576px) {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 6px;
       }
     }
 
@@ -313,9 +318,9 @@
     .requests-list {
       .requests-cards-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-        gap: 8px; // Reduce gap to match Facebook's tight spacing
-        margin-top: 8px; // Reduce top margin
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); // Match UserCard compact width
+        gap: 8px; // Tight spacing
+        margin-top: 12px;
         padding-top: 0;
 
         @media (max-width: 768px) {
@@ -325,7 +330,7 @@
 
         @media (max-width: 576px) {
           grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-          gap: 4px;
+          gap: 6px;
         }
       }
     }

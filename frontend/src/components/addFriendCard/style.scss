@@ -186,8 +186,60 @@
     }
   }
 
+  // Responsive design
+  @media (max-width: 768px) {
+    padding: 10px 12px;
+
+    .friend-avatar {
+      margin-right: 10px;
+
+      img {
+        width: 50px;
+        height: 50px;
+      }
+    }
+
+    .friend-info {
+      .friend-name {
+        h3 {
+          font-size: 15px;
+          line-height: 1.2;
+        }
+
+        .username {
+          font-size: 12px;
+        }
+      }
+
+      .mutual-info {
+        .mutual-count {
+          font-size: 12px;
+        }
+      }
+    }
+
+    .friend-actions {
+      .action-buttons {
+        gap: 6px;
+
+        .action-button {
+          &.add-button {
+            padding: 7px 12px;
+            font-size: 13px;
+          }
+
+          &.remove-suggestion-button {
+            width: 32px;
+            height: 32px;
+            padding: 6px;
+          }
+        }
+      }
+    }
+  }
+
   @media (max-width: 576px) {
-    padding: 8px 12px;
+    padding: 8px 10px;
 
     .friend-avatar {
       margin-right: 8px;
@@ -221,10 +273,8 @@
       .action-buttons {
         .action-button {
           &.add-button {
-            width: 100%;
-            justify-content: center;
+            padding: 6px 10px;
             font-size: 12px;
-            padding: 6px 8px;
           }
 
           &.remove-suggestion-button {
@@ -238,44 +288,42 @@
   }
 }
 
-// Compact layout (vertical) for friend request cards - Square avatar style
+// Compact layout (vertical) for friend suggestions - optimized for horizontal scroll
 .add-friend-card.compact {
   display: flex;
   flex-direction: column;
-  padding: 0; // Remove padding to match square avatar design
+  padding: 0;
   background: #ffffff;
   border-radius: 8px;
   border: 1px solid #dddfe2;
-  margin-bottom: 12px;
   transition: all 0.2s ease;
-  max-width: 200px;
-  width: 100%;
-  overflow: hidden; // Hide overflow for clean look
+  width: 200px; // Fixed width for horizontal scroll
+  overflow: hidden;
 
   &:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-color: rgba(24, 119, 242, 0.2);
   }
 
   .friend-avatar {
     width: 100%;
     height: 0;
-    padding-bottom: 100%; // Creates 1:1 aspect ratio (square)
+    padding-bottom: 100%; // Square aspect ratio
     position: relative;
     background: #f0f2f5;
     overflow: hidden;
 
     .avatar-user {
-      position: absolute !important; // Override AvatarUser component styles
+      position: absolute !important;
       top: 0 !important;
       left: 0 !important;
       width: 100% !important;
       height: 100% !important;
       object-fit: cover !important;
-      border: none !important; // Remove border for full square look
-      border-radius: 0 !important; // Square corners
-      margin: 0 !important; // Remove any margins
-      aspect-ratio: unset !important; // Remove aspect-ratio constraint
+      border: none !important;
+      border-radius: 0 !important;
+      margin: 0 !important;
     }
 
     img {
@@ -288,62 +336,54 @@
       border: none !important;
       border-radius: 0 !important;
       margin: 0 !important;
-      aspect-ratio: unset !important;
     }
   }
 
   .friend-info {
-    padding: 16px; // Normal padding for content area
-    width: 100%;
+    padding: 12px 12px 8px 12px;
+    text-align: center;
 
     .friend-name {
       h3 {
-        margin: 0 0 4px 0;
+        margin: 0 0 6px 0;
         font-size: 16px;
         font-weight: 600;
         color: #1c1e21;
-        line-height: 1.2;
-        word-wrap: break-word;
-        text-align: center;
+        line-height: 1.3;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
       }
 
       .username {
-        display: block;
-        font-size: 13px;
-        color: #65676b;
-        font-weight: 400;
-        margin-bottom: 8px;
-        text-align: center;
+        display: none; // Hidden for clean compact look
       }
     }
 
     .mutual-info {
-      text-align: center;
-
       .mutual-count {
         font-size: 13px;
         color: #65676b;
         font-weight: 400;
+        line-height: 1.2;
       }
     }
   }
 
   .friend-actions {
-    width: 100%;
-    padding: 0 16px 16px 16px; // Bottom and side padding only
+    padding: 0 12px 12px 12px;
 
     .action-buttons {
       display: flex;
       flex-direction: column;
       gap: 8px;
-      width: 100%;
 
       .action-button {
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 6px;
-        padding: 10px 16px;
+        gap: 4px;
+        padding: 8px 12px;
         border: none;
         border-radius: 6px;
         font-size: 14px;
@@ -393,29 +433,15 @@
     }
   }
 
-  // Responsive for compact layout
+  // Responsive for horizontal scroll layout
   @media (max-width: 768px) {
-    max-width: 160px;
-    padding: 12px;
-
-    .friend-avatar {
-      margin-bottom: 10px;
-
-      img {
-        width: 70px;
-        height: 70px;
-      }
-    }
+    width: 180px;
 
     .friend-info {
-      margin-bottom: 12px;
+      padding: 10px 10px 6px 10px;
 
       .friend-name h3 {
-        font-size: 14px;
-      }
-
-      .friend-name .username {
-        font-size: 12px;
+        font-size: 15px;
       }
 
       .mutual-info .mutual-count {
@@ -423,12 +449,43 @@
       }
     }
 
-    .friend-actions .action-buttons .action-button {
-      padding: 8px 12px;
-      font-size: 13px;
+    .friend-actions {
+      padding: 0 10px 10px 10px;
+      
+      .action-buttons .action-button {
+        padding: 7px 10px;
+        font-size: 13px;
+      }
+    }
+  }
+
+  @media (max-width: 480px) {
+    width: 160px;
+
+    .friend-info {
+      padding: 8px 8px 6px 8px;
+
+      .friend-name h3 {
+        font-size: 14px;
+      }
+
+      .mutual-info .mutual-count {
+        font-size: 11px;
+      }
+    }
+
+    .friend-actions {
+      padding: 0 8px 8px 8px;
+      
+      .action-buttons .action-button {
+        padding: 6px 8px;
+        font-size: 12px;
+      }
     }
   }
 }
+
+// ...existing code...
 
 @keyframes spin {
   from {

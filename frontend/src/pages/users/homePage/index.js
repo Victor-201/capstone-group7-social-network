@@ -3,6 +3,7 @@ import { FaExclamationTriangle } from 'react-icons/fa';
 import CreatePost from '../../../components/createPost';
 import Post from '../../../components/postCard';
 import FriendCard from '../../../components/friendCard';
+import AddFriendCard from '../../../components/addFriendCard';
 import photo1Image from "../../../assets/images/logo192.png"
 import './style.scss';
 
@@ -164,7 +165,7 @@ const HomePage = () => {
               </div>
               <div className="friend-suggestions-list" ref={listRef}>
                 {friendSuggestions.map((user, idx) => (
-                  <FriendCard key={user.id} user={user} />
+                  <AddFriendCard key={user.id} user={user} type="compact" />
                 ))}
               </div>
             </div>

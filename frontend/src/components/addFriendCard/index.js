@@ -68,7 +68,7 @@ const AddFriendCard = ({
             {loading.add ? (
               <AddFriendCardIcon icon={FaSpinner} className="spinner" />
             ) : null}
-            {type === 'compact' ? 'Xác nhận' : 'Thêm bạn bè'}
+            {type === 'compact' && showRemove ? 'Xác nhận' : 'Thêm bạn bè'}
           </button>
           
           <button 
@@ -79,8 +79,9 @@ const AddFriendCard = ({
             {loading.remove ? (
               <AddFriendCardIcon icon={FaSpinner} className="spinner" />
             ) : null}
-            {type === 'compact' ? 'Xóa' : ''}
+            {type === 'compact' && showRemove ? 'Xóa' : ''}
             {type !== 'compact' && <AddFriendCardIcon icon={FaTimes} />}
+            {type === 'compact' && !showRemove && 'Xóa'}
           </button>
         </div>
       </div>

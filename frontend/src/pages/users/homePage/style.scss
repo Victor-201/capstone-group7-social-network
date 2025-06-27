@@ -57,3 +57,81 @@
   flex-direction: column;
   gap: 8px;
 }
+
+// Friend suggestions section styles
+.friend-suggestions-horizontal {
+  background: #fff;
+  border-radius: 10px;
+  padding: 16px;
+  margin: 24px 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  
+  .friend-suggestions-header {
+    margin-bottom: 16px;
+    
+    span:first-child {
+      display: block;
+      font-weight: bold;
+      font-size: 18px;
+      color: #1c1e21;
+      margin-bottom: 4px;
+    }
+    
+    .friend-suggestions-desc {
+      display: block;
+      font-weight: normal;
+      font-size: 14px;
+      color: #65676b;
+    }
+  }
+  
+  .friend-suggestions-list {
+    display: flex;
+    overflow-x: auto;
+    overflow-y: hidden;
+    gap: 12px;
+    padding: 8px 0 16px 0;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0,0,0,0.2) transparent;
+    
+    &::-webkit-scrollbar {
+      height: 6px;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+      background-color: rgba(0,0,0,0.2);
+      border-radius: 3px;
+    }
+    
+    &::-webkit-scrollbar-track {
+      background-color: transparent;
+    }
+    
+    // Ensure cards don't shrink and maintain fixed width for horizontal scroll
+    .add-friend-card.compact {
+      flex: 0 0 auto;
+      width: 200px; // Fixed width for horizontal layout
+      min-width: 200px;
+      margin: 0; // Remove auto margin
+    }
+    
+    @media (max-width: 768px) {
+      gap: 10px;
+      padding: 8px 0 12px 0;
+      
+      .add-friend-card.compact {
+        width: 180px;
+        min-width: 180px;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      gap: 8px;
+      
+      .add-friend-card.compact {
+        width: 160px;
+        min-width: 160px;
+      }
+    }
+  }
+}

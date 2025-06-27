@@ -25,7 +25,7 @@ const UserCard = ({
   type = "suggestion", // suggestion, request
 }) => {
   return (
-    <div className="user-card">
+    <div className="user-card facebook-style">
       <div className="user-avatar">
         <AvatarUser user={user} size="large" />
       </div>
