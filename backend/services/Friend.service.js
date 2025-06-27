@@ -114,7 +114,11 @@ export default {
   async getFriendsList(user_id) {
     const sent = await Friend.findAll({
       where: { user_id, status: 'accepted' },
-      include: [{ model: UserInfo, as: 'Recipient', attributes: ['id', 'full_name', 'avatar'] }]
+      include: [{ model: UserInfo, as: 'Recipient', attributes: ['id', 'full_name', 'avatar'], include: [{
+            model: UserAccount,
+            as: 'userAccount',
+            attributes: ['user_name']
+          }] }]
     });
 
     const received = await Friend.findAll({
