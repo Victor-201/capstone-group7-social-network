@@ -1,7 +1,7 @@
 import models from '../models/index.js';
 import { Op, Sequelize } from 'sequelize';
 
-const { Chat, ChatParticipant } = models;
+const { Chat, ChatParticipant, UserAccount, UserInfo, Message } = models;
 
 export default {
   async createPrivateChat(userId, otherUserId) {
@@ -44,25 +44,52 @@ export default {
       };
     }
   },
-
   async getPrivateChats(userId) {
     try {
       const chats = await Chat.findAll({
         where: { is_group: false },
-        include: [{
-          model: ChatParticipant,
-          as: 'Participants',
-          where: { user_id: userId },
-          attributes: []
-        }],
+        include: [
+          {
+            model: ChatParticipant,
+            as: 'Participants',
+            attributes: ['user_id'],
+            include: [{
+              model: UserInfo,
+              as: 'User',
+              attributes: ['id', 'full_name', 'avatar'],
+              include: [{
+                model: UserAccount,
+                as: 'userAccount',
+                attributes: ['user_name']
+              }]
+            }]
+          },
+          {
+            model: Message,
+            as: 'Messages',
+            separate: true,
+            limit: 1,
+            order: [['sent_at', 'DESC']]
+          }
+        ],
         order: [['created_at', 'DESC']]
       });
+      const result = chats.map(chat => {
+        const other = chat.Participants.find(p => p.user_id !== userId);
+        return {
+          chat_id: chat.id,
+          latest_message: chat.Messages?.[0] || null,
+          other_user: other?.User || null
+        };
+      });
 
-      return { result: chats };
+      return { result };
     } catch (error) {
+      console.error("Get private chats error:", error);
       return {
-        error: { code: 500, message: 'Error fetching chat list', detail: error.message }
+        error: { code: 500, message: 'Error fetching private chats', detail: error.message }
       };
     }
   }
+
 };
