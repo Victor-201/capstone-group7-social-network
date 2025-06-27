@@ -1,7 +1,7 @@
 import models from '../models/index.js';
 import { Op } from 'sequelize';
 
-const { Friend, UserInfo } = models;
+const { Friend, UserInfo, UserAccount } = models;
 
 const extractFriendIds = (records, targetId) =>
   records.map(r => r.user_id === targetId ? r.friend_id : r.user_id);
@@ -69,6 +69,7 @@ export default {
       return { error: { code: 400, message: "Invalid user" } };
     }
 
+    // Lấy danh sách bạn bè của user A
     const aFriends = await Friend.findAll({
       where: {
         status: 'accepted',
@@ -77,6 +78,7 @@ export default {
       attributes: ['user_id', 'friend_id']
     });
 
+    // Lấy danh sách bạn bè của user B
     const bFriends = await Friend.findAll({
       where: {
         status: 'accepted',
@@ -85,22 +87,30 @@ export default {
       attributes: ['user_id', 'friend_id']
     });
 
+    // Hàm tách ra ID bạn bè
     const aSet = new Set(extractFriendIds(aFriends, user_id));
     const bSet = new Set(extractFriendIds(bFriends, friend_id));
 
+    // Giao 2 tập hợp để tìm bạn chung
     const mutualIds = [...aSet].filter(id => bSet.has(id));
+
     if (mutualIds.length === 0) {
       return { error: { code: 404, message: "No mutual friends found" } };
     }
 
+    // Lấy thông tin chi tiết các bạn chung
     const mutualFriends = await UserInfo.findAll({
       where: { id: { [Op.in]: mutualIds } },
+      include: [{
+        model: UserAccount,
+        as: 'userAccount',
+        attributes: ['user_name']
+      }],
       attributes: ['id', 'full_name', 'avatar']
     });
 
-    return { result: { mutualFriends }, count: mutualIds.length};
+    return { result: { mutualFriends }, count: mutualIds.length };
   },
-
   async getFriendsList(user_id) {
     const sent = await Friend.findAll({
       where: { user_id, status: 'accepted' },
@@ -109,7 +119,17 @@ export default {
 
     const received = await Friend.findAll({
       where: { friend_id: user_id, status: 'accepted' },
-      include: [{ model: UserInfo, as: 'Requester', attributes: ['id', 'full_name', 'avatar'] }]
+      include: [
+        { model: UserInfo, 
+          as: 'Requester', 
+          attributes: ['id', 'full_name', 'avatar'],
+          include: [{
+            model: UserAccount,
+            as: 'userAccount',
+            attributes: ['user_name']
+          }]
+        }
+      ]
     });
 
     const friends = [
@@ -117,7 +137,7 @@ export default {
       ...received.map(f => f.Requester)
     ];
 
-    return { result:  friends  };
+    return { result: friends };
   },
 
   async deleteFriend(user_id, friend_id) {
@@ -149,8 +169,13 @@ export default {
       include: [{
         model: UserInfo,
         as: 'Recipient',
-        attributes: ['id', 'full_name', 'avatar']
-      }]
+        attributes: ['id', 'full_name', 'avatar'],
+        include: [{
+          model: UserAccount,
+          as: 'userAccount',
+          attributes: ['user_name']
+        }]
+      }],
     });
 
     return { result: { requests: sentRequests } };
@@ -162,7 +187,12 @@ export default {
       include: [{
         model: UserInfo,
         as: 'Requester',
-        attributes: ['id', 'full_name', 'avatar']
+        attributes: ['id', 'full_name', 'avatar'],
+        include: [{
+          model: UserAccount,
+          as: 'userAccount',
+          attributes: ['user_name']
+        }]
       }]
     });
 
@@ -176,19 +206,19 @@ export default {
 
     try {
       const friend = await Friend.findOne({
-      where: {
-        status: 'accepted',
-        [Op.or]: [
-          { user_id, friend_id },
-          { user_id: friend_id, friend_id: user_id }
-        ]
-      }
-    });
+        where: {
+          status: 'accepted',
+          [Op.or]: [
+            { user_id, friend_id },
+            { user_id: friend_id, friend_id: user_id }
+          ]
+        }
+      });
 
-    if (!friend) {
-      return { isFriend: false };
-    }
-    return { isFriend: true };
+      if (!friend) {
+        return { isFriend: false };
+      }
+      return { isFriend: true };
     } catch (error) {
       return { error: { code: 500, message: "Server internal error" } };
     }
@@ -199,7 +229,7 @@ export default {
     }
 
     try {
-      
+
       const directFriends = await Friend.findAll({
         where: {
           status: 'accepted',
@@ -211,7 +241,7 @@ export default {
         f.user_id === user_id ? f.friend_id : f.user_id
       );
 
-      
+
       const friendsOfFriends = await Friend.findAll({
         where: {
           status: 'accepted',
@@ -255,6 +285,11 @@ export default {
 
       const suggestedUsers = await UserInfo.findAll({
         where: { id: { [Op.in]: finalSuggestedIds } },
+        include: [{
+          model: UserAccount,
+          as: 'userAccount',
+          attributes: ['user_name']
+        }],
         attributes: ["id", "full_name", "avatar"]
       });
       return { result: suggestedUsers };
