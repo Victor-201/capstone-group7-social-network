@@ -29,14 +29,16 @@ const getUserName = (user) => {
 
 const FriendCard = ({ 
   user, 
-  type = 'friend', // friend, request, suggestion, not-friend
+  type = 'friend', // friend, request, suggestion, not-friend, follower, following
   onAccept,
   onReject,
   onRemove,
   onAdd,
+  onFollow,
   onUnfollow,
   onBlock,
   onReport,
+  isFollowing = false,
   loading = {},
   mutualFriendsCount = 0,
   mutualFriendsData = [],
@@ -117,6 +119,131 @@ const FriendCard = ({
                   >
                     <FriendCardIcon icon={FaEyeSlash} />
                     Huỷ theo dõi
+                  </button>
+                  <button 
+                    className="dropdown-item"
+                    onClick={() => {
+                      onBlock?.();
+                      setShowDropdown(false);
+                    }}
+                  >
+                    <FriendCardIcon icon={FaBan} />
+                    Chặn
+                  </button>
+                  <button 
+                    className="dropdown-item"
+                    onClick={() => {
+                      onReport?.();
+                      setShowDropdown(false);
+                    }}
+                  >
+                    <FriendCardIcon icon={FaFlag} />
+                    Báo cáo
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+
+      case 'follower':
+        return (
+          <div className="action-buttons">
+            <button 
+              className="action-button add-button"
+              onClick={onAdd}
+              disabled={loading.add}
+            >
+              {loading.add ? <FriendCardIcon icon={FaSpinner} className="spinner" /> : <FriendCardIcon icon={FaUserPlus} />}
+              Thêm bạn bè
+            </button>
+            <div className="more-options" ref={dropdownRef}>
+              <button 
+                className="action-button more-button"
+                onClick={() => setShowDropdown(!showDropdown)}
+              >
+                <FriendCardIcon icon={FaEllipsisH} />
+              </button>
+              {showDropdown && (
+                <div className="dropdown-menu">
+                  {isFollowing ? (
+                    <button 
+                      className="dropdown-item"
+                      onClick={() => {
+                        onUnfollow?.();
+                        setShowDropdown(false);
+                      }}
+                    >
+                      <FriendCardIcon icon={FaEyeSlash} />
+                      Huỷ theo dõi
+                    </button>
+                  ) : (
+                    <button 
+                      className="dropdown-item"
+                      onClick={() => {
+                        onFollow?.();
+                        setShowDropdown(false);
+                      }}
+                    >
+                      <FriendCardIcon icon={FaUserPlus} />
+                      Theo dõi lại
+                    </button>
+                  )}
+                  <button 
+                    className="dropdown-item"
+                    onClick={() => {
+                      onBlock?.();
+                      setShowDropdown(false);
+                    }}
+                  >
+                    <FriendCardIcon icon={FaBan} />
+                    Chặn
+                  </button>
+                  <button 
+                    className="dropdown-item"
+                    onClick={() => {
+                      onReport?.();
+                      setShowDropdown(false);
+                    }}
+                  >
+                    <FriendCardIcon icon={FaFlag} />
+                    Báo cáo
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+
+      case 'following':
+        return (
+          <div className="action-buttons">
+            <button 
+              className="action-button unfollow-button"
+              onClick={onUnfollow}
+              disabled={loading.unfollow}
+            >
+              {loading.unfollow ? <FriendCardIcon icon={FaSpinner} className="spinner" /> : <FriendCardIcon icon={FaEyeSlash} />}
+              Huỷ theo dõi
+            </button>
+            <div className="more-options" ref={dropdownRef}>
+              <button 
+                className="action-button more-button"
+                onClick={() => setShowDropdown(!showDropdown)}
+              >
+                <FriendCardIcon icon={FaEllipsisH} />
+              </button>
+              {showDropdown && (
+                <div className="dropdown-menu">
+                  <button 
+                    className="dropdown-item"
+                    onClick={() => {
+                      onAdd?.();
+                      setShowDropdown(false);
+                    }}
+                  >
+                    <FriendCardIcon icon={FaUserPlus} />
+                    Thêm bạn bè
                   </button>
                   <button 
                     className="dropdown-item"

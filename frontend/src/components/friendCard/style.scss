@@ -218,6 +218,24 @@
             cursor: not-allowed;
           }
         }
+
+        &.unfollow-button {
+          background: #f0f2f5;
+          color: #1c1e21;
+          border: 1px solid #dddfe2;
+
+          &:hover:not(:disabled) {
+            background: #e4e6ea;
+            color: #1c1e21;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+          }
+
+          &:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+          }
+        }
       }
 
       // More options for second button row

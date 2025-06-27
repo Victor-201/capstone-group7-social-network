@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { FaSpinner, FaExclamationTriangle, FaSearch, FaFilter, FaEllipsisH } from 'react-icons/fa';
+import { FaSpinner, FaExclamationTriangle, FaSearch, FaFilter, FaEllipsisH, FaBars, FaTimes } from 'react-icons/fa';
 import FriendCard from '../../../components/friendCard';
 import UserCard from '../../../components/userCard';
 import FriendSuggestions from '../../../components/friendSuggestions';
@@ -21,6 +21,7 @@ const ThemedIcon = ({ icon: Icon, className }) => {
 const FriendsPage = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   
   // Sử dụng hooks từ friends/ folder
   const {
@@ -263,30 +264,21 @@ const FriendsPage = () => {
     }
   };
 
-  // Handle follow/unfollow user
-  const handleFollowToggle = async (userId, isFollowing) => {
+  // Handle follow user
+  const handleFollowUser = async (userId) => {
     setLocalActionLoading(prev => ({ ...prev, [`follow_${userId}`]: true }));
     
     try {
-      let result;
-      if (isFollowing) {
-        result = await unfollowUser(userId);
-        if (result.success) {
-          setMessage('Đã hủy theo dõi người dùng');
-        }
+      const result = await followUser(userId);
+      if (result.success) {
+        setMessage('Đã theo dõi người dùng');
+        await fetchAllData(); // Refresh data
       } else {
-        result = await followUser(userId);
-        if (result.success) {
-          setMessage('Đã theo dõi người dùng');
-        }
-      }
-      
-      if (!result.success) {
-        console.error('Error with follow action:', result.message || 'Unknown error');
-        setMessage('Có lỗi xảy ra với thao tác theo dõi');
+        console.error('Error following user:', result.message || 'Unknown error');
+        setMessage('Có lỗi xảy ra khi theo dõi người dùng');
       }
     } catch (err) {
-      console.error('handleFollowToggle error', err);
+      console.error('handleFollowUser error', err);
       setMessage('Đã xảy ra lỗi. Vui lòng thử lại sau.');
     } finally {
       setLocalActionLoading(prev => ({ ...prev, [`follow_${userId}`]: false }));
@@ -300,19 +292,16 @@ const FriendsPage = () => {
 
   // Handle unfollow user
   const handleUnfollowUser = async (userId) => {
-    if (!window.confirm('Bạn có chắc chắn muốn huỷ theo dõi người này?')) {
-      return;
-    }
-    
     setLocalActionLoading(prev => ({ ...prev, [`unfollow_${userId}`]: true }));
     
     try {
       const result = await unfollowUser(userId);
       if (result.success) {
-        setMessage('Đã huỷ theo dõi người dùng');
-        await fetchAllData();
+        setMessage('Đã bỏ theo dõi người dùng');
+        await fetchAllData(); // Refresh data
       } else {
-        setMessage('Có lỗi xảy ra khi huỷ theo dõi');
+        console.error('Error unfollowing user:', result.message || 'Unknown error');
+        setMessage('Có lỗi xảy ra khi bỏ theo dõi người dùng');
       }
     } catch (err) {
       console.error('handleUnfollowUser error', err);
@@ -320,6 +309,7 @@ const FriendsPage = () => {
     } finally {
       setLocalActionLoading(prev => ({ ...prev, [`unfollow_${userId}`]: false }));
       
+      // Clear message after 3 seconds
       setTimeout(() => {
         setMessage(null);
       }, 3000);
@@ -417,9 +407,39 @@ const FriendsPage = () => {
         )}
         
         <div className="friends-wrapper">
-          <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
+          {/* Mobile sidebar overlay */}
+          <div 
+            className={`sidebar-overlay ${sidebarOpen ? 'active' : ''}`}
+            onClick={() => setSidebarOpen(false)}
+          />
+          
+          <div className={`friends-sidebar ${sidebarOpen ? 'mobile-open' : ''}`}>
+            {/* Mobile close button */}
+            <button 
+              className="mobile-close-btn"
+              onClick={() => setSidebarOpen(false)}
+            >
+              <ThemedIcon icon={FaTimes} />
+            </button>
+            
+            <h1 className="page-title">Bạn bè</h1>
+            <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
+          </div>
+          
           <div className="friends-main">
             <div className="content">
+              {/* Mobile header with toggle */}
+              <div className="mobile-header">
+                <button 
+                  className="mobile-toggle-btn"
+                  onClick={() => setSidebarOpen(true)}
+                >
+                  <ThemedIcon icon={FaBars} />
+                  <span>Menu</span>
+                </button>
+                <h2 className="mobile-title">Bạn bè</h2>
+              </div>
+              
               <div className="search-friends">
                 <input 
                   type="text" 
@@ -621,13 +641,13 @@ const FriendsPage = () => {
                               type="follower"
                               isFollowing={isUserFollowed(follower.id)}
                               onAdd={() => handleSendRequest(follower.id)}
-                              onFollow={() => handleFollowToggle(follower.id, false)}
+                              onFollow={() => handleFollowUser(follower.id)}
                               onUnfollow={() => handleUnfollowUser(follower.id)}
                               onBlock={() => handleBlockUser(follower.id)}
                               onReport={() => handleReportUser(follower.id)}
                               loading={{
-                                add: actionLoading[`add_${follower.id}`],
-                                follow: actionLoading[`follow_${follower.id}`],
+                                add: localActionLoading[`add_${follower.id}`],
+                                follow: localActionLoading[`follow_${follower.id}`],
                                 unfollow: localActionLoading[`unfollow_${follower.id}`],
                                 block: localActionLoading[`block_${follower.id}`],
                                 report: localActionLoading[`report_${follower.id}`]
@@ -665,8 +685,7 @@ const FriendsPage = () => {
                               onBlock={() => handleBlockUser(followedUser.id)}
                               onReport={() => handleReportUser(followedUser.id)}
                               loading={{
-                                add: actionLoading[`add_${followedUser.id}`],
-                                follow: actionLoading[`follow_${followedUser.id}`],
+                                add: localActionLoading[`add_${followedUser.id}`],
                                 unfollow: localActionLoading[`unfollow_${followedUser.id}`],
                                 block: localActionLoading[`block_${followedUser.id}`],
                                 report: localActionLoading[`report_${followedUser.id}`]
