@@ -19,31 +19,19 @@ const FriendSuggestions = ({ limit = 6 }) => {
   const { suggestions, loading, error, refetch } = useFriendSuggestions();
   const { sendRequest, loading: actionLoading } = useFriendActions();
 
-  // Get suggestion IDs for batch mutual friends fetching
   const suggestionIds = useMemo(() => {
     return Array.isArray(suggestions) ? suggestions.map(user => user.id).filter(Boolean) : [];
   }, [suggestions]);
 
-  // Fetch mutual friends counts for all suggestions
   const {
     mutualCounts,
     loading: mutualLoading,
     error: mutualError
   } = useBatchMutualFriends(suggestionIds);
 
-  // Debug log 
-  console.log('FriendSuggestions Debug:', {
-    suggestions: suggestions?.length || 0,
-    suggestionIds,
-    mutualCounts,
-    mutualLoading,
-    mutualError
-  });
-
   const handleSendRequest = async (userId) => {
     try {
       await sendRequest(userId);
-      // Refetch suggestions after sending request
       refetch();
     } catch (error) {
       console.error('Error sending friend request:', error);

@@ -21,16 +21,13 @@ const getUserName = (user) => {
   const displayName = getDisplayName(user);
   const username = user.user_name || user.userName;
   
-  // Only show username if it's different from display name
   if (username && username !== displayName && !displayName.toLowerCase().includes(username.toLowerCase())) {
     return username;
   }
   return null;
 };
 
-// Helper function to get username for navigation (updated for backend commit)
 const getUserNameForNavigation = (user) => {
-  // Ưu tiên userAccount.user_name từ commit backend mới
   return user.userAccount?.user_name || user.user_name || user.userName;
 };
 
@@ -57,7 +54,6 @@ const FriendCard = ({
   // Handle click to navigate to profile
   const handleProfileClick = () => {
     const username = getUserNameForNavigation(user);
-    console.log('FriendCard navigation:', { user, username, navigating_to: `/${username}` });
     if (username) {
       navigate(`/${username}`);
     } else {

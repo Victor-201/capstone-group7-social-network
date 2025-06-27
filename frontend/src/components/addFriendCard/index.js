@@ -5,7 +5,6 @@ import AvatarUser from '../avatarUser';
 import MutualFriendsDisplay from '../mutualFriendsDisplay';
 import "./style.scss";
 
-// Themed icon component for AddFriendCard
 const AddFriendCardIcon = ({ icon: Icon, className }) => {
   const themeClass = `add-friend-card-icon ${className || ''}`;
   return <Icon className={themeClass} />;
@@ -23,25 +22,18 @@ const AddFriendCard = ({
 }) => {
   const navigate = useNavigate();
 
-  // Helper function to get username for navigation (updated for backend commit)
   const getUserNameForNavigation = (user) => {
-    // Ưu tiên userAccount.user_name từ commit backend mới
     return user.userAccount?.user_name || user.user_name || user.userName;
   };
 
-  // Handle click to navigate to profile
   const handleProfileClick = () => {
     const username = getUserNameForNavigation(user);
-    console.log('AddFriendCard navigation:', { user, username, navigating_to: `/${username}` });
     if (username) {
       navigate(`/${username}`);
     } else {
       console.warn('AddFriendCard: No username found for navigation', user);
     }
   };
-
-  // Debug log để kiểm tra mutualFriendsCount
-  console.log(`AddFriendCard - User: ${user?.full_name || user?.fullName}, MutualCount: ${mutualFriendsCount}`);
 
   // Helper function to get display name
   const getDisplayName = (user) => {

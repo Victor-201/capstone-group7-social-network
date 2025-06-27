@@ -10,20 +10,14 @@ const MutualFriendsDisplay = ({
 }) => {
   const navigate = useNavigate();
   
-  // Handle click to navigate to friend's profile
   const handleFriendClick = (friend) => {
-    // Ưu tiên userAccount.user_name từ commit backend mới
     const username = friend.userAccount?.user_name || friend.user_name || friend.userName;
     if (username) {
       navigate(`/${username}`);
     }
   };
 
-  // Ensure mutualFriends is always an array
   const safeMutualFriends = Array.isArray(mutualFriends) ? mutualFriends : [];
-  
-  // Debug log
-  console.log('MutualFriendsDisplay props:', { mutualFriends, count, safeMutualFriends });
   
   if (count === 0) {
     return (
@@ -33,7 +27,6 @@ const MutualFriendsDisplay = ({
     );
   }
 
-  // Show avatars for the first few mutual friends
   const displayAvatars = safeMutualFriends.slice(0, maxAvatars);
   const remainingCount = Math.max(0, count - maxAvatars);
 

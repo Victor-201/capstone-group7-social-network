@@ -35,19 +35,14 @@ const UserCard = ({
 }) => {
   const navigate = useNavigate();
 
-  // Handle click to navigate to profile
   const handleProfileClick = () => {
     const username = getUserNameForNavigation(user);
-    console.log('UserCard navigation:', { user, username, navigating_to: `/${username}` });
     if (username) {
       navigate(`/${username}`);
     } else {
       console.warn('UserCard: No username found for navigation', user);
     }
   };
-
-  // Debug log
-  console.log(`UserCard: ${user?.full_name || user?.fullName || 'Unknown'} - mutualFriendsCount:`, mutualFriendsCount, 'mutualFriendsData:', mutualFriendsData);
   
   return (
     <div className="user-card facebook-style">

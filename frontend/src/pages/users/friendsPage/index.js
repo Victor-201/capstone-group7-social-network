@@ -145,13 +145,6 @@ const FriendsPage = () => {
     error: mutualDetailedError
   } = useBatchMutualFriendsDetailed(allFriendIds);
 
-  // Debug log for mutual counts
-  useEffect(() => {
-    console.log('FriendsPage: mutualCounts updated:', mutualCounts);
-    console.log('FriendsPage: mutualFriendsData updated:', mutualFriendsData);
-    console.log('FriendsPage: allFriendIds:', allFriendIds);
-  }, [mutualCounts, mutualFriendsData, allFriendIds]);
-
   const [localActionLoading, setLocalActionLoading] = useState({});
   const [message, setMessage] = useState(null);
   const [recentlyUnfriended, setRecentlyUnfriended] = useState(new Map());
@@ -170,17 +163,6 @@ const FriendsPage = () => {
     console.log('FriendsPage: Fetching initial data...');
     fetchAllData();
   }, [fetchAllData]);
-
-  // Debug logging for state changes
-  useEffect(() => {
-    console.log('FriendsPage state update:', {
-      friendsCount: friends?.length || 0,
-      requestsCount: receivedRequests?.length || 0,
-      followersCount: followers?.length || 0,
-      followingCount: following?.length || 0,
-      activeTab
-    });
-  }, [friends, receivedRequests, followers, following, activeTab]);
 
   // Handle sending a friend request
   const handleSendRequest = async (userId) => {
