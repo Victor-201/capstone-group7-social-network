@@ -1,14 +1,14 @@
 import { useState } from 'react';
-import { 
-    createChat, 
-    updateChat, 
+import {
+    createChat,
+    updateChat,
     deleteChat,
     addParticipant,
     removeParticipant
 } from '../../api/chatApi';
-import { 
-    sendMessage, 
-    updateMessage, 
+import {
+    sendMessage,
+    updateMessage,
     deleteMessage,
     markMessagesAsRead
 } from '../../api/messageApi';
@@ -17,14 +17,14 @@ export const useChatActions = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
-    const createNewChat = async (participants) => {
+    const createNewChat = async (friend_id) => {
         const token = localStorage.getItem('token');
         if (!token) throw new Error("No token provided");
 
         try {
             setLoading(true);
             setError(null);
-            const data = await createChat(token, participants);
+            const data = await createChat(token, friend_id); 
             return data;
         } catch (err) {
             setError(err.message);
@@ -33,6 +33,7 @@ export const useChatActions = () => {
             setLoading(false);
         }
     };
+
 
     const updateExistingChat = async (chatId, updateData) => {
         const token = localStorage.getItem('token');

@@ -5,6 +5,7 @@ export const ROUTERS = {
         WATCH: "/watch",
         GROUPS: "/groups",
         PROFILE: "/:user_name",
+        SETTINGS: "/settings",
     },
     PUBLIC: {
         LOGIN: "/login",

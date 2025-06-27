@@ -9,6 +9,7 @@ import TermsOfServicePage from './pages/users/termsOfServicePage';
 import AuthPage from './pages/users/authPage';
 import MasterLayout from './layouts/masterLayout';
 import PrivateRoute from './components/privateRoute';
+import SettingsPage from './pages/users/settingsPage';
 import { ROUTERS } from './utils/router';
 
 const renderUserRouter = () => {
@@ -36,6 +37,11 @@ const renderUserRouter = () => {
     {
       path: ROUTERS.USER.PROFILE,
       Component: <PersonalPage />,
+      roles: ['user', 'admin'],
+    },
+    {
+      path: ROUTERS.USER.SETTINGS,
+      Component: <SettingsPage />,
       roles: ['user', 'admin'],
     },
   ];

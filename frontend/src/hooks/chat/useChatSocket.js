@@ -9,7 +9,7 @@ import {
   markMessagesAsRead
 } from "../../api/messageApi";
 
-export const useChat = (chatId) => {
+export const useChatSocket = (chat_id) => {
   const { auth } = useAuth();
   const socket = useSocket();
 
@@ -17,21 +17,21 @@ export const useChat = (chatId) => {
   const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
-    if (!auth.token || !chatId) return;
+    if (!auth.token || !chat_id) return;
 
     // Gán token và kết nối socket
     socket.auth = { token: auth.token };
     socket.connect();
 
     // Tham gia phòng chat cụ thể
-    socket.emit("joinChat", chatId);
+    socket.emit("joinChat", chat_id);
 
-    loadMessages(chatId);
-    loadUnreadCount(chatId);
+    loadMessages(chat_id);
+    loadUnreadCount(chat_id);
 
     // Lắng nghe tin nhắn mới
     socket.on("newMessage", (message) => {
-      if (message.chatId === chatId) {
+      if (message.chat_id === chat_id) {
         setMessages((prev) => [...prev, message]);
       } else {
         setUnreadCount((prev) => prev + 1);
@@ -46,20 +46,20 @@ export const useChat = (chatId) => {
       socket.off("newMessage");
       socket.disconnect();
     };
-  }, [auth.token, chatId]);
+  }, [auth.token, chat_id]);
 
-  const loadMessages = async (chatId) => {
+  const loadMessages = async (chat_id) => {
     try {
-      const data = await getMessagesByChatId(auth.token, chatId);
+      const data = await getMessagesByChatId(auth.token, chat_id);
       setMessages(data);
     } catch (err) {
       console.error("Load messages failed:", err);
     }
   };
 
-  const loadUnreadCount = async (chatId) => {
+  const loadUnreadCount = async (chat_id) => {
     try {
-      const count = await countUnreadMessages(auth.token, chatId);
+      const count = await countUnreadMessages(auth.token, chat_id);
       setUnreadCount(count);
     } catch (err) {
       console.error("Load unread count failed:", err);
@@ -69,7 +69,7 @@ export const useChat = (chatId) => {
   const handleSendMessage = async (content) => {
     try {
       const newMessage = await sendMessage(auth.token, {
-        chatId,
+        chat_id,
         content,
       });
       // Server sẽ tự emit lại qua socket nên không cần setMessages
@@ -82,7 +82,7 @@ export const useChat = (chatId) => {
 
   const markAsRead = async () => {
     try {
-      await markMessagesAsRead(auth.token, chatId);
+      await markMessagesAsRead(auth.token, chat_id);
       setUnreadCount(0);
     } catch (err) {
       console.error("Mark as read failed:", err);
@@ -95,8 +95,8 @@ export const useChat = (chatId) => {
     sendMessage: handleSendMessage,
     markAsRead,
     reloadChat: () => {
-      loadMessages(chatId);
-      loadUnreadCount(chatId);
+      loadMessages(chat_id);
+      loadUnreadCount(chat_id);
     },
   };
 };

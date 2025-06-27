@@ -21,7 +21,7 @@ export const useChats = () => {
             setLoading(true);
             setError(null);
             const data = await getChats(auth.token);
-            setChats(data.chats || []);
+            setChats(data || []);
         } catch (err) {
             setError(err.message);
         } finally {

@@ -11,9 +11,8 @@ const UserSection = ({ user, onClose }) => {
     const navigator = useNavigate();
 
     const menuItems = [
-        { icon: <FaCog />, label: 'Cài đặt & quyền riêng tư', onClick: () => {} },
-        { icon: <FaQuestionCircle />, label: 'Trợ giúp & hỗ trợ', onClick: () => {} },
-        { icon: <FaMoon />, label: 'Màn hình & trợ năng', onClick: () => {} },
+        { icon: <FaCog />, label: 'Cài đặt', onClick: () => { navigator(ROUTERS.USER.SETTINGS)} },
+        { icon: <FaMoon />, label: 'Chế độ màn hình', onClick: () => {} },
         { icon: <FaCommentDots />, label: 'Đóng góp ý kiến', onClick: () => {} },
         { icon: <FaSignOutAlt />, label: 'Đăng xuất', onClick: () => { logout(); onClose(); navigator(ROUTERS.USER.HOME) } },
     ];
@@ -42,7 +41,7 @@ const UserSection = ({ user, onClose }) => {
             </ul>
 
             <footer className="popup__footer">
-                Quyền riêng tư · Điều khoản · Quảng cáo · Lựa chọn quảng cáo · Cookie · Xem thêm · Meta © 2025
+                Điều khoản · Meta © 2025
             </footer>
         </section>
     );

@@ -5,6 +5,9 @@ const { Chat, ChatParticipant, UserAccount, UserInfo, Message } = models;
 
 export default {
   async createPrivateChat(userId, otherUserId) {
+    if (!otherUserId) {
+      throw new Error('Thiếu userId hoặc otherUserId để tạo chat', userId, otherUserId);
+    }
     if (userId.toString() === otherUserId.toString()) {
       return {
         error: { code: 400, message: 'You cannot create a chat with yourself.' }
@@ -12,22 +15,23 @@ export default {
     }
 
     try {
-      const existingChat = await Chat.findOne({
-        where: { is_group: false },
+      const existingChat = await ChatParticipant.findAll({
+        where: {
+          user_id: { [Op.in]: [userId, otherUserId] }
+        },
+        attributes: ['chat_id'],
+        group: ['chat_id'],
+        having: Sequelize.literal('COUNT(DISTINCT user_id) = 2'),
         include: [{
-          model: ChatParticipant,
-          as: 'Participants',
-          where: {
-            user_id: { [Op.in]: [userId, otherUserId] }
-          },
-          attributes: ['user_id']
-        }],
-        group: ['Chat.id'],
-        having: Sequelize.literal('COUNT(*) = 2')
+          model: Chat,
+          where: { is_group: false },
+          attributes: []
+        }]
       });
+      console.log('existingChat', existingChat);
 
-      if (existingChat) {
-        return { result: { message: "Chat already exists", chatId: existingChat.id } };
+      if (existingChat.length > 0) {
+        return { result: { message: 'Private chat already exists', chat_id: existingChat[0].chat_id} };
       }
 
       const chat = await Chat.create({ is_group: false });
