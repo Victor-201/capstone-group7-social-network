@@ -207,44 +207,44 @@
   }
 }
 
-// Compact layout for friends page requests
-.requests-cards-grid {
-  .user-card.facebook-style {
-    max-width: 180px; // Even more compact for requests grid
-
-    .user-info {
-      padding: 10px 12px 6px 12px; // Tighter padding
-
-      .user-name h3 {
-        font-size: 15px; // Slightly smaller
-        margin: 0 0 4px 0;
-      }
-
-      .mutual-info .mutual-friends .mutual-count {
-        font-size: 12px; // Smaller mutual friends text
-      }
-    }
-
-    .user-actions {
-      padding: 0 12px 12px 12px; // Tighter padding
-
-      .action-buttons {
-        gap: 6px; // Reduce gap between buttons
-
-        .action-button {
-          font-size: 13px; // Smaller button text
-          padding: 7px 14px; // Compact button padding
-
-          &.primary-button,
-          &.secondary-button {
-            font-weight: 600;
-            border-radius: 6px;
-          }
-        }
-      }
-    }
-  }
-}
+// Compact layout for friends page requests - COMMENTED OUT vì đã chuyển sang FriendCard
+// .requests-cards-grid {
+//   .user-card.facebook-style {
+//     max-width: 180px; // Even more compact for requests grid
+//
+//     .user-info {
+//       padding: 10px 12px 6px 12px; // Tighter padding
+//
+//       .user-name h3 {
+//         font-size: 15px; // Slightly smaller
+//         margin: 0 0 4px 0;
+//       }
+//
+//       .mutual-info .mutual-friends .mutual-count {
+//         font-size: 12px; // Smaller mutual friends text
+//       }
+//     }
+//
+//     .user-actions {
+//       padding: 0 12px 12px 12px; // Tighter padding
+//
+//       .action-buttons {
+//         gap: 6px; // Reduce gap between buttons
+//
+//         .action-button {
+//           font-size: 13px; // Smaller button text
+//           padding: 7px 14px; // Compact button padding
+//
+//           &.primary-button,
+//           &.secondary-button {
+//             font-weight: 600;
+//             border-radius: 6px;
+//           }
+//         }
+//       }
+//     }
+//   }
+// }
 
 // Animation keyframes
 @keyframes spin {
