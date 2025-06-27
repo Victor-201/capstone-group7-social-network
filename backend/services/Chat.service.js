@@ -12,21 +12,21 @@ export default {
     }
 
     try {
-      const existingChat = await Chat.findOne({
-        where: { is_group: false },
+      const existingChat = await ChatParticipant.findAll({
+        where: {
+          user_id: { [Op.in]: [userId, otherUserId] }
+        },
+        attributes: ['chat_id'],
+        group: ['chat_id'],
+        having: Sequelize.literal('COUNT(DISTINCT user_id) = 2'),
         include: [{
-          model: ChatParticipant,
-          as: 'Participants',
-          where: {
-            user_id: { [Op.in]: [userId, otherUserId] }
-          },
-          attributes: ['user_id']
-        }],
-        group: ['Chat.id'],
-        having: Sequelize.literal('COUNT(*) = 2')
+          model: Chat,
+          where: { is_group: false },
+          attributes: []
+        }]
       });
 
-      if (existingChat) {
+      if (existingChat.length > 0) {
         return { result: { message: "Chat already exists", chatId: existingChat.id } };
       }
 

@@ -61,11 +61,11 @@ export default {
         email: data.email,
         password: hashed
       }, { transaction: t });
-      
+
       await ProfileDetail.create({
         user_id: userInfo.id
-      }, { transaction: t } );
-  });
+      }, { transaction: t });
+    });
 
     return {
       result: {
@@ -279,13 +279,23 @@ export default {
   },
 
   async verifyOtpCode({ email, otp_code }) {
+    if (!email || !otp_code) {
+      return {
+        error: {
+          code: 400,
+          name: "MissingFields",
+          message: "Email and OTP code are both required"
+        }
+      };
+    }
+
     const user = await UserAccount.findOne({ where: { email } });
     if (!user || !user.otp_code || !user.otp_expiry) {
       return {
         error: {
           code: 400,
           name: "InvalidRequest",
-          message: "Invalid request data"
+          message: "Invalid request data or OTP has not been sent"
         }
       };
     }
@@ -325,7 +335,6 @@ export default {
       }
     };
   },
-
   async resetPassword(new_password, token) {
     if (!token) {
       return {
