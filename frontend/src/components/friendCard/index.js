@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { FaSpinner, FaEllipsisH, FaUserMinus, FaUserPlus, FaEyeSlash, FaFlag, FaBan } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
 import AvatarUser from '../avatarUser';
 import MutualFriendsDisplay from '../mutualFriendsDisplay';
 import "./style.scss";
@@ -20,11 +21,14 @@ const getUserName = (user) => {
   const displayName = getDisplayName(user);
   const username = user.user_name || user.userName;
   
-  // Only show username if it's different from display name
   if (username && username !== displayName && !displayName.toLowerCase().includes(username.toLowerCase())) {
     return username;
   }
   return null;
+};
+
+const getUserNameForNavigation = (user) => {
+  return user.userAccount?.user_name || user.user_name || user.userName;
 };
 
 const FriendCard = ({ 
@@ -43,8 +47,19 @@ const FriendCard = ({
   mutualFriendsCount = 0,
   mutualFriendsData = [],
 }) => {
+  const navigate = useNavigate();
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef(null);
+
+  // Handle click to navigate to profile
+  const handleProfileClick = () => {
+    const username = getUserNameForNavigation(user);
+    if (username) {
+      navigate(`/${username}`);
+    } else {
+      console.warn('FriendCard: No username found for navigation', user);
+    }
+  };
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -332,11 +347,11 @@ const FriendCard = ({
 
   return (
     <div className="friend-card facebook-style">
-      <div className="friend-avatar">
+      <div className="friend-avatar" onClick={handleProfileClick} style={{ cursor: 'pointer' }}>
         <AvatarUser user={user} size="large" />
       </div>
       
-      <div className="friend-info">
+      <div className="friend-info" onClick={handleProfileClick} style={{ cursor: 'pointer' }}>
         <div className="friend-name">
           <h3>{getDisplayName(user)}</h3>
           {getUserName(user) && (
