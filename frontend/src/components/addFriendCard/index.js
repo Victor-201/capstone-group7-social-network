@@ -1,6 +1,7 @@
 import React from 'react';
 import { FaSpinner, FaTimes } from 'react-icons/fa';
 import AvatarUser from '../avatarUser';
+import MutualFriendsDisplay from '../mutualFriendsDisplay';
 import "./style.scss";
 
 // Themed icon component for AddFriendCard
@@ -15,6 +16,7 @@ const AddFriendCard = ({
   onRemove,
   loading = {},
   mutualFriendsCount = 0,
+  mutualFriendsData = [],
   showRemove = false,
   type = 'suggestion', // suggestion, compact
 }) => {
@@ -53,11 +55,10 @@ const AddFriendCard = ({
         </div>
         
         <div className="mutual-info">
-          {mutualFriendsCount > 0 && (
-            <span className="mutual-count">
-              {mutualFriendsCount} bạn chung
-            </span>
-          )}
+          <MutualFriendsDisplay
+            mutualFriends={mutualFriendsData}
+            count={mutualFriendsCount}
+          />
         </div>
       </div>
 

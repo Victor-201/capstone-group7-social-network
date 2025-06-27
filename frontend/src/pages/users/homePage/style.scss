@@ -133,5 +133,23 @@
         min-width: 160px;
       }
     }
+    
+    // Loading và error states cho suggestions
+    .suggestions-loading,
+    .suggestions-error,
+    .no-suggestions {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      text-align: center;
+      min-height: 100px;
+      color: #65676b;
+      font-size: 14px;
+    }
+    
+    .suggestions-error {
+      color: #e41e3f;
+    }
   }
 }
