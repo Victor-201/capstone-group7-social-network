@@ -13,6 +13,9 @@ import { useEditDetails } from "../../../../../hooks/profile/useEditDetails";
 import { getUserInfo } from "../../../../../api/userApi";
 import { useUserImages } from "../../../../../hooks/media/useUserImages";
 import MediaCard from "../../../../../components/mediaCard";
+import { useFriends } from "../../../../../hooks/friends/useFriends";
+import AvatarUser from "../../../../../components/avatarUser";
+import { useCloudinaryFile } from "../../../../../hooks/useCloudinaryFile";
 
 const relationshipOptions = [
   { label: "Độc thân", value: "single" },
@@ -21,10 +24,23 @@ const relationshipOptions = [
   { label: "Đã kết hôn", value: "married" },
 ];
 
-const PostsTab = ({ userInfo, isOwner }) => {
+const PostsTab = ({ userInfo, isOwner, handleTabClick }) => {
   const { posts } = useUserPosts();
   const totalPosts = posts?.length || 0;
   const { images, loading: loadingImages } = useUserImages(userInfo?.id);
+ // Ở đầu file:
+const {
+  friends,
+  loading: loadingFriends,
+  error: friendsError,
+  refetch: refetchFriends,
+} = useFriends();
+
+useEffect(() => {
+  if (userInfo?.id) {
+    refetchFriends(userInfo.id);
+  }
+}, [userInfo?.id, refetchFriends]);
 
 
 
@@ -165,45 +181,69 @@ const PostsTab = ({ userInfo, isOwner }) => {
           <div className="photos-card">
             <div className="photos-card__header">
               <h3>Ảnh</h3>
-              <a href="#photos" className="photos-card__see-all">Xem tất cả ảnh</a>
+              <button
+                className="photos-card__see-all"
+                onClick={() => handleTabClick?.("photos")} // ✅ chuyển tab sang Ảnh
+              >
+                Xem tất cả ảnh
+              </button>
             </div>
+
             <div className="photos-card__grid">
               {loadingImages ? (
                 <p>Đang tải ảnh...</p>
               ) : images.length === 0 ? (
                 <p>Chưa có ảnh nào</p>
               ) : (
-                images.map((img) => (
-                  <div className="photos-card__item">
+                images.slice(0, 9).map((img) => (
+                  <div key={img.media_id} className="photos-card__item">
                     <MediaCard media_id={img.media_id} media_type={"image"} />
                   </div>
                 ))
               )}
             </div>
           </div>
-          <div className="friends-card">
-            <div className="friends-card__header">
-              <h3>Bạn bè</h3>
-              <a href="#friends" className="friends-card__see-all">Xem tất cả bạn bè</a>
-            </div>
-            <p className="friends-card__count">1.5K bạn bè</p>
-            <div className="friends-card__grid">
-              {[friend1Image].map((img, idx) => (
-                <div key={idx} className="friends-card__item">
-                  <img src={img} alt="Friend" />
-                  <p>Nguyễn Văn B</p>
-                </div>
-              ))}
+
+          <div className="poststab__friends-preview">
+  <div className="friends-preview__header">
+    <h3>Bạn bè</h3>
+    <button type="button" onClick={() => handleTabClick("friends")}>
+      Xem tất cả
+    </button>
+  </div>
+
+  {loadingFriends ? (
+    <p>Đang tải danh sách bạn bè...</p>
+  ) : friends.length === 0 ? (
+    <p>Chưa có bạn bè nào</p>
+  ) : (
+    <div className="friends-preview__grid">
+      {friends.slice(0, 9).map((friend) => (
+        <div key={friend.id} className="friend-card-mini">
+          <div className="friend-card-mini__avatar">
+            <div className="avatar-wrapper">
+              <AvatarUser user={friend} />
             </div>
           </div>
+          <p className="friend-card-mini__name">{friend.full_name}</p>
+        </div>
+      ))}
+    </div>
+  )}
+</div>
+
         </div>
 
         <div className="content__main">
           {isOwner && <CreatePost userInfo={userInfo} />}
           <div className="posts">
-            {totalPosts === 0 ? <p>Chưa có bài đăng nào</p> : posts.map((post) => (
-              <PostCard key={post.id} post={post} userInfo={userInfo} />
-            ))}
+            {totalPosts === 0 ? (
+              <p>Chưa có bài đăng nào</p>
+            ) : (
+              posts.map((post) => (
+                <PostCard key={post.id} post={post} userInfo={userInfo} />
+              ))
+            )}
           </div>
         </div>
       </div>
