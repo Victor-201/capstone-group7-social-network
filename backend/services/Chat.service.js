@@ -31,7 +31,11 @@ export default {
       console.log('existingChat', existingChat);
 
       if (existingChat.length > 0) {
+<<<<<<< HEAD
         return { result: { message: 'Private chat already exists', chat_id: existingChat[0].chat_id} };
+=======
+        return { result: { message: "Chat already exists", chatId: existingChat.id } };
+>>>>>>> 0d6750fca43ed58a5bcff24d59e9720f41430a29
       }
 
       const chat = await Chat.create({ is_group: false });

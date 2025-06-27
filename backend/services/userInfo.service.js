@@ -101,7 +101,7 @@ export default {
   /**
    * Lấy thông tin user theo id (tương tự getUserInfo).
    */
-  async getUserInfoById(id) {
+  async getUserInfoByIdS(id) {
     if (!id) {
       return { error: { code: 400, message: "id is required" } };
     }
