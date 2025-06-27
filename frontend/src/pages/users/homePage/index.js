@@ -2,12 +2,51 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { FaExclamationTriangle } from 'react-icons/fa';
 import CreatePost from '../../../components/createPost';
 import Post from '../../../components/postCard';
-import FriendCard from '../../../components/friendCard';
+import AddFriendCard from '../../../components/addFriendCard';
+import { useFriendSuggestions } from '../../../hooks/friends/useFriendSuggestions';
+import { useBatchMutualFriends, useBatchMutualFriendsDetailed } from '../../../hooks/friends/useMutualFriends';
+import { useFriendActions } from '../../../hooks/friends/useFriendActions';
 import photo1Image from "../../../assets/images/logo192.png"
 import './style.scss';
 
 const HomePage = () => {
   const [posts, setPosts] = useState([]);
+  const [message, setMessage] = useState('');
+  const [removedSuggestions, setRemovedSuggestions] = useState(new Set());
+  
+  // Hook để lấy friend suggestions từ database
+  const { 
+    suggestions: realFriendSuggestions, 
+    loading: suggestionsLoading, 
+    error: suggestionsError,
+    refetch: refetchSuggestions
+  } = useFriendSuggestions();
+  
+  // Hook cho friend actions
+  const {
+    sendRequest,
+    loading: friendActionLoading,
+    error: friendActionError
+  } = useFriendActions();
+  
+  // Prepare friend IDs for mutual friends
+  const friendSuggestionIds = useMemo(() => {
+    return realFriendSuggestions?.map(user => user.id).filter(Boolean) || [];
+  }, [realFriendSuggestions]);
+
+  // Fetch mutual friends counts và detailed data
+  const {
+    mutualCounts
+    // loading: mutualLoading,
+    // error: mutualError
+  } = useBatchMutualFriends(friendSuggestionIds);
+
+  const {
+    mutualFriendsData
+    // loading: mutualDetailedLoading,
+    // error: mutualDetailedError
+  } = useBatchMutualFriendsDetailed(friendSuggestionIds);
+  
   // Tạo ref để giữ vị trí random, không bị random lại mỗi lần render
   const suggestionIndexRef = useRef(null);
   const listRef = useRef(null);
@@ -133,20 +172,41 @@ const HomePage = () => {
     }
   }, []);
 
+  // Xử lý friend suggestions từ database
   const friendSuggestions = useMemo(() => {
-    return [
-      { id: 'friend-1', fullName: 'Nguyễn Xuân Hải', username: 'xuanhai0913', avatar: 'v1652278394/user_avatars/friend_1.jpg' },
-      { id: 'friend-2', fullName: 'Nguyễn Ngọc Trung', username: 'hoangthie', avatar: 'v1652278394/user_avatars/friend_2.jpg' },
-      { id: 'friend-3', fullName: 'Nguyễn Văn Thắng', username: 'tranminhf', avatar: 'v1652278394/user_avatars/friend_3.jpg' },
-      { id: 'friend-4', fullName: 'Trần Thị Mai', username: 'maitran', avatar: 'v1652278394/user_avatars/friend_4.jpg' },
-      { id: 'friend-5', fullName: 'Lê Văn Hòa', username: 'hoale', avatar: 'v1652278394/user_avatars/friend_5.jpg' },
-      { id: 'friend-6', fullName: 'Phạm Minh Tuấn', username: 'minhtuan', avatar: 'v1652278394/user_avatars/friend_6.jpg' },
-      { id: 'friend-7', fullName: 'Ngô Thị Hạnh', username: 'hanhngo', avatar: 'v1652278394/user_avatars/friend_7.jpg' },
-      { id: 'friend-8', fullName: 'Đỗ Quang Huy', username: 'quanghuydo', avatar: 'v1652278394/user_avatars/friend_8.jpg' },
-      { id: 'friend-9', fullName: 'Vũ Thị Lan', username: 'lanvu', avatar: 'v1652278394/user_avatars/friend_9.jpg' },
-      { id: 'friend-10', fullName: 'Nguyễn Văn Hùng', username: 'hungnguyen', avatar: 'v1652278394/user_avatars/friend_10.jpg' },
-    ].sort(() => Math.random() - 0.5); // shuffle
-  }, []);
+    if (suggestionsLoading || !realFriendSuggestions) {
+      return [];
+    }
+    // Filter out removed suggestions và shuffle
+    return [...realFriendSuggestions]
+      .filter(user => !removedSuggestions.has(user.id))
+      .sort(() => Math.random() - 0.5)
+      .slice(0, 10); // Hiển thị tối đa 10 suggestions
+  }, [realFriendSuggestions, suggestionsLoading, removedSuggestions]);
+
+  // Handler cho thêm bạn bè
+  const handleAddFriend = async (user) => {
+    try {
+      await sendRequest(user.id);
+      setMessage(`Đã gửi lời mời kết bạn đến ${user.fullName || user.full_name || user.user_name}`);
+      
+      // Remove from suggestions after successful send
+      setRemovedSuggestions(prev => new Set([...prev, user.id]));
+      
+      // Clear message after 3 seconds
+      setTimeout(() => setMessage(''), 3000);
+    } catch (error) {
+      setMessage(`Lỗi khi gửi lời mời: ${error.message}`);
+      setTimeout(() => setMessage(''), 5000);
+    }
+  };
+
+  // Handler cho xóa suggestion
+  const handleRemoveSuggestion = (user) => {
+    setRemovedSuggestions(prev => new Set([...prev, user.id]));
+    setMessage(`Đã xóa gợi ý kết bạn với ${user.fullName || user.full_name || user.user_name}`);
+    setTimeout(() => setMessage(''), 3000);
+  };
 
   const renderPostsWithSuggestions = () => {
     if (!posts.length) return null;
@@ -163,9 +223,35 @@ const HomePage = () => {
                 <span className="friend-suggestions-desc">Kết nối với những người bạn có thể biết</span>
               </div>
               <div className="friend-suggestions-list" ref={listRef}>
-                {friendSuggestions.map((user, idx) => (
-                  <FriendCard key={user.id} user={user} />
-                ))}
+                {suggestionsLoading ? (
+                  <div className="suggestions-loading">
+                    <span>Đang tải gợi ý kết bạn...</span>
+                  </div>
+                ) : suggestionsError ? (
+                  <div className="suggestions-error">
+                    <span>Không thể tải gợi ý kết bạn</span>
+                  </div>
+                ) : friendSuggestions.length > 0 ? (
+                  friendSuggestions.map((user, idx) => (
+                    <AddFriendCard 
+                      key={user.id} 
+                      user={user} 
+                      type="compact"
+                      mutualFriendsCount={mutualCounts[user.id] || 0}
+                      mutualFriendsData={mutualFriendsData[user.id]?.mutualFriends || []}
+                      onAdd={() => handleAddFriend(user)}
+                      onRemove={() => handleRemoveSuggestion(user)}
+                      loading={{ 
+                        add: friendActionLoading,
+                        remove: false 
+                      }}
+                    />
+                  ))
+                ) : (
+                  <div className="no-suggestions">
+                    <span>Chưa có gợi ý kết bạn</span>
+                  </div>
+                )}
               </div>
             </div>
           </React.Fragment>
@@ -178,6 +264,13 @@ const HomePage = () => {
   return (
     <div className="container">
       <article className="home-page">
+        {/* Message display */}
+        {message && (
+          <div className={`message ${friendActionError ? 'error-message' : 'success-message'}`}>
+            {message}
+          </div>
+        )}
+        
         {/* Create Post Section */}
         <div className="create-post-section">
           <CreatePost />

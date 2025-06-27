@@ -1,6 +1,7 @@
 import React from 'react';
 import { FaSpinner, FaTimes } from 'react-icons/fa';
 import AvatarUser from '../avatarUser';
+import MutualFriendsDisplay from '../mutualFriendsDisplay';
 import "./style.scss";
 
 // Themed icon component for AddFriendCard
@@ -15,9 +16,13 @@ const AddFriendCard = ({
   onRemove,
   loading = {},
   mutualFriendsCount = 0,
+  mutualFriendsData = [],
   showRemove = false,
   type = 'suggestion', // suggestion, compact
 }) => {
+  // Debug log để kiểm tra mutualFriendsCount
+  console.log(`AddFriendCard - User: ${user?.full_name || user?.fullName}, MutualCount: ${mutualFriendsCount}`);
+
   // Helper function to get display name
   const getDisplayName = (user) => {
     return user.fullName || user.full_name || user.user_name || user.userName || user.name || 'Người dùng';
@@ -50,15 +55,10 @@ const AddFriendCard = ({
         </div>
         
         <div className="mutual-info">
-          {mutualFriendsCount > 0 ? (
-            <span className="mutual-count">
-              {mutualFriendsCount} bạn chung
-            </span>
-          ) : (
-            <span className="mutual-count">
-              Chưa có bạn chung
-            </span>
-          )}
+          <MutualFriendsDisplay
+            mutualFriends={mutualFriendsData}
+            count={mutualFriendsCount}
+          />
         </div>
       </div>
 
@@ -72,7 +72,7 @@ const AddFriendCard = ({
             {loading.add ? (
               <AddFriendCardIcon icon={FaSpinner} className="spinner" />
             ) : null}
-            {type === 'compact' ? 'Xác nhận' : 'Thêm bạn bè'}
+            {type === 'compact' && showRemove ? 'Xác nhận' : 'Thêm bạn bè'}
           </button>
           
           <button 
@@ -83,8 +83,9 @@ const AddFriendCard = ({
             {loading.remove ? (
               <AddFriendCardIcon icon={FaSpinner} className="spinner" />
             ) : null}
-            {type === 'compact' ? 'Xóa' : ''}
+            {type === 'compact' && showRemove ? 'Xóa' : ''}
             {type !== 'compact' && <AddFriendCardIcon icon={FaTimes} />}
+            {type === 'compact' && !showRemove && 'Xóa'}
           </button>
         </div>
       </div>

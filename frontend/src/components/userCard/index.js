@@ -1,6 +1,7 @@
 import React from 'react';
-import { FaSpinner, FaUserPlus } from 'react-icons/fa';
+import { FaSpinner } from 'react-icons/fa';
 import AvatarUser from '../avatarUser';
+import MutualFriendsDisplay from '../mutualFriendsDisplay';
 import "./style.scss";
 
 // Helper function to get display name
@@ -20,12 +21,16 @@ const UserCard = ({
   onSecondaryAction,
   loading = {},
   mutualFriendsCount = 0,
+  mutualFriendsData = [], // Array of mutual friends with details
   primaryButtonText = "Thêm bạn bè",
   secondaryButtonText = "Xóa",
   type = "suggestion", // suggestion, request
 }) => {
+  // Debug log
+  console.log(`UserCard: ${user?.full_name || user?.fullName || 'Unknown'} - mutualFriendsCount:`, mutualFriendsCount, 'mutualFriendsData:', mutualFriendsData);
+  
   return (
-    <div className="user-card">
+    <div className="user-card facebook-style">
       <div className="user-avatar">
         <AvatarUser user={user} size="large" />
       </div>
@@ -36,20 +41,11 @@ const UserCard = ({
         </div>
         
         <div className="mutual-info">
-          {mutualFriendsCount > 0 ? (
-            <div className="mutual-friends">
-              <UserCardIcon icon={FaUserPlus} />
-              <span className="mutual-count">
-                {mutualFriendsCount} bạn chung
-              </span>
-            </div>
-          ) : (
-            <div className="mutual-friends">
-              <span className="mutual-count">
-                Chưa có bạn chung
-              </span>
-            </div>
-          )}
+          <MutualFriendsDisplay 
+            mutualFriends={mutualFriendsData}
+            count={mutualFriendsCount}
+            maxAvatars={2}
+          />
         </div>
       </div>
 
