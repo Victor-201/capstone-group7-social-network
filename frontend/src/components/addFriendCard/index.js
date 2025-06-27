@@ -18,6 +18,9 @@ const AddFriendCard = ({
   showRemove = false,
   type = 'suggestion', // suggestion, compact
 }) => {
+  // Debug log để kiểm tra mutualFriendsCount
+  console.log(`AddFriendCard - User: ${user?.full_name || user?.fullName}, MutualCount: ${mutualFriendsCount}`);
+
   // Helper function to get display name
   const getDisplayName = (user) => {
     return user.fullName || user.full_name || user.user_name || user.userName || user.name || 'Người dùng';

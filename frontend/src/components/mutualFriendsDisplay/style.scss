@@ -1,0 +1,89 @@
+.mutual-friends-display {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  
+  &.empty {
+    .mutual-count {
+      color: #8e8e93;
+      font-size: 13px;
+    }
+  }
+  
+  .mutual-avatars {
+    display: flex;
+    align-items: center;
+    position: relative;
+    
+    .mutual-avatar {
+      position: relative;
+      border: 2px solid #fff;
+      border-radius: 50%;
+      overflow: hidden;
+      width: 20px;
+      height: 20px;
+      
+      &:not(:first-child) {
+        margin-left: -6px;
+      }
+      
+      .avatar-user {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      
+      &.more-count {
+        background: #e4e4e7;
+        border-color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        
+        .more-indicator {
+          font-size: 9px;
+          font-weight: 600;
+          color: #71717a;
+          line-height: 1;
+        }
+      }
+    }
+  }
+  
+  .mutual-count {
+    font-size: 13px;
+    color: #71717a;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+}
+
+// Dark theme
+[data-theme="dark"] {
+  .mutual-friends-display {
+    &.empty {
+      .mutual-count {
+        color: #9ca3af;
+      }
+    }
+    
+    .mutual-avatars {
+      .mutual-avatar {
+        border-color: #1f2937;
+        
+        &.more-count {
+          background: #374151;
+          border-color: #1f2937;
+          
+          .more-indicator {
+            color: #d1d5db;
+          }
+        }
+      }
+    }
+    
+    .mutual-count {
+      color: #9ca3af;
+    }
+  }
+}

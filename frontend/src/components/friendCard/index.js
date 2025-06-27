@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { FaSpinner, FaEllipsisH, FaUserMinus, FaUserPlus, FaEyeSlash, FaFlag, FaBan } from 'react-icons/fa';
 import AvatarUser from '../avatarUser';
+import MutualFriendsDisplay from '../mutualFriendsDisplay';
 import "./style.scss";
 
 // Themed icon component for FriendCard
@@ -38,6 +39,7 @@ const FriendCard = ({
   onReport,
   loading = {},
   mutualFriendsCount = 0,
+  mutualFriendsData = [],
 }) => {
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef(null);
@@ -217,18 +219,10 @@ const FriendCard = ({
         
         
         <div className="mutual-info">
-          {mutualFriendsCount > 0 && (
-            <div className="mutual-friends-display">
-              <div className="mutual-avatars">
-                {/* Placeholder for mutual friends avatars - có thể bổ sung sau */}
-                <div className="avatar-placeholder"></div>
-                <div className="avatar-placeholder"></div>
-              </div>
-              <span className="mutual-count">
-                {mutualFriendsCount} bạn chung
-              </span>
-            </div>
-          )}
+          <MutualFriendsDisplay
+            mutualFriends={mutualFriendsData}
+            count={mutualFriendsCount}
+          />
           {type === 'request' && user.createdAt && (
             <span className="request-time">
               {new Date(user.createdAt).toLocaleDateString('vi-VN')}

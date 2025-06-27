@@ -9,6 +9,7 @@ import { useFriends } from '../../../hooks/friends/useFriends';
 import { useFriendRequests } from '../../../hooks/friends/useFriendRequests';
 import { useFollow } from '../../../hooks/friends/useFollow';
 import { useFriendActions } from '../../../hooks/friends/useFriendActions';
+import { useBatchMutualFriends, useBatchMutualFriendsDetailed } from '../../../hooks/friends/useMutualFriends';
 import './style.scss';
 
 // Custom styled icon component
@@ -56,6 +57,7 @@ const FriendsPage = () => {
     error: actionError
   } = useFriendActions();
 
+  // Initialize activeTab state before using it in hooks
   const [activeTab, setActiveTab] = useState(() => {
     // Check URL params for initial tab
     const tabParam = searchParams.get('tab');
@@ -71,6 +73,58 @@ const FriendsPage = () => {
       setActiveTab(tabParam);
     }
   }, [searchParams]);
+
+  // Prepare friend IDs for batch mutual friends fetching
+  const allFriendIds = useMemo(() => {
+    const ids = new Set();
+    
+    // Add friends
+    if (Array.isArray(friends)) {
+      friends.forEach(friend => friend?.id && ids.add(friend.id));
+    }
+    
+    // Add received requests
+    if (Array.isArray(receivedRequests)) {
+      receivedRequests.forEach(request => {
+        const requester = request?.Requester || request?.requester || request?.user;
+        if (requester?.id) ids.add(requester.id);
+      });
+    }
+    
+    // Add followers
+    if (Array.isArray(followers)) {
+      followers.forEach(follower => follower?.id && ids.add(follower.id));
+    }
+    
+    // Add following
+    if (Array.isArray(following)) {
+      following.forEach(followed => followed?.id && ids.add(followed.id));
+    }
+    
+    return Array.from(ids);
+  }, [friends, receivedRequests, followers, following]);
+
+  // Fetch mutual friends counts for all users
+  const {
+    mutualCounts,
+    loading: mutualLoading,
+    error: mutualError
+  } = useBatchMutualFriends(allFriendIds);
+
+  // Fetch detailed mutual friends data for all tabs that need it
+  const {
+    mutualFriendsData,
+    loading: mutualDetailedLoading,
+    error: mutualDetailedError
+  } = useBatchMutualFriendsDetailed(allFriendIds);
+
+  // Debug log for mutual counts
+  useEffect(() => {
+    console.log('FriendsPage: mutualCounts updated:', mutualCounts);
+    console.log('FriendsPage: mutualFriendsData updated:', mutualFriendsData);
+    console.log('FriendsPage: allFriendIds:', allFriendIds);
+  }, [mutualCounts, mutualFriendsData, allFriendIds]);
+
   const [localActionLoading, setLocalActionLoading] = useState({});
   const [message, setMessage] = useState(null);
   const [recentlyUnfriended, setRecentlyUnfriended] = useState(new Map());
@@ -355,10 +409,10 @@ const FriendsPage = () => {
     <div className="friends-page">
       <div className="container">
         {message && (<div className="message success-message">{message}</div>)}
-        {(friendsError || requestsError || followError || actionError) && (
+        {(friendsError || requestsError || followError || actionError || mutualError) && (
           <div className="message error-message">
             <ThemedIcon icon={FaExclamationTriangle} className="error-icon" /> 
-            {friendsError || requestsError || followError || actionError}
+            {friendsError || requestsError || followError || actionError || mutualError}
           </div>
         )}
         
@@ -432,7 +486,8 @@ const FriendsPage = () => {
                                   block: localActionLoading[`block_${friendId}`],
                                   report: localActionLoading[`report_${friendId}`]
                                 }}
-                                mutualFriendsCount={friend.mutualFriendsCount || 0}
+                                mutualFriendsCount={mutualCounts[friendId] || 0}
+                                mutualFriendsData={mutualFriendsData[friendId]?.mutualFriends || []}
                               />
                             );
                           }).filter(Boolean) : (
@@ -476,7 +531,8 @@ const FriendsPage = () => {
                                   block: localActionLoading[`block_${friend.id}`],
                                   report: localActionLoading[`report_${friend.id}`]
                                 }}
-                                mutualFriendsCount={friend.mutualFriendsCount || 0}
+                                mutualFriendsCount={mutualCounts[friend.id] || 0}
+                                mutualFriendsData={mutualFriendsData[friend.id]?.mutualFriends || []}
                               />
                             ))}
                           </div>
@@ -531,7 +587,8 @@ const FriendsPage = () => {
                                   primary: localActionLoading[`accept_${requester.id}`] || false,
                                   secondary: localActionLoading[`reject_${requester.id}`] || false
                                 }}
-                                mutualFriendsCount={requester.mutualFriendsCount || 0}
+                                mutualFriendsCount={mutualCounts[requester.id] || 0}
+                                mutualFriendsData={mutualFriendsData[requester.id]?.mutualFriends || []}
                                 primaryButtonText="Xác nhận"
                                 secondaryButtonText="Xóa"
                                 type="request"
@@ -575,6 +632,8 @@ const FriendsPage = () => {
                                 block: localActionLoading[`block_${follower.id}`],
                                 report: localActionLoading[`report_${follower.id}`]
                               }}
+                              mutualFriendsCount={mutualCounts[follower.id] || 0}
+                              mutualFriendsData={mutualFriendsData[follower.id]?.mutualFriends || []}
                             />
                           ))}
                         </div>
@@ -612,6 +671,8 @@ const FriendsPage = () => {
                                 block: localActionLoading[`block_${followedUser.id}`],
                                 report: localActionLoading[`report_${followedUser.id}`]
                               }}
+                              mutualFriendsCount={mutualCounts[followedUser.id] || 0}
+                              mutualFriendsData={mutualFriendsData[followedUser.id]?.mutualFriends || []}
                             />
                           ))}
                         </div>

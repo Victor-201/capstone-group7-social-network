@@ -6,4 +6,20 @@
   height: 100%;
   aspect-ratio: 1/1;
   object-fit: cover;
+  border-radius: 50%;
+  
+  &.mini {
+    width: 20px;
+    height: 20px;
+  }
+  
+  &.small {
+    width: 32px;
+    height: 32px;
+  }
+  
+  &.large {
+    width: 64px;
+    height: 64px;
+  }
 }

@@ -203,6 +203,12 @@ export const getMutualFriends = async (token, friendId) => {
     
     if (!response.ok) {
         const errorData = await response.json();
+        
+        // Handle "No mutual friends found" as a special case
+        if (response.status === 404 && errorData.message === "No mutual friends found") {
+            return { mutualFriends: [] };
+        }
+        
         throw new Error(errorData.message || `HTTP ${response.status}`);
     }
 

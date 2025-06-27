@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { FaSpinner, FaUserPlus } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import AddFriendCard from '../addFriendCard';
 import { useFriendSuggestions } from '../../hooks/friends/useFriendSuggestions';
 import { useFriendActions } from '../../hooks/friends/useFriendActions';
+import { useBatchMutualFriends } from '../../hooks/friends/useMutualFriends';
 import { ROUTERS } from '../../utils/router';
 import './style.scss';
 
@@ -17,6 +18,27 @@ const FriendSuggestions = ({ limit = 6 }) => {
   const navigate = useNavigate();
   const { suggestions, loading, error, refetch } = useFriendSuggestions();
   const { sendRequest, loading: actionLoading } = useFriendActions();
+
+  // Get suggestion IDs for batch mutual friends fetching
+  const suggestionIds = useMemo(() => {
+    return Array.isArray(suggestions) ? suggestions.map(user => user.id).filter(Boolean) : [];
+  }, [suggestions]);
+
+  // Fetch mutual friends counts for all suggestions
+  const {
+    mutualCounts,
+    loading: mutualLoading,
+    error: mutualError
+  } = useBatchMutualFriends(suggestionIds);
+
+  // Debug log 
+  console.log('FriendSuggestions Debug:', {
+    suggestions: suggestions?.length || 0,
+    suggestionIds,
+    mutualCounts,
+    mutualLoading,
+    mutualError
+  });
 
   const handleSendRequest = async (userId) => {
     try {
@@ -32,7 +54,7 @@ const FriendSuggestions = ({ limit = 6 }) => {
     navigate(`${ROUTERS.USER.FRIENDS}?tab=suggestions`);
   };
 
-  if (loading) {
+  if (loading || mutualLoading) {
     return (
       <div className="friend-suggestions loading">
         <SuggestionsIcon icon={FaSpinner} className="spinner" />
@@ -41,10 +63,10 @@ const FriendSuggestions = ({ limit = 6 }) => {
     );
   }
 
-  if (error) {
+  if (error || mutualError) {
     return (
       <div className="friend-suggestions error">
-        <p>Không thể tải gợi ý kết bạn: {error}</p>
+        <p>Không thể tải gợi ý kết bạn: {error || mutualError}</p>
         <button onClick={refetch}>Thử lại</button>
       </div>
     );
@@ -80,7 +102,7 @@ const FriendSuggestions = ({ limit = 6 }) => {
             loading={{
               add: actionLoading.sendRequest === user.id
             }}
-            mutualFriendsCount={user.mutualFriendsCount || 0}
+            mutualFriendsCount={mutualCounts[user.id] || user.mutualFriendsCount || 0}
             showRemove={true}
           />
         ))}
