@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { FaSpinner, FaEllipsisH, FaUserMinus, FaUserPlus, FaEyeSlash, FaFlag, FaBan } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
 import AvatarUser from '../avatarUser';
 import MutualFriendsDisplay from '../mutualFriendsDisplay';
 import "./style.scss";
@@ -27,6 +28,12 @@ const getUserName = (user) => {
   return null;
 };
 
+// Helper function to get username for navigation (updated for backend commit)
+const getUserNameForNavigation = (user) => {
+  // Ưu tiên userAccount.user_name từ commit backend mới
+  return user.userAccount?.user_name || user.user_name || user.userName;
+};
+
 const FriendCard = ({ 
   user, 
   type = 'friend', // friend, request, suggestion, not-friend, follower, following
@@ -43,8 +50,20 @@ const FriendCard = ({
   mutualFriendsCount = 0,
   mutualFriendsData = [],
 }) => {
+  const navigate = useNavigate();
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef(null);
+
+  // Handle click to navigate to profile
+  const handleProfileClick = () => {
+    const username = getUserNameForNavigation(user);
+    console.log('FriendCard navigation:', { user, username, navigating_to: `/${username}` });
+    if (username) {
+      navigate(`/${username}`);
+    } else {
+      console.warn('FriendCard: No username found for navigation', user);
+    }
+  };
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -332,11 +351,11 @@ const FriendCard = ({
 
   return (
     <div className="friend-card facebook-style">
-      <div className="friend-avatar">
+      <div className="friend-avatar" onClick={handleProfileClick} style={{ cursor: 'pointer' }}>
         <AvatarUser user={user} size="large" />
       </div>
       
-      <div className="friend-info">
+      <div className="friend-info" onClick={handleProfileClick} style={{ cursor: 'pointer' }}>
         <div className="friend-name">
           <h3>{getDisplayName(user)}</h3>
           {getUserName(user) && (

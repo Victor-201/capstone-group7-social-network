@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import AvatarUser from '../avatarUser';
 import './style.scss';
 
@@ -7,6 +8,17 @@ const MutualFriendsDisplay = ({
   count = 0, 
   maxAvatars = 2 
 }) => {
+  const navigate = useNavigate();
+  
+  // Handle click to navigate to friend's profile
+  const handleFriendClick = (friend) => {
+    // Ưu tiên userAccount.user_name từ commit backend mới
+    const username = friend.userAccount?.user_name || friend.user_name || friend.userName;
+    if (username) {
+      navigate(`/${username}`);
+    }
+  };
+
   // Ensure mutualFriends is always an array
   const safeMutualFriends = Array.isArray(mutualFriends) ? mutualFriends : [];
   
@@ -29,7 +41,13 @@ const MutualFriendsDisplay = ({
     <div className="mutual-friends-display">
       <div className="mutual-avatars">
         {displayAvatars.map((friend, index) => (
-          <div key={friend.id} className="mutual-avatar" style={{ zIndex: maxAvatars - index }}>
+          <div 
+            key={friend.id} 
+            className="mutual-avatar" 
+            style={{ zIndex: maxAvatars - index, cursor: 'pointer' }}
+            onClick={() => handleFriendClick(friend)}
+            title={`Xem trang cá nhân của ${friend.full_name || friend.fullName}`}
+          >
             <AvatarUser 
               user={friend} 
               size="mini"
