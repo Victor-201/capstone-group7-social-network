@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { FaSpinner, FaExclamationTriangle, FaSearch, FaFilter, FaEllipsisH, FaBars, FaTimes } from 'react-icons/fa';
 import FriendCard from '../../../components/friendCard';
-import UserCard from '../../../components/userCard';
 import FriendSuggestions from '../../../components/friendSuggestions';
 import Sidebar from './modals/Sidebar/index';
 import { useFriends } from '../../../hooks/friends/useFriends';
@@ -146,13 +145,6 @@ const FriendsPage = () => {
     error: mutualDetailedError
   } = useBatchMutualFriendsDetailed(allFriendIds);
 
-  // Debug log for mutual counts
-  useEffect(() => {
-    console.log('FriendsPage: mutualCounts updated:', mutualCounts);
-    console.log('FriendsPage: mutualFriendsData updated:', mutualFriendsData);
-    console.log('FriendsPage: allFriendIds:', allFriendIds);
-  }, [mutualCounts, mutualFriendsData, allFriendIds]);
-
   const [localActionLoading, setLocalActionLoading] = useState({});
   const [message, setMessage] = useState(null);
   const [recentlyUnfriended, setRecentlyUnfriended] = useState(new Map());
@@ -171,17 +163,6 @@ const FriendsPage = () => {
     console.log('FriendsPage: Fetching initial data...');
     fetchAllData();
   }, [fetchAllData]);
-
-  // Debug logging for state changes
-  useEffect(() => {
-    console.log('FriendsPage state update:', {
-      friendsCount: friends?.length || 0,
-      requestsCount: receivedRequests?.length || 0,
-      followersCount: followers?.length || 0,
-      followingCount: following?.length || 0,
-      activeTab
-    });
-  }, [friends, receivedRequests, followers, following, activeTab]);
 
   // Handle sending a friend request
   const handleSendRequest = async (userId) => {
@@ -614,63 +595,6 @@ const FriendsPage = () => {
                         </div>
                       </h2>
                       
-                      {/* Beautiful inline filter controls */}
-                      <div className="search-controls">
-                        <div className="search-row">
-                          <div className="filter-buttons">
-                            <span className="section-label">Lọc:</span>
-                            <button 
-                              className={`filter-btn ${filterBy === 'all' ? 'active' : ''}`}
-                              onClick={() => handleFilterChange('all')}
-                            >
-                              Tất cả
-                            </button>
-                            <button 
-                              className={`filter-btn ${filterBy === 'online' ? 'active' : ''}`}
-                              onClick={() => handleFilterChange('online')}
-                            >
-                              Online
-                            </button>
-                            <button 
-                              className={`filter-btn ${filterBy === 'recent' ? 'active' : ''}`}
-                              onClick={() => handleFilterChange('recent')}
-                            >
-                              Gần đây
-                            </button>
-                          </div>
-                          
-                          <div className="sort-buttons">
-                            <span className="section-label">Sắp xếp:</span>
-                            <button 
-                              className={`sort-btn ${sortBy === 'name' ? 'active' : ''}`}
-                              onClick={() => handleSortChange('name')}
-                            >
-                              Tên A-Z
-                            </button>
-                            <button 
-                              className={`sort-btn ${sortBy === 'recent' ? 'active' : ''}`}
-                              onClick={() => handleSortChange('recent')}
-                            >
-                              Gần đây
-                            </button>
-                            <button 
-                              className={`sort-btn ${sortBy === 'online' ? 'active' : ''}`}
-                              onClick={() => handleSortChange('online')}
-                            >
-                              Online
-                            </button>
-                          </div>
-                          
-                          {(filterBy !== 'all' || sortBy !== 'name') && (
-                            <button 
-                              className="clear-all-btn"
-                              onClick={clearFilters}
-                            >
-                              ✨ Xóa bộ lọc
-                            </button>
-                          )}
-                        </div>
-                      </div>
                       {!filteredFriends.length && !recentlyUnfriended.size ? (
                         <div className="empty-state">
                           <p>{debouncedSearchQuery ? 'Không tìm thấy bạn bè nào phù hợp.' : 'Bạn chưa có người bạn nào. Hãy tìm và kết bạn với mọi người!'}</p>
@@ -791,24 +715,22 @@ const FriendsPage = () => {
                             }
                             
                             return (
-                              <UserCard
+                              <FriendCard
                                 key={`request-${requestUser.id}-${index}`}
                                 user={{
                                   ...requestUser,
                                   full_name: requestUser.full_name || requestUser.fullName || requestUser.name,
                                   createdAt: requestUser.created_at || requestUser.createdAt
                                 }}
-                                onPrimaryAction={() => handleRequestResponse(requestUser.id, 'accept')}
-                                onSecondaryAction={() => handleRequestResponse(requestUser.id, 'reject')}
+                                type="request"
+                                onAccept={() => handleRequestResponse(requestUser.id, 'accept')}
+                                onReject={() => handleRequestResponse(requestUser.id, 'reject')}
                                 loading={{
-                                  primary: localActionLoading[`accept_${requestUser.id}`] || false,
-                                  secondary: localActionLoading[`reject_${requestUser.id}`] || false
+                                  accept: localActionLoading[`accept_${requestUser.id}`] || false,
+                                  reject: localActionLoading[`reject_${requestUser.id}`] || false
                                 }}
                                 mutualFriendsCount={mutualCounts[requestUser.id] || 0}
                                 mutualFriendsData={mutualFriendsData[requestUser.id]?.mutualFriends || []}
-                                primaryButtonText="Xác nhận"
-                                secondaryButtonText="Xóa"
-                                type="request"
                               />
                             );
                           }).filter(Boolean)}

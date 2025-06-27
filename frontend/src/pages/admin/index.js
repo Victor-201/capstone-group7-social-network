@@ -26,7 +26,7 @@ const actions = [
 ];
 
 const AdminDashboard = () => {
-  const [activeSection, setActiveSection] = useState("accounts");
+  const [activeSection, setActiveSection] = useState("state");
 
   const renderSection = () => {
     switch (activeSection) {
@@ -43,20 +43,27 @@ const AdminDashboard = () => {
 
   return (
     <div className="admin-dashboard">
-      <h1>Trang quản trị</h1>
-      <section className="admin-actions-switch">
-        {actions.map((action) => (
-          <button
-            key={action.key}
-            className={`admin-switch-btn${activeSection === action.key ? " active" : ""}`}
-            onClick={() => setActiveSection(action.key)}
-          >
-            <span className="admin-card-icon">{action.icon}</span>
-            {action.title}
-          </button>
-        ))}
-      </section>
-      <div className="admin-section-content">{renderSection()}</div>
+      <h1 className="admin-title">Trang quản trị</h1>
+
+      <div className="admin-body">
+        <div className="admin-sidebar">
+          {["state", "posts", "accounts"].map((key) => {
+            const action = actions.find((a) => a.key === key);
+            return (
+              <button
+                key={action.key}
+                className={`admin-switch-btn${activeSection === action.key ? " active" : ""}`}
+                onClick={() => setActiveSection(action.key)}
+              >
+                <span className="admin-card-icon">{action.icon}</span>
+                {action.title}
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="admin-content">{renderSection()}</div>
+      </div>
     </div>
   );
 };

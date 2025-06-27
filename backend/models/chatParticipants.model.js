@@ -26,6 +26,7 @@ const ChatParticipant = (sequelize) => {
 
     model.belongsTo(models.UserInfo, {
       foreignKey: 'user_id',
+      as: 'User',
       onDelete: 'CASCADE',
       onUpdate: 'CASCADE',
     });

@@ -13,7 +13,7 @@
       margin: 0.75rem 0;
       cursor: pointer;
       border-radius: 16px;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: all 0.2s ease-in-out;
       position: relative;
       overflow: hidden;
       
@@ -38,17 +38,17 @@
         align-items: center;
         color: get-theme-color("text-primary");
         font-weight: 500;
-        font-size: 1.05rem;
+        font-size: 1.75rem;
         border-radius: 16px;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: all 0.2s ease-in-out;
         position: relative;
         min-height: 60px;
         
         .nav-icon {
-          font-size: 1.4rem;
+          font-size: 1.7rem;
           margin-right: 1rem;
           color: get-theme-color("text-secondary");
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          transition: all 0.2s ease-in-out;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -57,61 +57,52 @@
         }
         
         .nav-label {
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          transition: all 0.2s ease-in-out;
           white-space: nowrap;
           font-weight: 500;
         }
       }
 
       &:hover {
-        transform: translateX(8px);
-        
         .nav-link {
-          background: linear-gradient(135deg, 
-            rgba(get-theme-color("tertiary-color"), 0.08) 0%, 
-            rgba(get-theme-color("tertiary-color"), 0.05) 100%);
+          background-color: rgba(get-theme-color("quinary-color"), 0.1);
           color: get-theme-color("text-primary");
-          box-shadow: 0 6px 20px rgba(get-theme-color("tertiary-color"), 0.15);
           
           .nav-icon {
-            color: get-theme-color("tertiary-color");
-            transform: scale(1.15);
+            color: get-theme-color("quaternary-color");
+            transform: scale(1.1);
           }
           
           .nav-label {
-            color: get-theme-color("tertiary-color");
+            color: get-theme-color("quaternary-color");
           }
         }
       }
 
       &.active {
-        transform: translateX(8px);
-        
         &::before {
           transform: scaleY(1);
         }
         
         .nav-link {
-          background: linear-gradient(135deg, 
-            get-theme-color("tertiary-color") 0%, 
-            darken(get-theme-color("tertiary-color"), 5%) 100%);
-          color: get-theme-color("text-quaternary");
-          box-shadow: 0 8px 25px rgba(get-theme-color("tertiary-color"), 0.35);
+          background-color: get-theme-color("secondary-color");
+          color: get-theme-color("text-primary");
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
           
           .nav-icon {
-            color: get-theme-color("text-quaternary");
+            color: get-theme-color("text-primary");
             transform: scale(1.1);
           }
           
           .nav-label {
             font-weight: 600;
-            color: get-theme-color("text-quaternary");
+            color: get-theme-color("text-primary");
           }
         }
       }
 
       &:active {
-        transform: translateX(6px) scale(0.98);
+        transform: scale(0.98);
       }
     }
   }
@@ -135,11 +126,6 @@
             width: 24px;
             height: 24px;
           }
-        }
-        
-        &:hover,
-        &.active {
-          transform: translateX(6px);
         }
       }
     }

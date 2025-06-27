@@ -1,10 +1,10 @@
 import React from 'react';
 import { FaSpinner, FaTimes } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
 import AvatarUser from '../avatarUser';
 import MutualFriendsDisplay from '../mutualFriendsDisplay';
 import "./style.scss";
 
-// Themed icon component for AddFriendCard
 const AddFriendCardIcon = ({ icon: Icon, className }) => {
   const themeClass = `add-friend-card-icon ${className || ''}`;
   return <Icon className={themeClass} />;
@@ -20,8 +20,20 @@ const AddFriendCard = ({
   showRemove = false,
   type = 'suggestion', // suggestion, compact
 }) => {
-  // Debug log để kiểm tra mutualFriendsCount
-  console.log(`AddFriendCard - User: ${user?.full_name || user?.fullName}, MutualCount: ${mutualFriendsCount}`);
+  const navigate = useNavigate();
+
+  const getUserNameForNavigation = (user) => {
+    return user.userAccount?.user_name || user.user_name || user.userName;
+  };
+
+  const handleProfileClick = () => {
+    const username = getUserNameForNavigation(user);
+    if (username) {
+      navigate(`/${username}`);
+    } else {
+      console.warn('AddFriendCard: No username found for navigation', user);
+    }
+  };
 
   // Helper function to get display name
   const getDisplayName = (user) => {
@@ -42,11 +54,11 @@ const AddFriendCard = ({
 
   return (
     <div className={`add-friend-card ${type === 'compact' ? 'compact' : 'horizontal'}`}>
-      <div className="friend-avatar">
+      <div className="friend-avatar" onClick={handleProfileClick} style={{ cursor: 'pointer' }}>
         <AvatarUser user={user} size={type === 'compact' ? 'large' : 'medium'} />
       </div>
       
-      <div className="friend-info">
+      <div className="friend-info" onClick={handleProfileClick} style={{ cursor: 'pointer' }}>
         <div className="friend-name">
           <h3>{getDisplayName(user)}</h3>
           {getUserName(user) && (

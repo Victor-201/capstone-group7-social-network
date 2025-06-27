@@ -17,7 +17,7 @@ CREATE TABLE User_Account (
     phone_number VARCHAR(20) UNIQUE NOT NULL,
     user_name VARCHAR(255) UNIQUE NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
-    otp_code VARCHAR(6),
+    otp_code VARCHAR(60),
     otp_expiry TIMESTAMP,
     password VARCHAR(255) NOT NULL,
     role ENUM('user', 'admin') DEFAULT 'user',

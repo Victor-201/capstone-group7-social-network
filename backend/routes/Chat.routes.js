@@ -4,6 +4,6 @@ import { createChat, getChatList } from '../controllers/Chat.controller.js';
 const router = Router();
 
 router.post('/chats', createChat);
-router.get('/chats', getChatList)
+router.get('/chats', getChatList);
 
 export default router;

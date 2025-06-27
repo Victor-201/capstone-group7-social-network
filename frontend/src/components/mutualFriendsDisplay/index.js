@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import AvatarUser from '../avatarUser';
 import './style.scss';
 
@@ -7,11 +8,16 @@ const MutualFriendsDisplay = ({
   count = 0, 
   maxAvatars = 2 
 }) => {
-  // Ensure mutualFriends is always an array
-  const safeMutualFriends = Array.isArray(mutualFriends) ? mutualFriends : [];
+  const navigate = useNavigate();
   
-  // Debug log
-  console.log('MutualFriendsDisplay props:', { mutualFriends, count, safeMutualFriends });
+  const handleFriendClick = (friend) => {
+    const username = friend.userAccount?.user_name || friend.user_name || friend.userName;
+    if (username) {
+      navigate(`/${username}`);
+    }
+  };
+
+  const safeMutualFriends = Array.isArray(mutualFriends) ? mutualFriends : [];
   
   if (count === 0) {
     return (
@@ -21,7 +27,6 @@ const MutualFriendsDisplay = ({
     );
   }
 
-  // Show avatars for the first few mutual friends
   const displayAvatars = safeMutualFriends.slice(0, maxAvatars);
   const remainingCount = Math.max(0, count - maxAvatars);
 
@@ -29,7 +34,13 @@ const MutualFriendsDisplay = ({
     <div className="mutual-friends-display">
       <div className="mutual-avatars">
         {displayAvatars.map((friend, index) => (
-          <div key={friend.id} className="mutual-avatar" style={{ zIndex: maxAvatars - index }}>
+          <div 
+            key={friend.id} 
+            className="mutual-avatar" 
+            style={{ zIndex: maxAvatars - index, cursor: 'pointer' }}
+            onClick={() => handleFriendClick(friend)}
+            title={`Xem trang cá nhân của ${friend.full_name || friend.fullName}`}
+          >
             <AvatarUser 
               user={friend} 
               size="mini"
