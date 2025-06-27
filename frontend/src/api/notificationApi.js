@@ -75,6 +75,21 @@ export const markAllAsRead = async (token) => {
     return data.result || data;
 };
 
+export const deleteNotification = async (token, notificationId) => {
+    const response = await fetch(`${BASE_URL}/notifications/${notificationId}/delete`, {
+        method: 'DELETE',
+        headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+        },
+    });
+    const data = await response.json();
+    if (!response.ok) {
+        throw new Error(data.message || `HTTP ${response.status}`);
+    }
+    return data.result || data;
+}
+
 export const deleteReadNotifications = async (token) => {
     const response = await fetch(`${BASE_URL}/notifications/delete-read`, {
         method: 'DELETE',

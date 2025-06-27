@@ -151,6 +151,29 @@
       color: #333;
     }
 
+    &__section-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+
+      .message-create {
+        border-radius: 50%;
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        color: get-theme-color("quinary-color");
+        cursor: pointer;
+
+        &:hover {
+          background-color: get-theme-color("secondary-color");
+        }
+      }
+    }
+
     &__section-more {
       position: relative;
       background: none;
@@ -213,6 +236,22 @@
       padding: 0;
     }
 
+    &__no-notification,
+    &__no-message {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      color: get-theme-color("text-primary");
+
+      img {
+        width: 50%;
+        height: 50%;
+        margin-right: 10px;
+      }
+    }
+
     &__notification {
       &-filter {
         display: flex;
@@ -243,6 +282,51 @@
           }
         }
       }
+    }
+    &__create-chat {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      color: get-theme-color("text-primary");
+
+      .create-chat {
+        &__input {
+          width: 100%;
+          height: 40px;
+          border-radius: 10px;
+          border: 1px solid rgba(get-theme-color("tertiary-color"), 0.2);
+          background-color: get-theme-color("background-color-light");
+          padding: 0 10px;
+          font-size: 16px;
+          outline: none;
+        }
+
+        &__loader {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        &__friends-list {
+          list-style: none;
+          display: flex;
+          flex-direction: column;
+          gap: 5px;
+          margin: 0;
+          padding: 0;
+        }
+
+        &__friend-item {
+          display: flex;
+          align-items: center;
+          gap: 5px;
+          cursor: pointer;
+        }
+      }
+    }
+    &__message {
     }
   }
 }

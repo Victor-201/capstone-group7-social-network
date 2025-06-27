@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { getChatMessages } from '../../api/messageApi';
+import { getMessagesByChatId } from '../../api/messageApi';
 
 export const useChatMessages = (chatId, page = 1, limit = 20) => {
     const [messages, setMessages] = useState([]);
@@ -24,7 +24,7 @@ export const useChatMessages = (chatId, page = 1, limit = 20) => {
             if (!isLoadMore) setLoading(true);
             setError(null);
             
-            const data = await getChatMessages(token, chatId, pageNum, limit);
+            const data = await getMessagesByChatId(token, chatId, pageNum, limit);
             
             if (isLoadMore) {
                 // For messages, we usually want older messages at the top

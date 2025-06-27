@@ -33,8 +33,11 @@ const Header = () => {
         unreadCount,
         setNotifications,
         setUnreadCount,
-        reload,
+        reloadNotifications,
+        loading: loadingNotifications,
+        error: errorNotifications
     } = useNotifications();
+
     // Set menu items based on role
     useEffect(() => {
         const baseMenus = [
@@ -50,10 +53,6 @@ const Header = () => {
 
         setMenus(baseMenus);
     }, [auth.role]);
-
-    useEffect(() => {
-        setUnreadCount(0);
-    }, []);
     // Handle clicks outside to close popups
     useClickOutside(popupUserPanelRef, () => {
         setActiveUsePanelPopup(null);
@@ -100,7 +99,7 @@ const Header = () => {
                                             <li
                                                 key={user.id}
                                                 className="header__search-item"
-                                                onClick={() => navigate(ROUTERS.USER.PROFILE.replace(':id', user.id))}
+                                                onClick={() => navigate(ROUTERS.USER.PROFILE.replace(':user_name', user.userAccount.user_name))}
                                             >
                                                 <div className="search-item__info">
                                                     <h3>{user.full_name}</h3>
@@ -173,6 +172,14 @@ const Header = () => {
                                 type={activeUsePanelPopup}
                                 user={userInfo}
                                 onClose={() => setActiveUsePanelPopup(null)}
+                                reloadFns={{
+                                    notifications: reloadNotifications,
+                                }}
+                                notiData={{
+                                    notifications,
+                                    loadingNotifications,
+                                    errorNotifications,
+                                }}
                             />
                         )}
                     </div>

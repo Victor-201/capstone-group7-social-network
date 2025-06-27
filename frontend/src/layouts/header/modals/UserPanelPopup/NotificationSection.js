@@ -1,12 +1,10 @@
 import NotificationItem from '../../../../components/notificationItem';
-import { useNotifications } from '../../../../hooks/notifications';
 import Loader from '../../../../components/loader';
+import emptyNotification from '../../../../assets/images/empty/empty_notification.gif'
 
-const NotificationSection = ({ filter, onClose, onRefresh }) => {
-    const { notifications, loading, error } = useNotifications(filter);
+const NotificationSection = ({ notifications, loading, error, onClose, reloadNotifications }) => {
     return (
         <section className="popup__section popup__section--notification">
-            {/* filter buttons... */}
             {loading ? (
                 <div className="popup__loader">
                     <Loader />
@@ -14,7 +12,10 @@ const NotificationSection = ({ filter, onClose, onRefresh }) => {
             ) : error ? (
                 <div className="popup__error">{error}</div>
             ) : notifications.length === 0 ? (
-                <div className="popup__no-notification">Không có thông báo nào.</div>
+                <div className="popup__no-notification">
+                    <img src={emptyNotification} alt="No notification" />
+                    <span>Không có thống báo</span>
+                </div>
             ) : (
                 <ul className="popup__notification-list">
                     {notifications.map(noti => (
@@ -22,7 +23,7 @@ const NotificationSection = ({ filter, onClose, onRefresh }) => {
                             key={noti.id}
                             noti={noti}
                             onClose={onClose}
-                            onRefresh={onRefresh} // TRUYỀN THẲNG onRefresh
+                            reloadNotifications={reloadNotifications} 
                         />
                     ))}
                 </ul>

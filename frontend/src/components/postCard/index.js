@@ -91,7 +91,6 @@ const Post = ({ post, userInfo }) => {
             <div className="post__media-list">
               {post.media.map((media, index) => (
                 <MediaItem
-                  key={media.media_url || index}
                   mediaUrl={media.media_url}
                   mediaType={media.media_type}
                 />

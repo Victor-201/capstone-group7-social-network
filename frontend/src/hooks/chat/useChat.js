@@ -1,20 +1,18 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useAuth } from "../../contexts/AuthContext";
 import { 
     getChats,
     getChatById,
-    getChatMessages
 } from '../../api/chatApi';
-import { sendMessage } from '../../api/messageApi';
 
 export const useChats = () => {
     const [chats, setChats] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const { auth } = useAuth();
 
     const fetchChats = useCallback(async () => {
-        const token = localStorage.getItem('token');
-        if (!token) {
-            setError("No token provided");
+        if (!auth.token) {
             setLoading(false);
             return;
         }
@@ -22,7 +20,7 @@ export const useChats = () => {
         try {
             setLoading(true);
             setError(null);
-            const data = await getChats(token);
+            const data = await getChats(auth.token);
             setChats(data.chats || []);
         } catch (err) {
             setError(err.message);
@@ -42,15 +40,14 @@ export const useChat = (chatId) => {
     const [chat, setChat] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const { auth } = useAuth();
 
     const fetchChat = useCallback(async () => {
         if (!chatId) {
             setLoading(false);
             return;
         }
-
-        const token = localStorage.getItem('token');
-        if (!token) {
+        if (!auth.token) {
             setError("No token provided");
             setLoading(false);
             return;
@@ -59,7 +56,7 @@ export const useChat = (chatId) => {
         try {
             setLoading(true);
             setError(null);
-            const data = await getChatById(token, chatId);
+            const data = await getChatById(auth.token, chatId);
             setChat(data.chat);
         } catch (err) {
             setError(err.message);

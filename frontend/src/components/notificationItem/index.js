@@ -3,46 +3,32 @@ import './style.scss';
 import useTimeAgo from '../../hooks/useTimeAgo';
 import AvatarUser from '../avatarUser';
 import { useNavigate } from 'react-router-dom';
-import { useMarkAsRead } from '../../hooks/notifications';
-import { useMarkAsUnRead } from '../../hooks/notifications';
+import { useMarkAsRead, useMarkAsUnRead, useDeleteNotification } from '../../hooks/notifications';
 import { BsThreeDots } from 'react-icons/bs';
 
-const NotificationItem = ({ noti, onMarkedRead, onClose, onRefresh }) => {
+const NotificationItem = ({ noti, onClose, reloadNotifications }) => {
     const [showActions, setShowActions] = useState(false);
+    const actionsRef = useRef(null);
     const timeAgo = useTimeAgo(noti.created_at);
     const navigate = useNavigate();
-    const { read } = useMarkAsRead();
-    const { unread } = useMarkAsUnRead();
-    const actionsRef = useRef(null);
+    const { readNoti } = useMarkAsRead();
+    const { unreadNoti } = useMarkAsUnRead();
+    const { deleteNoti } = useDeleteNotification();
 
-    const handleClick = async () => {
-        if (noti.is_read) {
-            navigate(noti.link || '/');
-            onClose?.();
-            return;
-        }
-        
-        const updated = await read(noti.id);
+    const handleActionNoti = async (action) => {
+        const updated = await action(noti.id);
         if (updated) {
-            onMarkedRead?.(updated);
-            onRefresh?.(); // Thêm dòng này để load lại danh sách
-            navigate(noti.link || '/');
-            onClose?.();
-        }
-    };
-
-    const toggleActions = (e) => {
-        e.stopPropagation(); // Ngăn click lan ra ngoài
-        setShowActions((prev) => !prev);
-    };
-
-    const handleClickOutside = (e) => {
-        if (actionsRef.current && !actionsRef.current.contains(e.target)) {
+            reloadNotifications?.();
             setShowActions(false);
         }
     };
 
     useEffect(() => {
+        const handleClickOutside = (e) => {
+            if (actionsRef.current && !actionsRef.current.contains(e.target)) {
+                setShowActions(false);
+            }
+        };
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
@@ -50,53 +36,22 @@ const NotificationItem = ({ noti, onMarkedRead, onClose, onRefresh }) => {
     return (
         <li
             className={`notification__item ${noti.is_read ? 'notification__item--read' : ''}`}
-            onDoubleClick={handleClick}
+            onDoubleClick={() => handleActionNoti(readNoti)}
         >
-            <div className="notification__more" onClick={toggleActions} ref={actionsRef}>
+            <div className="notification__more" onClick={(e) => { e.stopPropagation(); setShowActions((prev) => !prev); }} ref={actionsRef}>
                 <BsThreeDots />
                 {showActions && (
                     <div className="notification__more--actions">
                         {noti.is_read ? (
-                            <button
-                                className="notification__action"
-                                onClick={async (e) => {
-                                    e.stopPropagation();
-                                    const updated = await unread(noti.id);
-                                    if (updated) {
-                                        onMarkedRead?.(updated);
-                                        onRefresh?.(); // Thêm dòng này
-                                    }
-                                    setShowActions(false);
-                                }}
-                            >
+                            <button className="notification__action" onClick={() => handleActionNoti(unreadNoti)}>
                                 Đánh dấu chưa đọc
                             </button>
                         ) : (
-                            <button
-                                className="notification__action"
-                                onClick={async (e) => {
-                                    e.stopPropagation();
-                                    const updated = await read(noti.id);
-                                    if (updated) {
-                                        onMarkedRead?.(updated);
-                                        onRefresh?.(); // Thêm dòng này
-                                    }
-                                    setShowActions(false);
-                                }}
-                            >
+                            <button className="notification__action" onClick={() => handleActionNoti(readNoti)}>
                                 Đánh dấu đã đọc
                             </button>
                         )}
-                        <button
-                            className="notification__action"
-                            onClick={async (e) => {
-                                e.stopPropagation();
-                                // TODO: Thêm logic xoá ở đây, ví dụ:
-                                // await deleteNotification(noti.id);
-                                onRefresh?.(); // Thêm dòng này
-                                setShowActions(false);
-                            }}
-                        >
+                        <button className="notification__action" onClick={() => handleActionNoti(deleteNoti)}>
                             Xoá thông báo
                         </button>
                     </div>

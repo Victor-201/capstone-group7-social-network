@@ -17,7 +17,7 @@ export default {
             });
 
             if (!notifications || notifications.length === 0) {
-                return { error: { code: 404, message: "No notifications found" } };
+                return { result: [] };
             }
 
             return { result: notifications };
@@ -89,7 +89,7 @@ export default {
             return { error: { code: 400, message: "Missing required fields" } };
         }
 
-        if(receiver_id === user_id && action_type !== "system") {
+        if (receiver_id === user_id && action_type !== "system") {
             return { error: { code: 400, message: "You can't send system notification to yourself" } };
         }
 
@@ -103,7 +103,7 @@ export default {
                 },
             });
             if (isExist) {
-                return {error: {code: 400, message: "This notification is exist"}};
+                return { error: { code: 400, message: "This notification is exist" } };
             }
             const notification = await Notification.create({
                 sender_id: user_id,

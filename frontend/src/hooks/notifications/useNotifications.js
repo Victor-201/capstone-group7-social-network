@@ -53,7 +53,7 @@ export const useNotifications = () => {
     unreadCount,
     setNotifications,
     setUnreadCount,
-    reload: () => {
+    reloadNotifications: () => {
       loadNotifications();
       loadUnreadCount();
     },
