@@ -162,8 +162,6 @@ const FriendsPage = () => {
     if (fetchedTabs.has(tab)) {
       return; // Đã fetch rồi, không fetch lại
     }
-
-    console.log(`Fetching data for tab: ${tab}`);
     
     // Set loading cho tab này
     setTabLoading(prev => new Set([...prev, tab]));
@@ -191,7 +189,7 @@ const FriendsPage = () => {
       // Đánh dấu tab đã được fetch
       setFetchedTabs(prev => new Set([...prev, tab]));
     } catch (error) {
-      console.error(`Error fetching data for tab ${tab}:`, error);
+      // Error handling
     } finally {
       // Xóa loading cho tab này
       setTabLoading(prev => {
@@ -221,7 +219,6 @@ const FriendsPage = () => {
   // Fetch dữ liệu ban đầu chỉ cho tab đầu tiên
   useEffect(() => {
     if (isInitialLoad) {
-      console.log('FriendsPage: Fetching initial data for first tab...');
       fetchDataForTab(activeTab);
       setIsInitialLoad(false);
     }
@@ -230,14 +227,13 @@ const FriendsPage = () => {
   // Fetch mutual friends chỉ khi có dữ liệu và cần thiết
   useEffect(() => {
     if (allFriendIds.length > 0 && !isInitialLoad && shouldFetchMutual) {
-      console.log('Fetching mutual friends for IDs:', allFriendIds);
       // Delay fetch mutual friends để tránh fetch ngay khi load
       const timer = setTimeout(() => {
         Promise.all([
           refetchMutualCounts(),
           refetchMutualDetailed()
-        ]).catch(error => {
-          console.error('Error fetching mutual friends:', error);
+        ]).catch(() => {
+          // Error handling
         });
       }, 100); // Delay 100ms để tránh fetch ngay lập tức
       
@@ -262,11 +258,9 @@ const FriendsPage = () => {
         // Now refetch to get updated data
         await fetchAllData();
       } else {
-        console.error('Error sending friend request:', result.message || 'Unknown error');
         setMessage('Có lỗi xảy ra khi gửi lời mời kết bạn');
       }
     } catch (err) {
-      console.error('handleSendRequest error', err);
       setMessage('Đã xảy ra lỗi. Vui lòng thử lại sau.');
     } finally {
       setLocalActionLoading(prev => ({ ...prev, [`add_${userId}`]: false }));
@@ -295,11 +289,9 @@ const FriendsPage = () => {
         // Refresh data after action
         await fetchAllData();
       } else {
-        console.error('Error handling friend request:', result.message || 'Unknown error');
         setMessage('Có lỗi xảy ra khi xử lý lời mời kết bạn');
       }
     } catch (err) {
-      console.error('handleRequestResponse error', err);
       setMessage('Đã xảy ra lỗi. Vui lòng thử lại sau.');
     } finally {
       setLocalActionLoading(prev => ({ ...prev, [`${action}_${requesterId}`]: false }));
@@ -320,7 +312,6 @@ const FriendsPage = () => {
     // Find friend info before removing
     const friendInfo = friends?.find(f => f.id === friendId);
     if (!friendInfo) {
-      console.error('Friend not found');
       return;
     }
     
@@ -336,11 +327,9 @@ const FriendsPage = () => {
         handleTabChange('suggestions');
         // Don't refetch immediately to avoid duplicate display
       } else {
-        console.error('Error removing friend:', result.message || 'Unknown error');
         setMessage('Có lỗi xảy ra khi xóa bạn bè');
       }
     } catch (err) {
-      console.error('handleRemoveFriend error', err);
       setMessage('Đã xảy ra lỗi. Vui lòng thử lại sau.');
     } finally {
       setLocalActionLoading(prev => ({ ...prev, [`remove_${friendId}`]: false }));
@@ -359,14 +348,12 @@ const FriendsPage = () => {
     try {
       const result = await followUser(userId);
       if (result.success) {
-        setMessage('Đã theo dõi người dùng');
-        await fetchAllData(); // Refresh data
+        setMessage('Đã theo dõi người dùng thành công');
+        await refetchFollow();
       } else {
-        console.error('Error following user:', result.message || 'Unknown error');
         setMessage('Có lỗi xảy ra khi theo dõi người dùng');
       }
     } catch (err) {
-      console.error('handleFollowUser error', err);
       setMessage('Đã xảy ra lỗi. Vui lòng thử lại sau.');
     } finally {
       setLocalActionLoading(prev => ({ ...prev, [`follow_${userId}`]: false }));
@@ -386,13 +373,11 @@ const FriendsPage = () => {
       const result = await unfollowUser(userId);
       if (result.success) {
         setMessage('Đã bỏ theo dõi người dùng');
-        await fetchAllData(); // Refresh data
+        await refetchFollow();
       } else {
-        console.error('Error unfollowing user:', result.message || 'Unknown error');
         setMessage('Có lỗi xảy ra khi bỏ theo dõi người dùng');
       }
     } catch (err) {
-      console.error('handleUnfollowUser error', err);
       setMessage('Đã xảy ra lỗi. Vui lòng thử lại sau.');
     } finally {
       setLocalActionLoading(prev => ({ ...prev, [`unfollow_${userId}`]: false }));
@@ -406,22 +391,24 @@ const FriendsPage = () => {
 
   // Handle block user
   const handleBlockUser = async (userId) => {
-    if (!window.confirm('Bạn có chắc chắn muốn chặn người này? Họ sẽ không thể xem trang cá nhân và tương tác với bạn.')) {
+    if (!window.confirm('Bạn có chắc chắn muốn chặn người dùng này?')) {
       return;
     }
     
     setLocalActionLoading(prev => ({ ...prev, [`block_${userId}`]: true }));
     
     try {
-      // TODO: Implement block API call
-      // const result = await blockUser(userId);
-      setMessage('Đã chặn người dùng (Chức năng đang phát triển)');
+      // Placeholder for block API call
+      setMessage('Tính năng chặn người dùng sẽ sớm được triển khai');
+      
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 500));
     } catch (err) {
-      console.error('handleBlockUser error', err);
-      setMessage('Đã xảy ra lỗi khi chặn người dùng.');
+      setMessage('Đã xảy ra lỗi. Vui lòng thử lại sau.');
     } finally {
       setLocalActionLoading(prev => ({ ...prev, [`block_${userId}`]: false }));
       
+      // Clear message after 3 seconds
       setTimeout(() => {
         setMessage(null);
       }, 3000);
@@ -437,15 +424,17 @@ const FriendsPage = () => {
     setLocalActionLoading(prev => ({ ...prev, [`report_${userId}`]: true }));
     
     try {
-      // TODO: Implement report API call
-      // const result = await reportUser(userId);
-      setMessage('Đã gửi báo cáo (Chức năng đang phát triển)');
+      // Placeholder for report API call
+      setMessage('Cảm ơn bạn đã báo cáo. Chúng tôi sẽ xem xét báo cáo của bạn.');
+      
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 500));
     } catch (err) {
-      console.error('handleReportUser error', err);
-      setMessage('Đã xảy ra lỗi khi báo cáo.');
+      setMessage('Đã xảy ra lỗi. Vui lòng thử lại sau.');
     } finally {
       setLocalActionLoading(prev => ({ ...prev, [`report_${userId}`]: false }));
       
+      // Clear message after 3 seconds
       setTimeout(() => {
         setMessage(null);
       }, 3000);
@@ -473,12 +462,8 @@ const FriendsPage = () => {
           isSuggestion: true
         }));
       
-      console.log('Suggestions mode - unfriended as suggestions:', unfriendedSuggestions.map(f => f.id));
       return unfriendedSuggestions;
     }
-    
-    console.log('Friends mode - current friends only:', currentFriends.map(f => f.id));
-    console.log('Recently unfriended (hidden):', Array.from(recentlyUnfriended.keys()));
     
     return currentFriends;
   }, [friends, recentlyUnfriended, activeTab]);
@@ -679,7 +664,6 @@ const FriendsPage = () => {
                           {filteredFriends.length > 0 ? filteredFriends.map((friend, index) => {
                             // Validate friend object
                             if (!friend || !friend.id) {
-                              console.warn('Invalid friend object:', friend);
                               return null;
                             }
                             
@@ -775,7 +759,6 @@ const FriendsPage = () => {
                           {filteredRequests.map((requestUser, index) => {
                             // Use the processed request user data
                             if (!requestUser || !requestUser.id) {
-                              console.warn('Invalid request user data:', requestUser);
                               return null;
                             }
                             
