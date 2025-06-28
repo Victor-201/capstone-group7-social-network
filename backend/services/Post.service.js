@@ -164,7 +164,7 @@ export default {
         Follow.findAll({ where: { follower_id: user_id }, attributes: ['following_id'] })
       ]);
 
-      const friendIds = friends.result.friends.map(friend => friend.id);
+      const friendIds = friends.result.map(friend => friend.id);
       const followedIds = follows.map(f => f.following_id);
 
       const relatedIds = [...new Set([user_id, ...friendIds, ...followedIds])];
