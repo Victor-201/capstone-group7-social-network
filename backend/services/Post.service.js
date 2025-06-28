@@ -123,7 +123,6 @@ export default {
 
       if (files && files.length > 0) {
         const mediaResults = uploadMultipleMedia(Array.isArray(files) ? files : []);
-
         if (mediaResults.length > 0) {
           await PostMedia.destroy({ where: { post_id: postId } });
 
