@@ -54,8 +54,6 @@ export const useBatchMutualFriendsDetailed = (friendIds = []) => {
       return;
     }
 
-    console.log('useBatchMutualFriendsDetailed: Starting fetch for IDs:', friendIds);
-
     const token = localStorage.getItem('token');
     if (!token) {
       setError("Vui lòng đăng nhập để xem bạn bè chung");
@@ -70,16 +68,13 @@ export const useBatchMutualFriendsDetailed = (friendIds = []) => {
       // Fetch tất cả mutual friends details song song
       const promises = friendIds.map(async (friendId) => {
         try {
-          console.log(`Fetching detailed mutual friends for user ${friendId}...`);
           const result = await getMutualFriends(token, friendId);
-          console.log(`Mutual friends result for ${friendId}:`, result);
           return {
             friendId,
             mutualFriends: result?.mutualFriends || [],
             count: result?.mutualFriends?.length || 0
           };
         } catch (err) {
-          console.log(`Failed to fetch mutual friends for ${friendId}:`, err);
           return { friendId, mutualFriends: [], count: 0 };
         }
       });
@@ -92,10 +87,8 @@ export const useBatchMutualFriendsDetailed = (friendIds = []) => {
         dataMap[friendId] = { mutualFriends, count };
       });
       
-      console.log('useBatchMutualFriendsDetailed: Final dataMap:', dataMap);
       setMutualFriendsData(dataMap);
     } catch (err) {
-      console.error('Failed to fetch batch detailed mutual friends:', err);
       setError(err);
       setMutualFriendsData({});
     } finally {
@@ -122,8 +115,6 @@ export const useBatchMutualFriends = (friendIds = []) => {
       return;
     }
 
-    console.log('useBatchMutualFriends: Starting fetch for IDs:', friendIds);
-
     const token = localStorage.getItem('token');
     if (!token) {
       setError("Vui lòng đăng nhập để xem bạn bè chung");
@@ -138,10 +129,7 @@ export const useBatchMutualFriends = (friendIds = []) => {
       // Fetch tất cả mutual friends counts song song
       const promises = friendIds.map(async (friendId) => {
         try {
-          console.log(`Fetching mutual friends for user ${friendId}...`);
           const result = await getMutualFriends(token, friendId);
-          console.log(`Mutual friends result for ${friendId}:`, result);
-          
           // Handle both success and "no mutual friends" cases
           if (result.mutualFriends) {
             return {
@@ -153,7 +141,6 @@ export const useBatchMutualFriends = (friendIds = []) => {
             return { friendId, count: 0 };
           }
         } catch (err) {
-          console.log(`Failed to fetch mutual friends for ${friendId}:`, err);
           return { friendId, count: 0 };
         }
       });
@@ -166,10 +153,8 @@ export const useBatchMutualFriends = (friendIds = []) => {
         countsMap[friendId] = count;
       });
       
-      console.log('useBatchMutualFriends: Final counts map:', countsMap);
       setMutualCounts(countsMap);
     } catch (err) {
-      console.error('Failed to fetch batch mutual friends:', err);
       setError(err);
       setMutualCounts({});
     } finally {

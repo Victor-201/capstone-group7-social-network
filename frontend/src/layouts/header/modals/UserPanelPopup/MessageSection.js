@@ -7,19 +7,16 @@ import ChatBox from '../../../../components/chatBox';
 import ChatList from '../../../../components/chatList';
 
 const MessageSection = ({ onClose, isOpenCreateChat, setIsOpenCreateChat }) => {
+    const [other_userId, setOtherUserId] = useState(null);
+    const [isOpenChatRoom, setIsOpenChatRoom] = useState(false);
     const [chatId, setChatId] = useState(null);
     const { chats, loading: loadingChats, error: errorChats, refetch } = useChats();
-    const { createNewChat, loading: loadingCreate, error: errorCreate } = useChatActions();
     const { friends, loading: loadingFriends, error: errorFriends } = useFriends();
 
  const handleCreateChat = async (friend_id) => {
-    try {
-        const newChat = await createNewChat(friend_id);
-        setChatId(newChat.chat_id);
-        setIsOpenCreateChat(false);
-    } catch (err) {
-        console.error("Tạo chat thất bại:", err.message);
-    }
+    setOtherUserId(friend_id);
+    setIsOpenCreateChat(false);
+    setIsOpenChatRoom(true);
 };
 
     const handleSelectChat = (chatId) => {
@@ -28,6 +25,7 @@ const MessageSection = ({ onClose, isOpenCreateChat, setIsOpenCreateChat }) => {
 
     const handleCloseChat = () => {
         setChatId(null);
+        setIsOpenChatRoom(false);
     };
 
     return (
@@ -58,8 +56,8 @@ const MessageSection = ({ onClose, isOpenCreateChat, setIsOpenCreateChat }) => {
                         </ul>
                     )}
                 </div>
-            ) : chatId ? (
-                <ChatBox chatId={chatId} onClose={handleCloseChat} />
+            ) : isOpenChatRoom || chatId ? (
+                <ChatBox chatId={chatId} friend_id ={other_userId} onClose={handleCloseChat} />
             ) : loadingChats ? (
                 <div className="popup__loader">
                     <Loader />
@@ -71,7 +69,7 @@ const MessageSection = ({ onClose, isOpenCreateChat, setIsOpenCreateChat }) => {
             ) : (
                 <ul className="popup__message-list">
                     {chats.map(chat => (
-                        <ChatList key={chat.chat_id} chat={chat} handleSelectChat={handleSelectChat} />
+                        <ChatList key={chat.chat_id} chat={chat} handleSelectChat={handleSelectChat} setOtherUserId={setOtherUserId} />
                     ))}
                 </ul>
             )}
