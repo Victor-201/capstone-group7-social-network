@@ -14,7 +14,7 @@ export const updateUserInfo = async (req, res) => {
 
 export const getUserInfoById = async (req, res) => {
   const { id } = req.params;
-  const { error, result } = await userInfoService.getUserInfoById(id);
+  const { error, result } = await userInfoService.getUserInfoByIdS(id);
   if (error) return res.status(error.code).json(error);
   return res.status(200).json(result);
 };
@@ -34,3 +34,12 @@ export const updateProfileVisibility = async (req, res) => {
   }
   return res.status(200).json(result);
 };
+
+export const getUserInfoByUserName = async (req, res) => {
+  const user_name = req.params.user_name;
+  const { error, result } = await userInfoService.getUserByUserName(user_name);
+  if(error){
+    return res.status(error.code).json(error);
+  }
+  return res.status(200).json(result);
+}
