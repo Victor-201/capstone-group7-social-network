@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import CreatePost from "../../../../../components/createPost";
-import PostCard from "../../../../../components/postCard";
+import Post from "../../../../../components/postCard";
 import photo1Image from "../../../../../assets/images/logo192.png";
 import photo2Image from "../../../../../assets/images/logo192.png";
 import friend1Image from "../../../../../assets/images/logo192.png";
@@ -17,6 +17,7 @@ import { useFriends } from "../../../../../hooks/friends/useFriends";
 import AvatarUser from "../../../../../components/avatarUser";
 import { useCloudinaryFile } from "../../../../../hooks/useCloudinaryFile";
 
+
 const relationshipOptions = [
   { label: "Độc thân", value: "single" },
   { label: "Đang hẹn hò", value: "in_a_relationship" },
@@ -26,7 +27,7 @@ const relationshipOptions = [
 
 const PostsTab = ({ userInfo, isOwner, handleTabClick }) => {
   const { posts } = useUserPosts();
-  const totalPosts = posts?.length || 0;
+  console.log("posts", posts);
   const { images, loading: loadingImages } = useUserImages(userInfo?.id);
  // Ở đầu file:
 const {
@@ -61,7 +62,7 @@ useEffect(() => {
   const loadProfileDetails = async () => {
     const token = localStorage.getItem("token");
     const data = await getUserInfo(token);
-
+  
     setBio(data?.bio || "");
     setProfileDetails({
       job: { value: data?.ProfileDetails?.job || "", is_visible: getVisible("job", data) },
@@ -243,13 +244,14 @@ useEffect(() => {
         </div>
 
         <div className="content__main">
-          {isOwner && <CreatePost userInfo={userInfo} />}
+          {isOwner && <CreatePost user_id={userInfo.user_id} />}
           <div className="posts">
-            {totalPosts === 0 ? (
+            {posts.length === 0 ? (
+
               <p>Chưa có bài đăng nào</p>
             ) : (
               posts.map((post) => (
-                <PostCard key={post.id} post={post} userInfo={userInfo} />
+                <Post key={post.id} post={post} user_id={userInfo.user_id} />
               ))
             )}
           </div>

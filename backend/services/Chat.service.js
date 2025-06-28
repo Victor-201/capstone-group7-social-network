@@ -29,7 +29,7 @@ export default {
         }]
       });
       if (existingChat.length > 0) {
-        return { result: { message: 'Private chat already exists', chat_id: existingChat[0].chat_id } };
+        return { result: { message: 'Private chat already exists', chat: existingChat[0] } };
       }
 
       const chat = await Chat.create({ is_group: false });
@@ -39,7 +39,7 @@ export default {
         { chat_id: chat.id, user_id: otherUserId }
       ]);
 
-      return { result: { message: 'Private chat created', chat } };
+      return { result: { message: 'Private chat created', chat: chat } };
     } catch (error) {
       return {
         error: { code: 500, message: 'Error creating chat', detail: error.message }

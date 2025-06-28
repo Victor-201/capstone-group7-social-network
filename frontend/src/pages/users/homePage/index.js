@@ -1,3 +1,4 @@
+// pages/home/HomePage.jsx
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { FaExclamationTriangle } from 'react-icons/fa';
 import CreatePost from '../../../components/createPost';
@@ -7,29 +8,28 @@ import { useFriendSuggestions } from '../../../hooks/friends/useFriendSuggestion
 import { useBatchMutualFriends, useBatchMutualFriendsDetailed } from '../../../hooks/friends/useMutualFriends';
 import { useFriendActions } from '../../../hooks/friends/useFriendActions';
 import { useUserFeedPosts } from '../../../hooks/posts/useUserPosts';
+import { useAuth } from '../../../contexts/AuthContext';
 import './style.scss';
 
 const HomePage = () => {
-  const { posts } = useUserFeedPosts(); // ✅ Lấy bài viết từ API thật
+  const { auth } = useAuth();
+  console.log("thanglimlon", auth);
+  const { posts, loading: postsLoading, error: postsError } = useUserFeedPosts();
   const [message, setMessage] = useState('');
   const [removedSuggestions, setRemovedSuggestions] = useState(new Set());
 
-  // Lấy gợi ý kết bạn
   const {
     suggestions: realFriendSuggestions,
     loading: suggestionsLoading,
     error: suggestionsError,
-    refetch: refetchSuggestions
   } = useFriendSuggestions();
 
-  // Gửi yêu cầu kết bạn
   const {
     sendRequest,
     loading: friendActionLoading,
-    error: friendActionError
+    error: friendActionError,
   } = useFriendActions();
 
-  // Danh sách ID để lấy mutual friend count
   const friendSuggestionIds = useMemo(() => {
     return realFriendSuggestions?.map(user => user.id).filter(Boolean) || [];
   }, [realFriendSuggestions]);
@@ -37,7 +37,6 @@ const HomePage = () => {
   const { mutualCounts } = useBatchMutualFriends(friendSuggestionIds);
   const { mutualFriendsData } = useBatchMutualFriendsDetailed(friendSuggestionIds);
 
-  // Tạo ref để giữ chỉ số random
   const suggestionIndexRef = useRef(null);
 
   useEffect(() => {
@@ -46,7 +45,6 @@ const HomePage = () => {
     }
   }, [posts]);
 
-  // Danh sách bạn bè đề xuất (lọc và random)
   const friendSuggestions = useMemo(() => {
     if (suggestionsLoading || !realFriendSuggestions) return [];
 
@@ -59,31 +57,58 @@ const HomePage = () => {
   const handleAddFriend = async (user) => {
     try {
       await sendRequest(user.id);
-      setMessage(`Đã gửi lời mời kết bạn đến ${user.fullName || user.full_name || user.user_name}`);
+      setMessage(`✅ Đã gửi lời mời kết bạn đến ${user.fullName || user.user_name}`);
       setRemovedSuggestions(prev => new Set([...prev, user.id]));
       setTimeout(() => setMessage(''), 3000);
     } catch (error) {
-      setMessage(`Lỗi khi gửi lời mời: ${error.message}`);
+      setMessage(`❌ Lỗi khi gửi lời mời: ${error.message}`);
       setTimeout(() => setMessage(''), 5000);
     }
   };
 
   const handleRemoveSuggestion = (user) => {
     setRemovedSuggestions(prev => new Set([...prev, user.id]));
-    setMessage(`Đã xóa gợi ý kết bạn với ${user.fullName || user.full_name || user.user_name}`);
+    setMessage(`🚫 Đã xóa gợi ý với ${user.fullName || user.user_name}`);
     setTimeout(() => setMessage(''), 3000);
   };
 
   const renderPostsWithSuggestions = () => {
-    if (!posts.length) return null;
+    if (postsLoading) {
+      return <p>⏳ Đang tải bài viết...</p>;
+    }
+
+    if (postsError) {
+      return (
+        <div className="posts-error">
+          <FaExclamationTriangle />
+          <span>{postsError}</span>
+          {postsError.includes("hết hạn") && (
+            <button
+              className="login-button"
+              onClick={() => {
+                localStorage.removeItem("token");
+                window.location.href = "/login";
+              }}
+            >
+              Đăng nhập
+            </button>
+          )}
+        </div>
+      );
+    }
+
+    if (!posts.length) {
+      return <p>📭 Không có bài viết nào từ bạn hoặc bạn bè.</p>;
+    }
 
     const suggestionIndex = suggestionIndexRef.current;
 
     return posts.map((post, index) => {
-      if (index === suggestionIndex) {
+
+      if (index === suggestionIndex && friendSuggestions.length > 0) {
         return (
-          <React.Fragment key={`suggestion-${index}`}>
-            <Post post={post} />
+          <React.Fragment key={`suggestion-${post.id || post._id || index}`}>
+            <Post post={post} user_id={post.user_id} />
             <div className="friend-suggestions-horizontal">
               <div className="friend-suggestions-header">
                 <span>Gợi ý kết bạn</span>
@@ -91,14 +116,8 @@ const HomePage = () => {
               </div>
               <div className="friend-suggestions-list">
                 {suggestionsLoading ? (
-                  <div className="suggestions-loading">
-                    <span>Đang tải gợi ý kết bạn...</span>
-                  </div>
-                ) : suggestionsError ? (
-                  <div className="suggestions-error">
-                    <span>Không thể tải gợi ý kết bạn</span>
-                  </div>
-                ) : friendSuggestions.length > 0 ? (
+                  <p>Đang tải gợi ý kết bạn...</p>
+                ) : (
                   friendSuggestions.map((user) => (
                     <AddFriendCard
                       key={user.id}
@@ -108,24 +127,17 @@ const HomePage = () => {
                       mutualFriendsData={mutualFriendsData[user.id]?.mutualFriends || []}
                       onAdd={() => handleAddFriend(user)}
                       onRemove={() => handleRemoveSuggestion(user)}
-                      loading={{
-                        add: friendActionLoading,
-                        remove: false,
-                      }}
+                      loading={{ add: friendActionLoading, remove: false }}
                     />
                   ))
-                ) : (
-                  <div className="no-suggestions">
-                    <span>Chưa có gợi ý kết bạn</span>
-                  </div>
-                )}
+                ) }
               </div>
             </div>
           </React.Fragment>
         );
       }
 
-      return <Post key={post.id} post={post} />;
+      return <Post key={post.id} post={post} user_id={post.user_id} />;
     });
   };
 
@@ -137,20 +149,11 @@ const HomePage = () => {
             {message}
           </div>
         )}
-
         <div className="create-post-section">
-          <CreatePost />
+          <CreatePost user_id={auth.id} />  
         </div>
-
         <div className="newsfeed">
-          {posts.length === 0 ? (
-            <div className="no-posts">
-              <FaExclamationTriangle />
-              <span>Chưa có bài viết nào</span>
-            </div>
-          ) : (
-            renderPostsWithSuggestions()
-          )}
+          {renderPostsWithSuggestions()}
         </div>
       </article>
     </div>

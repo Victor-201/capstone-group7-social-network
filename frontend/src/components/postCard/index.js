@@ -19,6 +19,7 @@ import { IoClose, IoChevronBack, IoChevronForward } from "react-icons/io5";
 import AvatarUser from "../avatarUser";
 import useCloudinaryFile from "../../hooks/useCloudinaryFile";
 import { usePostLikes } from "../../hooks/posts/usePostLikes";
+import { useUserInfo } from "../../hooks/user";
 import "./style.scss";
 
 // Component để hiển thị ảnh trong modal
@@ -189,7 +190,8 @@ const MultipleImagesLayout = ({ images, onImageClick, onShowAll }) => {
   );
 };
 
-const Post = ({ post, userInfo }) => {
+const Post = ({ post, user_id }) => {
+  const { userInfo } = useUserInfo(user_id);
   const { toggleLike, loading, error } = usePostLikes();
   const [showImageModal, setShowImageModal] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);

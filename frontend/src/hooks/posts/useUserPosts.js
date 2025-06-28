@@ -33,6 +33,7 @@ export const useUserPosts = () => {
 
   return { posts, loading, error };
 };
+
 export const useUserFeedPosts = () => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -51,7 +52,7 @@ export const useUserFeedPosts = () => {
         setLoading(true);
         setError(null);
         const data = await fetchFeedPost(token);
-        setPosts(data);
+        setPosts(data.result || []); // ✅ CHỈ LẤY data.result
       } catch (err) {
         setError(err.message);
       } finally {
@@ -63,4 +64,4 @@ export const useUserFeedPosts = () => {
   }, []);
 
   return { posts, loading, error };
-}
+};
