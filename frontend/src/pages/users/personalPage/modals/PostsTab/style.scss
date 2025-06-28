@@ -754,3 +754,57 @@
 }
 
 }
+.about-card__bio-wrapper {
+  position: relative;
+  margin-bottom: 1rem;
+
+  .about-card__bio {
+    font-size: 15px;
+    color: #050505;
+    padding: 12px 14px;
+    border-radius: 8px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    word-break: break-word;
+    position: relative;
+
+    .about-card__edit-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: none;
+      border: none;
+      color: #65676b;
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 50%;
+      transition: background-color 0.2s;
+
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.05);
+      }
+
+      svg {
+        width: 18px;
+        height: 18px;
+      }
+    }
+  }
+
+  .about-card__bio-input {
+    width: 100%;
+    font-size: 15px;
+    padding: 12px 14px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    resize: vertical;
+    line-height: 1.5;
+    outline: none;
+
+    &:focus {
+      border-color: #1877f2;
+      box-shadow: 0 0 0 2px rgba(24, 119, 242, 0.2);
+    }
+  }
+}

@@ -6,194 +6,61 @@ import AddFriendCard from '../../../components/addFriendCard';
 import { useFriendSuggestions } from '../../../hooks/friends/useFriendSuggestions';
 import { useBatchMutualFriends, useBatchMutualFriendsDetailed } from '../../../hooks/friends/useMutualFriends';
 import { useFriendActions } from '../../../hooks/friends/useFriendActions';
-import photo1Image from "../../../assets/images/logo192.png"
+import { useUserFeedPosts } from '../../../hooks/posts/useUserPosts';
 import './style.scss';
 
 const HomePage = () => {
-  const [posts, setPosts] = useState([]);
+  const { posts } = useUserFeedPosts(); // ✅ Lấy bài viết từ API thật
   const [message, setMessage] = useState('');
   const [removedSuggestions, setRemovedSuggestions] = useState(new Set());
-  
-  // Hook để lấy friend suggestions từ database
-  const { 
-    suggestions: realFriendSuggestions, 
-    loading: suggestionsLoading, 
+
+  // Lấy gợi ý kết bạn
+  const {
+    suggestions: realFriendSuggestions,
+    loading: suggestionsLoading,
     error: suggestionsError,
     refetch: refetchSuggestions
   } = useFriendSuggestions();
-  
-  // Hook cho friend actions
+
+  // Gửi yêu cầu kết bạn
   const {
     sendRequest,
     loading: friendActionLoading,
     error: friendActionError
   } = useFriendActions();
-  
-  // Prepare friend IDs for mutual friends
+
+  // Danh sách ID để lấy mutual friend count
   const friendSuggestionIds = useMemo(() => {
     return realFriendSuggestions?.map(user => user.id).filter(Boolean) || [];
   }, [realFriendSuggestions]);
 
-  // Fetch mutual friends counts và detailed data
-  const {
-    mutualCounts
-    // loading: mutualLoading,
-    // error: mutualError
-  } = useBatchMutualFriends(friendSuggestionIds);
+  const { mutualCounts } = useBatchMutualFriends(friendSuggestionIds);
+  const { mutualFriendsData } = useBatchMutualFriendsDetailed(friendSuggestionIds);
 
-  const {
-    mutualFriendsData
-    // loading: mutualDetailedLoading,
-    // error: mutualDetailedError
-  } = useBatchMutualFriendsDetailed(friendSuggestionIds);
-  
-  // Tạo ref để giữ vị trí random, không bị random lại mỗi lần render
+  // Tạo ref để giữ chỉ số random
   const suggestionIndexRef = useRef(null);
-  const listRef = useRef(null);
 
   useEffect(() => {
-    const mockPosts = [
-      {
-        id: 1,
-        author: "Nguyễn Văn A",
-        time: "2 giờ trước",
-        content: "Chào mọi người! Đây là bài đăng mẫu trên trang chủ của tôi. #socialnetwork",
-        image: photo1Image,
-        reactions: 243,
-        comments: 42,
-        shares: 12,
-        liked: false,
-      },
-      {
-        id: 2,
-        author: "Nguyễn Văn B",
-        time: "1 ngày trước",
-        content: "Hôm nay là một ngày tuyệt vời! Đã hoàn thành xong dự án lớn.",
-        image: photo1Image,
-        reactions: 156,
-        comments: 28,
-        shares: 5,
-        liked: true,
-      },
-      {
-        id: 3,
-        author: "Nguyễn Văn C",
-        time: "3 ngày trước",
-        content: "Vừa đọc xong một cuốn sách hay. Ai có thể giới thiệu thêm sách về chủ đề này không?",
-        image: photo1Image,
-        reactions: 89,
-        comments: 31,
-        shares: 2,
-        liked: false,
-      },
-      {
-        id: 4,
-        author: "Trần Minh Dũng",
-        time: "5 giờ trước",
-        content: "Cuối tuần này mọi người có kế hoạch gì chưa? Mình muốn đi dã ngoại.",
-        image: photo1Image,
-        reactions: 120,
-        comments: 15,
-        shares: 3,
-        liked: false,
-      },
-      {
-        id: 5,
-        author: "Lê Thị Hồng",
-        time: "8 giờ trước",
-        content: "Hôm nay trời đẹp quá, ai đi cà phê không?",
-        image: photo1Image,
-        reactions: 98,
-        comments: 22,
-        shares: 4,
-        liked: true,
-      },
-      {
-        id: 6,
-        author: "Phạm Văn Nam",
-        time: "12 giờ trước",
-        content: "Chúc mọi người một ngày làm việc hiệu quả!",
-        image: photo1Image,
-        reactions: 76,
-        comments: 10,
-        shares: 1,
-        liked: false,
-      },
-      {
-        id: 7,
-        author: "Ngô Thị Mai",
-        time: "1 ngày trước",
-        content: "Mình vừa hoàn thành xong khóa học lập trình web, cảm thấy rất vui!",
-        image: photo1Image,
-        reactions: 134,
-        comments: 18,
-        shares: 6,
-        liked: true,
-      },
-      {
-        id: 8,
-        author: "Đỗ Quang Huy",
-        time: "2 ngày trước",
-        content: "Có ai biết quán ăn ngon ở Hà Nội không? Gợi ý giúp mình với!",
-        image: photo1Image,
-        reactions: 65,
-        comments: 9,
-        shares: 2,
-        liked: false,
-      },
-      {
-        id: 9,
-        author: "Vũ Thị Lan",
-        time: "3 ngày trước",
-        content: "Hôm nay mình nhận được tin vui, cảm ơn mọi người đã ủng hộ!",
-        image: photo1Image,
-        reactions: 150,
-        comments: 30,
-        shares: 7,
-        liked: true,
-      },
-      {
-        id: 10,
-        author: "Nguyễn Văn Hùng",
-        time: "4 ngày trước",
-        content: "Ai có kinh nghiệm học tiếng Anh giao tiếp chia sẻ với mình nhé.",
-        image: photo1Image,
-        reactions: 80,
-        comments: 12,
-        shares: 2,
-        liked: false,
-      },
-    ];
-    setPosts(mockPosts);
-
-    // Random vị trí chèn suggestion (0-9)
-    if (suggestionIndexRef.current === null) {
-      suggestionIndexRef.current = Math.floor(Math.random() * mockPosts.length);
+    if (posts.length && suggestionIndexRef.current === null) {
+      suggestionIndexRef.current = Math.floor(Math.random() * posts.length);
     }
-  }, []);
+  }, [posts]);
 
-  // Xử lý friend suggestions từ database
+  // Danh sách bạn bè đề xuất (lọc và random)
   const friendSuggestions = useMemo(() => {
-    if (suggestionsLoading || !realFriendSuggestions) {
-      return [];
-    }
-    // Filter out removed suggestions và shuffle
+    if (suggestionsLoading || !realFriendSuggestions) return [];
+
     return [...realFriendSuggestions]
       .filter(user => !removedSuggestions.has(user.id))
       .sort(() => Math.random() - 0.5)
-      .slice(0, 10); // Hiển thị tối đa 10 suggestions
+      .slice(0, 10);
   }, [realFriendSuggestions, suggestionsLoading, removedSuggestions]);
 
-  // Handler cho thêm bạn bè
   const handleAddFriend = async (user) => {
     try {
       await sendRequest(user.id);
       setMessage(`Đã gửi lời mời kết bạn đến ${user.fullName || user.full_name || user.user_name}`);
-      
-      // Remove from suggestions after successful send
       setRemovedSuggestions(prev => new Set([...prev, user.id]));
-      
-      // Clear message after 3 seconds
       setTimeout(() => setMessage(''), 3000);
     } catch (error) {
       setMessage(`Lỗi khi gửi lời mời: ${error.message}`);
@@ -201,7 +68,6 @@ const HomePage = () => {
     }
   };
 
-  // Handler cho xóa suggestion
   const handleRemoveSuggestion = (user) => {
     setRemovedSuggestions(prev => new Set([...prev, user.id]));
     setMessage(`Đã xóa gợi ý kết bạn với ${user.fullName || user.full_name || user.user_name}`);
@@ -212,6 +78,7 @@ const HomePage = () => {
     if (!posts.length) return null;
 
     const suggestionIndex = suggestionIndexRef.current;
+
     return posts.map((post, index) => {
       if (index === suggestionIndex) {
         return (
@@ -222,7 +89,7 @@ const HomePage = () => {
                 <span>Gợi ý kết bạn</span>
                 <span className="friend-suggestions-desc">Kết nối với những người bạn có thể biết</span>
               </div>
-              <div className="friend-suggestions-list" ref={listRef}>
+              <div className="friend-suggestions-list">
                 {suggestionsLoading ? (
                   <div className="suggestions-loading">
                     <span>Đang tải gợi ý kết bạn...</span>
@@ -232,18 +99,18 @@ const HomePage = () => {
                     <span>Không thể tải gợi ý kết bạn</span>
                   </div>
                 ) : friendSuggestions.length > 0 ? (
-                  friendSuggestions.map((user, idx) => (
-                    <AddFriendCard 
-                      key={user.id} 
-                      user={user} 
+                  friendSuggestions.map((user) => (
+                    <AddFriendCard
+                      key={user.id}
+                      user={user}
                       type="compact"
                       mutualFriendsCount={mutualCounts[user.id] || 0}
                       mutualFriendsData={mutualFriendsData[user.id]?.mutualFriends || []}
                       onAdd={() => handleAddFriend(user)}
                       onRemove={() => handleRemoveSuggestion(user)}
-                      loading={{ 
+                      loading={{
                         add: friendActionLoading,
-                        remove: false 
+                        remove: false,
                       }}
                     />
                   ))
@@ -257,6 +124,7 @@ const HomePage = () => {
           </React.Fragment>
         );
       }
+
       return <Post key={post.id} post={post} />;
     });
   };
@@ -264,23 +132,21 @@ const HomePage = () => {
   return (
     <div className="container">
       <article className="home-page">
-        {/* Message display */}
         {message && (
           <div className={`message ${friendActionError ? 'error-message' : 'success-message'}`}>
             {message}
           </div>
         )}
-        
-        {/* Create Post Section */}
+
         <div className="create-post-section">
           <CreatePost />
         </div>
-        {/* Newsfeed Section */}
+
         <div className="newsfeed">
           {posts.length === 0 ? (
             <div className="no-posts">
               <FaExclamationTriangle />
-              <span>No posts to show</span>
+              <span>Chưa có bài viết nào</span>
             </div>
           ) : (
             renderPostsWithSuggestions()

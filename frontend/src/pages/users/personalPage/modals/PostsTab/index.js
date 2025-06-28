@@ -128,15 +128,23 @@ useEffect(() => {
   };
 
   const renderVisibleItem = (field, label, Icon) => {
-    const isVisible = profileDetails[field]?.is_visible;
-    const value = profileDetails[field]?.value;
-    return isVisible && value ? (
-      <li>
-        <Icon className="about-icon" />
-        {label} <strong>{value}</strong>
-      </li>
-    ) : null;
-  };
+  const isVisible = profileDetails[field]?.is_visible;
+  const value = profileDetails[field]?.value;
+
+  // Map relationship value về label tiếng Việt nếu là relationship_status
+  const displayValue =
+    field === "relationship_status"
+      ? relationshipOptions.find(opt => opt.value === value)?.label || value
+      : value;
+
+  return isVisible && value ? (
+    <li>
+      <Icon className="about-icon" />
+      {label} <strong>{displayValue}</strong>
+    </li>
+  ) : null;
+};
+
 
   return (
     <section id="posts" className="tab-content tab-content--active">
