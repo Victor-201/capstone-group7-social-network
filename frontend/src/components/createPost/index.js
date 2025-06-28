@@ -4,8 +4,9 @@ import { MdPhotoLibrary, MdOutlineEmojiEmotions } from "react-icons/md";
 import "./style.scss";
 import AvatarUser from "../avatarUser";
 import { useCreatePost } from "../../hooks/posts/useCreatePost";
-
-const CreatePost = ({ userInfo, token }) => {
+import { useUserInfo } from "../../hooks/user";
+const CreatePost = ({ user_id }) => {
+  const { userInfo } = useUserInfo(user_id);
   const [content, setContent] = useState("");
   const [mediaFiles, setMediaFiles] = useState([]);
   const [accessModifier, setAccessModifier] = useState("public"); // NEW
@@ -16,7 +17,7 @@ const CreatePost = ({ userInfo, token }) => {
     loading,
     error,
     uploadProgress,
-  } = useCreatePost(token);
+  } = useCreatePost();
 
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);

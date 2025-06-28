@@ -47,6 +47,7 @@ export default {
       };
     }
   },
+
   async getPrivateChats(userId) {
     try {
       const chats = await Chat.findAll({
@@ -54,10 +55,12 @@ export default {
           is_group: false,
           '$Participants.user_id$': userId,
         },
+       
         include: [
           {
             model: ChatParticipant,
             as: 'Participants',
+            required: true,
             required: true,
             attributes: ['user_id'],
             include: [
@@ -84,7 +87,7 @@ export default {
           }
         ],
         order: [['created_at', 'DESC']],
-        subQuery: false
+        subQuery: false 
       });
 
       const result = await Promise.all(chats.map(async (chat) => {
