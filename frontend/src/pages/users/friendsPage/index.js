@@ -28,6 +28,12 @@ const FriendsPage = () => {
   const [sortBy, setSortBy] = useState('name'); // name, recent, online
   const [filterBy, setFilterBy] = useState('all'); // all, online, recent
 
+  // State để kiểm soát việc fetch dữ liệu cho từng tab
+  const [fetchedTabs, setFetchedTabs] = useState(new Set());
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
+  const [tabLoading, setTabLoading] = useState(new Set());
+  const [shouldFetchMutual, setShouldFetchMutual] = useState(false);
+
   // Debounce search query
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -37,20 +43,20 @@ const FriendsPage = () => {
     return () => clearTimeout(timer);
   }, [searchQuery]);
   
-  // Sử dụng hooks từ friends/ folder
+  // Sử dụng hooks từ friends/ folder với lazy loading
   const {
     friends,
     loading: friendsLoading,
     error: friendsError,
     refetch: refetchFriends
-  } = useFriends();
+  } = useFriends(null, false);
 
   const {
     receivedRequests,
     loading: requestsLoading,
     error: requestsError,
     refetch: refetchRequests
-  } = useFriendRequests();
+  } = useFriendRequests(false);
 
   const {
     followers,
@@ -61,7 +67,7 @@ const FriendsPage = () => {
     unfollow: unfollowUser,
     isUserFollowed,
     refetch: refetchFollow
-  } = useFollow();
+  } = useFollow(null, false);
 
   const {
     sendRequest: sendFriendRequest,
@@ -89,31 +95,18 @@ const FriendsPage = () => {
     }
   }, [searchParams]);
 
-  // Close filter dropdown when clicking outside - NOT NEEDED ANYMORE
-  // useEffect(() => {
-  //   const handleClickOutside = (event) => {
-  //     if (filterOpen && !event.target.closest('.filter-dropdown')) {
-  //       setFilterOpen(false);
-  //     }
-  //   };
-
-  //   document.addEventListener('mousedown', handleClickOutside);
-  //   return () => {
-  //     document.removeEventListener('mousedown', handleClickOutside);
-  //   };
-  // }, [filterOpen]);
-
   // Prepare friend IDs for batch mutual friends fetching
   const allFriendIds = useMemo(() => {
+    // Chỉ tính toán khi có dữ liệu thực sự
     const ids = new Set();
     
     // Add friends
-    if (Array.isArray(friends)) {
+    if (Array.isArray(friends) && friends.length > 0) {
       friends.forEach(friend => friend?.id && ids.add(friend.id));
     }
     
     // Add received requests
-    if (Array.isArray(receivedRequests)) {
+    if (Array.isArray(receivedRequests) && receivedRequests.length > 0) {
       receivedRequests.forEach(request => {
         const requester = request?.Requester || request?.requester || request?.user;
         if (requester?.id) ids.add(requester.id);
@@ -121,48 +114,141 @@ const FriendsPage = () => {
     }
     
     // Add followers
-    if (Array.isArray(followers)) {
+    if (Array.isArray(followers) && followers.length > 0) {
       followers.forEach(follower => follower?.id && ids.add(follower.id));
     }
     
     // Add following
-    if (Array.isArray(following)) {
+    if (Array.isArray(following) && following.length > 0) {
       following.forEach(followed => followed?.id && ids.add(followed.id));
     }
     
     return Array.from(ids);
   }, [friends, receivedRequests, followers, following]);
 
-  // Fetch mutual friends counts for all users
+  // Fetch mutual friends counts for all users - chỉ khi có dữ liệu
   const {
     mutualCounts,
-    error: mutualError
-  } = useBatchMutualFriends(allFriendIds);
+    error: mutualError,
+    refetch: refetchMutualCounts
+  } = useBatchMutualFriends(allFriendIds.length > 0 ? allFriendIds : [], false);
 
-  // Fetch detailed mutual friends data for all tabs that need it
+  // Fetch detailed mutual friends data for all tabs that need it - chỉ khi có dữ liệu
   const {
     mutualFriendsData,
-    error: mutualDetailedError
-  } = useBatchMutualFriendsDetailed(allFriendIds);
+    error: mutualDetailedError,
+    refetch: refetchMutualDetailed
+  } = useBatchMutualFriendsDetailed(allFriendIds.length > 0 ? allFriendIds : [], false);
 
   const [localActionLoading, setLocalActionLoading] = useState({});
   const [message, setMessage] = useState(null);
   const [recentlyUnfriended, setRecentlyUnfriended] = useState(new Map());
 
-  // Fetch tất cả dữ liệu
+  // Fetch tất cả dữ liệu (chỉ dùng khi cần refresh sau action)
   const fetchAllData = useCallback(async () => {
     await Promise.all([
       refetchFriends(),
       refetchRequests(),
       refetchFollow()
     ]);
+    // Đánh dấu tất cả tab đã được fetch
+    setFetchedTabs(new Set(['friends', 'suggestions', 'requests', 'followers', 'following']));
+    // Cho phép fetch mutual friends
+    setShouldFetchMutual(true);
   }, [refetchFriends, refetchRequests, refetchFollow]);
 
-  // Fetch data khi component mount
+  // Hàm để fetch dữ liệu cho tab cụ thể
+  const fetchDataForTab = useCallback(async (tab) => {
+    if (fetchedTabs.has(tab)) {
+      return; // Đã fetch rồi, không fetch lại
+    }
+
+    console.log(`Fetching data for tab: ${tab}`);
+    
+    // Set loading cho tab này
+    setTabLoading(prev => new Set([...prev, tab]));
+    
+    try {
+      switch (tab) {
+        case 'friends':
+        case 'suggestions':
+          await refetchFriends();
+          setShouldFetchMutual(true);
+          break;
+        case 'requests':
+          await refetchRequests();
+          setShouldFetchMutual(true);
+          break;
+        case 'followers':
+        case 'following':
+          await refetchFollow();
+          setShouldFetchMutual(true);
+          break;
+        case 'recent':
+        case 'birthdays':
+        case 'custom':
+          // Các tab này không cần fetch dữ liệu đặc biệt
+          break;
+        default:
+          break;
+      }
+      
+      // Đánh dấu tab đã được fetch
+      setFetchedTabs(prev => new Set([...prev, tab]));
+    } catch (error) {
+      console.error(`Error fetching data for tab ${tab}:`, error);
+    } finally {
+      // Xóa loading cho tab này
+      setTabLoading(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(tab);
+        return newSet;
+      });
+    }
+  }, [fetchedTabs, refetchFriends, refetchRequests, refetchFollow]);
+
+  // Handle tab change
+  const handleTabChange = useCallback((newTab) => {
+    setActiveTab(newTab);
+    // Cập nhật URL
+    navigate(`/friends?tab=${newTab}`);
+    // Fetch dữ liệu cho tab mới nếu chưa fetch
+    fetchDataForTab(newTab);
+  }, [navigate, fetchDataForTab]);
+
+  // Fetch dữ liệu khi chuyển tab
   useEffect(() => {
-    console.log('FriendsPage: Fetching initial data...');
-    fetchAllData();
-  }, [fetchAllData]);
+    if (!isInitialLoad) {
+      fetchDataForTab(activeTab);
+    }
+  }, [activeTab, fetchDataForTab, isInitialLoad]);
+
+  // Fetch dữ liệu ban đầu chỉ cho tab đầu tiên
+  useEffect(() => {
+    if (isInitialLoad) {
+      console.log('FriendsPage: Fetching initial data for first tab...');
+      fetchDataForTab(activeTab);
+      setIsInitialLoad(false);
+    }
+  }, [isInitialLoad, activeTab, fetchDataForTab]);
+
+  // Fetch mutual friends chỉ khi có dữ liệu và cần thiết
+  useEffect(() => {
+    if (allFriendIds.length > 0 && !isInitialLoad && shouldFetchMutual) {
+      console.log('Fetching mutual friends for IDs:', allFriendIds);
+      // Delay fetch mutual friends để tránh fetch ngay khi load
+      const timer = setTimeout(() => {
+        Promise.all([
+          refetchMutualCounts(),
+          refetchMutualDetailed()
+        ]).catch(error => {
+          console.error('Error fetching mutual friends:', error);
+        });
+      }, 100); // Delay 100ms để tránh fetch ngay lập tức
+      
+      return () => clearTimeout(timer);
+    }
+  }, [allFriendIds, isInitialLoad, shouldFetchMutual, refetchMutualCounts, refetchMutualDetailed]);
 
   // Handle sending a friend request
   const handleSendRequest = async (userId) => {
@@ -252,8 +338,7 @@ const FriendsPage = () => {
         // Store friend info temporarily so user can add them back
         setRecentlyUnfriended(prev => new Map(prev.set(friendId, friendInfo)));
         // Auto switch to suggestions tab
-        setActiveTab('suggestions');
-        navigate('/friends?tab=suggestions');
+        handleTabChange('suggestions');
         // Don't refetch immediately to avoid duplicate display
       } else {
         console.error('Error removing friend:', result.message || 'Unknown error');
@@ -534,7 +619,7 @@ const FriendsPage = () => {
             </button>
             
             <h1 className="page-title">Bạn bè</h1>
-            <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
+            <Sidebar activeTab={activeTab} onTabChange={handleTabChange} tabLoading={tabLoading} />
           </div>
           
           <div className="friends-main">
@@ -577,7 +662,7 @@ const FriendsPage = () => {
                 )}
               </div>
               
-              {(friendsLoading || requestsLoading || followLoading || actionLoading) ? (
+              {(friendsLoading || requestsLoading || followLoading || actionLoading || tabLoading.has(activeTab)) ? (
                 <div className="loading-container">
                   <ThemedIcon icon={FaSpinner} className="spinner" />
                   <p>Đang tải...</p>

@@ -1,8 +1,8 @@
 import React from 'react';
-import { FaUserFriends, FaUserPlus, FaHistory, FaBirthdayCake, FaListUl, FaUsers, FaUserTimes } from 'react-icons/fa';
+import { FaUserFriends, FaUserPlus, FaHistory, FaBirthdayCake, FaListUl, FaUsers, FaUserTimes, FaSpinner } from 'react-icons/fa';
 import './style.scss';
 
-const Sidebar = ({ activeTab, onTabChange }) => {
+const Sidebar = ({ activeTab, onTabChange, tabLoading = new Set() }) => {
   const tabs = [
     { key: 'friends', label: 'Tất cả bạn bè', icon: <FaUserFriends /> },
     { key: 'suggestions', label: 'Gợi ý kết bạn', icon: <FaUsers /> },
@@ -24,7 +24,9 @@ const Sidebar = ({ activeTab, onTabChange }) => {
             onClick={() => onTabChange(tab.key)}
           >
             <div className="nav-link">
-              <span className="nav-icon">{tab.icon}</span>
+              <span className="nav-icon">
+                {tabLoading.has(tab.key) ? <FaSpinner className="spinner" /> : tab.icon}
+              </span>
               <span className="nav-label">{tab.label}</span>
             </div>
           </li>

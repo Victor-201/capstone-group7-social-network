@@ -54,6 +54,11 @@
           justify-content: center;
           width: 28px;
           height: 28px;
+          
+          .spinner {
+            animation: spin 1s linear infinite;
+            color: get-theme-color("quaternary-color");
+          }
         }
         
         .nav-label {
@@ -156,6 +161,15 @@
         }
       }
     }
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
   }
 }
 

@@ -6,10 +6,10 @@ import {
     unfollowUser
 } from '../../api/followApi';
 
-export const useFollow = (userId = null) => {
+export const useFollow = (userId = null, autoFetch = false) => {
     const [followers, setFollowers] = useState([]);
     const [following, setFollowing] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(autoFetch);
     const [error, setError] = useState(null);
 
     const fetchFollowData = useCallback(async () => {
@@ -39,8 +39,10 @@ export const useFollow = (userId = null) => {
     }, [userId]);
 
     useEffect(() => {
-        fetchFollowData();
-    }, [fetchFollowData]);
+        if (autoFetch) {
+            fetchFollowData();
+        }
+    }, [autoFetch, fetchFollowData]);
 
     const follow = async (targetUserId) => {
         const token = localStorage.getItem('token');
