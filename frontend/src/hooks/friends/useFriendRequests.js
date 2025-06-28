@@ -4,10 +4,10 @@ import {
     getReceivedRequests
 } from '../../api/friendApi';
 
-export const useFriendRequests = () => {
+export const useFriendRequests = (autoFetch = false) => {
     const [sentRequests, setSentRequests] = useState([]);
     const [receivedRequests, setReceivedRequests] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(autoFetch);
     const [error, setError] = useState(null);
 
     const fetchRequests = useCallback(async () => {
@@ -40,9 +40,12 @@ export const useFriendRequests = () => {
         }
     }, []);
 
+    // Chỉ fetch tự động nếu autoFetch = true
     useEffect(() => {
-        fetchRequests();
-    }, [fetchRequests]);
+        if (autoFetch) {
+            fetchRequests();
+        }
+    }, [autoFetch, fetchRequests]);
 
     return { sentRequests, receivedRequests, loading, error, refetch: fetchRequests };
 };

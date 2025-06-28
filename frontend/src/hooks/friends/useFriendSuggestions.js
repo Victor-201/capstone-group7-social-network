@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { getFriendSuggestions } from '../../api/friendApi';
 
-export const useFriendSuggestions = () => {
+export const useFriendSuggestions = (autoFetch = false) => {
     const [suggestions, setSuggestions] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -29,8 +29,10 @@ export const useFriendSuggestions = () => {
     }, []);
 
     useEffect(() => {
-        fetchSuggestions();
-    }, [fetchSuggestions]);
+        if (autoFetch) {
+            fetchSuggestions();
+        }
+    }, [autoFetch, fetchSuggestions]);
 
     const refetch = useCallback(() => {
         fetchSuggestions();

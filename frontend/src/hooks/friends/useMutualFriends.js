@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { getMutualFriends } from '../../api/friendApi';
 
-export const useMutualFriends = (userId) => {
+export const useMutualFriends = (userId, autoFetch = false) => {
     const [mutualFriends, setMutualFriends] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -30,9 +30,12 @@ export const useMutualFriends = (userId) => {
         }
     }, [userId]);
 
+    // Chỉ fetch tự động nếu autoFetch = true
     useEffect(() => {
-        fetchMutualFriends();
-    }, [fetchMutualFriends]);
+        if (autoFetch) {
+            fetchMutualFriends();
+        }
+    }, [autoFetch, fetchMutualFriends]);
 
     return { 
         mutualFriends, 
@@ -43,7 +46,7 @@ export const useMutualFriends = (userId) => {
 };
 
 // Hook để batch fetch mutual friends với chi tiết
-export const useBatchMutualFriendsDetailed = (friendIds = []) => {
+export const useBatchMutualFriendsDetailed = (friendIds = [], autoFetch = false) => {
   const [mutualFriendsData, setMutualFriendsData] = useState({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -96,15 +99,18 @@ export const useBatchMutualFriendsDetailed = (friendIds = []) => {
     }
   }, [friendIds]);
 
+  // Chỉ fetch tự động nếu autoFetch = true
   useEffect(() => {
-    fetchAllMutualFriendsDetailed();
-  }, [fetchAllMutualFriendsDetailed]);
+    if (autoFetch) {
+      fetchAllMutualFriendsDetailed();
+    }
+  }, [autoFetch, fetchAllMutualFriendsDetailed]);
 
   return { mutualFriendsData, loading, error, refetch: fetchAllMutualFriendsDetailed };
 };
 
 // Hook để batch fetch mutual friends counts cho nhiều users
-export const useBatchMutualFriends = (friendIds = []) => {
+export const useBatchMutualFriends = (friendIds = [], autoFetch = false) => {
   const [mutualCounts, setMutualCounts] = useState({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -162,9 +168,12 @@ export const useBatchMutualFriends = (friendIds = []) => {
     }
   }, [friendIds]);
 
+  // Chỉ fetch tự động nếu autoFetch = true
   useEffect(() => {
-    fetchAllMutualCounts();
-  }, [fetchAllMutualCounts]);
+    if (autoFetch) {
+      fetchAllMutualCounts();
+    }
+  }, [autoFetch, fetchAllMutualCounts]);
 
   return { mutualCounts, loading, error, refetch: fetchAllMutualCounts };
 };
