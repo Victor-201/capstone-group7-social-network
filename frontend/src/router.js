@@ -2,7 +2,6 @@ import { Route, Routes } from 'react-router-dom';
 import HomePage from './pages/users/homePage';
 import PersonalPage from './pages/users/personalPage';
 import WatchPage from './pages/users/watchPage';
-import ForgotPasswordPage from './pages/users/forgotPasswordPage';
 import FriendsPage from './pages/users/friendsPage';
 import GroupsPage from './pages/users/groupsPage';
 import TermsOfServicePage from './pages/users/termsOfServicePage';
@@ -57,7 +56,7 @@ const renderUserRouter = () => {
     },
     {
       path: ROUTERS.PUBLIC.FORGOT_PASSWORD,
-      Component: <ForgotPasswordPage />,
+      Component: <AuthPage />,
     },
     {
       path: ROUTERS.PUBLIC.TERMS_OF_SERVICE,
