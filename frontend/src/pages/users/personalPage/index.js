@@ -18,6 +18,7 @@ import { useUserImages } from "../../../hooks/media/useUserImages";
 import { useFriends } from "../../../hooks/friends/useFriends";
 import { useUserInfo } from "../../../hooks/user";
 import { useAuth } from "../../../contexts/AuthContext";
+import { useBatchMutualFriends } from "../../../hooks/friends/useMutualFriends";
 
 import PostsTab from "./modals/PostsTab";
 import AboutTab from "./modals/AboutTab";
@@ -44,13 +45,18 @@ const PersonalPage = () => {
     loading: loadingFriends,
     error: friendsError,
     refetch: refetchFriends,
-  } = useFriends();
+  } = useFriends(userInfo?.id);
+
+  // Lấy danh sách friendIds từ friends
+  const friendIds = useMemo(() => friends.map(friend => friend.id), [friends]);
+  // Sử dụng hook useBatchMutualFriends để lấy số lượng bạn chung
+  const { mutualCounts, loading: loadingMutual, error: mutualError } = useBatchMutualFriends(friendIds);
 
   useEffect(() => {
-    if (activeTab === "friends" && userInfo?.id) {
+    if (userInfo?.id) {
       refetchFriends(userInfo.id);
     }
-  }, [activeTab, userInfo?.id, refetchFriends]);
+  }, [userInfo?.id, refetchFriends]);
 
   const handleTabClick = (tabId) => {
     setActiveTab(tabId);
@@ -123,8 +129,10 @@ const PersonalPage = () => {
         return (
           <div className="friends-tab-content">
             <h3>Danh sách bạn bè</h3>
-            {loadingFriends ? (
+            {loadingFriends || loadingMutual ? (
               <p>Đang tải danh sách bạn bè...</p>
+            ) : friendsError || mutualError ? (
+              <p>Lỗi khi tải danh sách bạn bè: {friendsError || mutualError}</p>
             ) : friends.length === 0 ? (
               <p>Chưa có bạn bè nào</p>
             ) : (
@@ -136,7 +144,11 @@ const PersonalPage = () => {
                     </div>
                     <div className="friend-info">
                       <p className="friend-name">{friend.full_name}</p>
-                      <p className="mutual-friends">3 bạn chung</p>
+                      <p className="mutual-friends">
+                        {mutualCounts[friend.id] !== undefined
+                          ? `${mutualCounts[friend.id]} bạn chung`
+                          : "Đang tải bạn chung..."}
+                      </p>
                     </div>
                   </div>
                 ))}
@@ -149,9 +161,9 @@ const PersonalPage = () => {
       default:
         return null;
     }
-  }, [activeTab, images, loadingImages, friends, loadingFriends]);
+  }, [activeTab, images, loadingImages, friends, loadingFriends, friendsError, mutualCounts, loadingMutual, mutualError, userInfo, isOwner]);
 
-  if (!userInfo) {
+  if (!userInfo || isLoading) {
     return <p className="loading-screen">⏳ Đang tải trang cá nhân...</p>;
   }
 
@@ -234,17 +246,20 @@ const PersonalPage = () => {
 
                 <div className="profile__friends-info">
                   <FiUsers />
-                  <span>{friends.length} bạn bè</span>
+                  <span>
+                    {loadingFriends ? "Đang tải..." : `${friends.length} bạn bè`}
+                  </span>
                   <div className="profile__friends-avatars">
-                    {friends.slice(0, 6).map((friend) => (
-                      <div
-                        key={friend.id}
-                        className="avatar-image"
-                        title={friend.full_name}
-                      >
-                        <AvatarUser user={friend} />
-                      </div>
-                    ))}
+                    {!loadingFriends &&
+                      friends.slice(0, 6).map((friend) => (
+                        <div
+                          key={friend.id}
+                          className="avatar-image"
+                          title={friend.full_name}
+                        >
+                          <AvatarUser user={friend} />
+                        </div>
+                      ))}
                   </div>
                 </div>
 
@@ -276,8 +291,7 @@ const PersonalPage = () => {
                     (tabId) => (
                       <li
                         key={tabId}
-                        className={`tabs__item ${activeTab === tabId ? "tabs__item--active" : ""
-                          }`}
+                        className={`tabs__item ${activeTab === tabId ? "tabs__item--active" : ""}`}
                       >
                         <a href={`#${tabId}`} onClick={() => handleTabClick(tabId)}>
                           {tabId === "posts"

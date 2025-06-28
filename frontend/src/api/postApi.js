@@ -41,3 +41,20 @@ export const fetchUserPosts = async (token) => {
 
   return data;
 };
+export const fetchFeedPost = async (token) => {
+
+  const response = await fetch(`${BASE_URL}/posts/feed`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Lỗi khi lấy bài viết.");
+  }
+
+  return data;
+};

@@ -4,13 +4,16 @@ import './style.scss';
 
 const TABS = {
     INFO: 'Thông tin cá nhân',
+    CONTACT: 'Liên lạc',
     SECURITY: 'Mật khẩu và bảo mật',
 };
 
 const tabKeyMap = {
     info: TABS.INFO,
+    contact: TABS.CONTACT, 
     security: TABS.SECURITY,
 };
+
 
 const SettingsPage = () => {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -56,13 +59,19 @@ const SettingsPage = () => {
                     <h3>{TABS.INFO}</h3>
                     <input type="text" name="full_name" value={formData.full_name} onChange={handleChange} placeholder="Họ và tên" />
                     <input type="date" name="birthday" value={formData.birthday} onChange={handleChange} placeholder="Ngày sinh" />
-                    <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="Email" />
-                    <input type="tel" name="phone" value={formData.phone} onChange={handleChange} placeholder="Số điện thoại" />
-                    <input type="text" name="user_name" value={formData.user_name} onChange={handleChange} placeholder="Tên người dùng" />
-                    <p>Liên kết của bạn: tenweb.com/{formData.user_name || 'username'}</p>
                     <button type="submit">Lưu thay đổi</button>
                 </form>
             );
+        }
+           else if (activeTab === TABS.CONTACT) {
+    return (
+        <form onSubmit={handleSubmit} className="settings-form">
+            <h3>{TABS.CONTACT}</h3>
+            <input type="text" name="email" value={formData.email} onChange={handleChange} placeholder="email" />
+            <input type="text" name="phone" value={formData.phone} onChange={handleChange} placeholder="sđt" />
+            <button type="submit">Lưu thông tin liên lạc</button>
+        </form>
+    );
         } else if (activeTab === TABS.SECURITY) {
             return (
                 <form onSubmit={handleSubmit} className="settings-form">
