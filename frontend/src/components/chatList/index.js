@@ -5,8 +5,6 @@ import './style.scss';
 
 const ChatList = ({ chat, handleSelectChat }) => {
   const { auth } = useAuth();
-  const timeAgo = useTimeAgo(chat.latest_message.sent_at);
-  const isSender = chat.latest_message.sender_id === auth.id;
 
   return (
     <li className="chat__friend-item" onClick={() => handleSelectChat(chat.chat_id)}>
@@ -15,10 +13,10 @@ const ChatList = ({ chat, handleSelectChat }) => {
       </div>
       <div className="chat__friend-info">
         <span><b>{chat.other_user.full_name}</b></span>
-        <span>
-          {isSender ? 'Bạn: ' : `${chat.other_user.full_name}: `}
-          {chat.latest_message.content} · {timeAgo}
-        </span>
+          <span>
+            {chat.latest_message.sender_id === auth.id ? 'Bạn: ' : `${chat.other_user.full_name}: `}
+            {chat.latest_message.content} · {useTimeAgo(chat.latest_message.sent_at)}
+          </span>
       </div>
     </li>
   );

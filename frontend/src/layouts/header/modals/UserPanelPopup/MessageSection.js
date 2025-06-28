@@ -15,7 +15,7 @@ const MessageSection = ({ onClose, isOpenCreateChat, setIsOpenCreateChat }) => {
  const handleCreateChat = async (friend_id) => {
     try {
         const newChat = await createNewChat(friend_id);
-        setChatId(newChat.chat.chat_id);
+        setChatId(newChat.chat_id);
         setIsOpenCreateChat(false);
     } catch (err) {
         console.error("Tạo chat thất bại:", err.message);
