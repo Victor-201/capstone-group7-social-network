@@ -46,25 +46,34 @@ export default {
       };
     }
   },
+
   async getPrivateChats(userId) {
     try {
       const chats = await Chat.findAll({
-        where: { is_group: false },
+        where: {
+          is_group: false,
+          '$Participants.user_id$': userId,
+        },
         include: [
           {
             model: ChatParticipant,
             as: 'Participants',
+            required: true,
             attributes: ['user_id'],
-            include: [{
-              model: UserInfo,
-              as: 'User',
-              attributes: ['id', 'full_name', 'avatar'],
-              include: [{
-                model: UserAccount,
-                as: 'userAccount',
-                attributes: ['user_name']
-              }]
-            }]
+            include: [
+              {
+                model: UserInfo,
+                as: 'User',
+                attributes: ['id', 'full_name', 'avatar'],
+                include: [
+                  {
+                    model: UserAccount,
+                    as: 'userAccount',
+                    attributes: ['user_name']
+                  }
+                ]
+              }
+            ]
           },
           {
             model: Message,
@@ -74,22 +83,43 @@ export default {
             order: [['sent_at', 'DESC']]
           }
         ],
-        order: [['created_at', 'DESC']]
+        order: [['created_at', 'DESC']],
+        subQuery: false 
       });
-      const result = chats.map(chat => {
-        const other = chat.Participants.find(p => p.user_id !== userId);
+
+      const result = await Promise.all(chats.map(async (chat) => {
+        const otherParticipant = await ChatParticipant.findOne({
+          where: {
+            chat_id: chat.id,
+            user_id: { [Op.ne]: userId }
+          },
+          include: [{
+            model: UserInfo,
+            as: 'User',
+            attributes: ['id', 'full_name', 'avatar'],
+            include: [{
+              model: UserAccount,
+              as: 'userAccount',
+              attributes: ['user_name']
+            }]
+          }]
+        });
+
         return {
           chat_id: chat.id,
           latest_message: chat.Messages?.[0] || null,
-          other_user: other?.User || null
+          other_user: otherParticipant?.User || null
         };
-      });
-
+      }));
       return { result };
     } catch (error) {
-      console.error("Get private chats error:", error);
+      console.error('Get private chats error:', error);
       return {
-        error: { code: 500, message: 'Error fetching private chats', detail: error.message }
+        error: {
+          code: 500,
+          message: 'Error fetching private chats',
+          detail: error.message
+        }
       };
     }
   }

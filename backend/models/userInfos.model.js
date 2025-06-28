@@ -18,7 +18,7 @@ const UserInfo = (sequelize) => {
     },
     gender: {
       type: DataTypes.STRING(50),
-      allowNull: false, 
+      allowNull: false,
     },
     bio: {
       type: DataTypes.TEXT,
@@ -36,11 +36,11 @@ const UserInfo = (sequelize) => {
       type: DataTypes.STRING,
       allowNull: true,
     }
-  }, 
-  {
-    tableName: 'user_infos',
-    timestamps: false
-  });
+  },
+    {
+      tableName: 'user_infos',
+      timestamps: false
+    });
 
   model.associate = (models) => {
     model.hasOne(models.UserAccount, {
@@ -132,6 +132,11 @@ const UserInfo = (sequelize) => {
       foreignKey: 'user_id',
       as: 'ProfileDetails',
       onDelete: 'CASCADE'
+    });
+    model.hasMany(models.ChatParticipant, {
+      foreignKey: 'user_id',
+      as: 'Participations',
+      onDelete: 'CASCADE',
     });
   };
   return model;
