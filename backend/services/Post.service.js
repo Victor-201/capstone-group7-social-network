@@ -111,15 +111,32 @@ export default {
     }
   },
 
-  async editPost(user_id, postId, body) {
+  async editPost(user_id, postId, body, files) {
     try {
       const post = await Post.findOne({ where: { id: postId, user_id } });
-      if (!post) return { error: { code: 404, message: 'Post not found or no permission' } };
+      if (!post) {
+        return { error: { code: 404, message: 'Post not found or no permission' } };
+      }
 
       post.content = body.content || post.content;
       post.access_modifier = body.accessModifier || post.access_modifier;
-      await post.save();
 
+      if (files && files.length > 0) {
+        const mediaResults = uploadMultipleMedia(Array.isArray(files) ? files : []);
+
+        if (mediaResults.length > 0) {
+          await PostMedia.destroy({ where: { post_id: postId } });
+
+          const mediaRecords = mediaResults.map(file => ({
+            post_id: postId,
+            media_url: file.public_id,
+            media_type: file.media_type || null
+          }));
+
+          await PostMedia.bulkCreate(mediaRecords);
+        }
+      }
+      await post.save();
       return { result: { message: 'Post updated successfully', post } };
     } catch (error) {
       return { error: { code: 500, message: 'Error updating post', detail: error.message } };

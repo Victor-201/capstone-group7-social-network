@@ -32,7 +32,7 @@ export const PostDetail = async (req, res) => {
 };
 
 export const editPost = async (req, res) => {
-  const { error, result } = await postService.editPost(req.user.id, req.params.id, req.body);
+  const { error, result } = await postService.editPost(req.user.id, req.params.id, req.body, req.file);
   if (error) return res.status(error.code).json(error);
   return res.status(200).json(result);
 };
