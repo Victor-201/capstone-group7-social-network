@@ -251,7 +251,7 @@ const PersonalPage = () => {
                   </span>
                   <div className="profile__friends-avatars">
                     {!loadingFriends &&
-                      friends.slice(0, 6).map((friend) => (
+                      friends.slice(0, 3).map((friend) => (
                         <div
                           key={friend.id}
                           className="avatar-image"

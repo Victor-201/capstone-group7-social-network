@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import useTimeAgo from "../../hooks/useTimeAgo";
+import EditPostPopup from "../postPopup";
 import {
   AiFillLike,
   AiOutlineLike,
@@ -23,18 +24,18 @@ import "./style.scss";
 // Component để hiển thị ảnh trong modal
 const ModalImage = ({ mediaUrl, alt, className }) => {
   const fileUrl = useCloudinaryFile(mediaUrl, "image");
-  
+
   if (!fileUrl) {
     return <div className="image-loading">Đang tải...</div>;
   }
-  
+
   return <img src={fileUrl} alt={alt} className={className} />;
 };
 
 // Component Modal hiển thị ảnh
 const ImageModal = ({ images, initialIndex, onClose }) => {
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
-  
+
   const nextImage = () => {
     setCurrentIndex((prev) => (prev + 1) % images.length);
   };
@@ -69,13 +70,13 @@ const ImageModal = ({ images, initialIndex, onClose }) => {
               <IoChevronBack />
             </button>
           )}
-          
+
           <ModalImage
             mediaUrl={images[currentIndex].media_url}
             alt={`Ảnh ${currentIndex + 1}`}
             className="image-modal__image"
           />
-          
+
           {images.length > 1 && (
             <button className="image-modal__nav image-modal__nav--next" onClick={nextImage}>
               <IoChevronForward />
@@ -89,9 +90,8 @@ const ImageModal = ({ images, initialIndex, onClose }) => {
             {images.map((image, index) => (
               <div
                 key={index}
-                className={`image-modal__thumbnail ${
-                  index === currentIndex ? "image-modal__thumbnail--active" : ""
-                }`}
+                className={`image-modal__thumbnail ${index === currentIndex ? "image-modal__thumbnail--active" : ""
+                  }`}
                 onClick={() => setCurrentIndex(index)}
               >
                 <ModalImage
@@ -115,9 +115,9 @@ const MediaItem = ({ mediaUrl, mediaType, onClick }) => {
   return (
     <div className="post__media-item">
       {mediaType === "image" ? (
-        <img 
-          src={fileUrl} 
-          alt="Ảnh bài viết" 
+        <img
+          src={fileUrl}
+          alt="Ảnh bài viết"
           onClick={onClick}
           style={{ cursor: "pointer" }}
         />
@@ -149,12 +149,12 @@ const MultipleImagesLayout = ({ images, onImageClick, onShowAll }) => {
           alt="Ảnh chính"
           className="post__media-image"
         />
-        <div 
+        <div
           className="post__media-overlay"
           onClick={() => onImageClick(firstImage.media_url)}
         />
       </div>
-      
+
       {/* Cột ảnh nhỏ bên phải */}
       <div className="post__media-column">
         {/* Ảnh nhỏ bên trên */}
@@ -164,12 +164,12 @@ const MultipleImagesLayout = ({ images, onImageClick, onShowAll }) => {
             alt="Ảnh phụ trên"
             className="post__media-image"
           />
-          <div 
+          <div
             className="post__media-overlay"
             onClick={() => onImageClick(secondImage.media_url)}
           />
         </div>
-        
+
         {/* Ảnh nhỏ bên dưới với overlay */}
         <div className="post__media-small post__media-small--bottom">
           <ModalImage
@@ -177,7 +177,7 @@ const MultipleImagesLayout = ({ images, onImageClick, onShowAll }) => {
             alt="Ảnh phụ dưới"
             className="post__media-image"
           />
-          <div 
+          <div
             className="post__media-overlay post__media-overlay--with-text"
             onClick={onShowAll}
           >
@@ -193,6 +193,8 @@ const Post = ({ post, userInfo }) => {
   const { toggleLike, loading, error } = usePostLikes();
   const [showImageModal, setShowImageModal] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [openActions, setOpenActions] = useState(false);
+  const [openEditPopup, setOpenEditPopup] = useState(false);
 
   // Lọc ra chỉ những media là ảnh và những media khác
   const images = post.media?.filter(media => media.media_type === "image") || [];
@@ -229,7 +231,7 @@ const Post = ({ post, userInfo }) => {
 
   const renderImages = () => {
     if (images.length === 0) return null;
-    
+
     if (images.length >= 4) {
       return (
         <MultipleImagesLayout
@@ -239,7 +241,7 @@ const Post = ({ post, userInfo }) => {
         />
       );
     }
-    
+
     // Layout cho 1-3 ảnh (giữ nguyên như cũ)
     return (
       <div className="post__media-list">
@@ -278,19 +280,35 @@ const Post = ({ post, userInfo }) => {
               </div>
             </div>
             <div className="post__actions">
-              <button className="post__action">
+              <button className="post__action" onClick={() => { setOpenActions(true); }}>
                 <BsThreeDots />
+                {openActions && (
+                  <div className="post__actions-menu">
+                    <button className="post__action-item" onClick={() => { setOpenEditPopup(true); setOpenActions(false); }}>
+                      Chỉnh sửa
+                    </button>
+                    <button className="post__action-item" onClick={() => { }}>
+                      Xóa
+                    </button>
+                  </div>
+                )}
               </button>
             </div>
           </div>
+          {openEditPopup && (
+            <EditPostPopup
+              post={post}
+              onClose={() => setOpenEditPopup(false)}
+            />
+          )}
 
           {/* Nội dung */}
           <div className="post__content">
             <p>{post.content}</p>
-            
+
             {/* Hiển thị ảnh */}
             {images.length > 0 && renderImages()}
-            
+
             {/* Hiển thị các media khác (video, etc.) */}
             {otherMedia.length > 0 && (
               <div className="post__media-list">
@@ -299,7 +317,7 @@ const Post = ({ post, userInfo }) => {
                     key={index}
                     mediaUrl={media.media_url}
                     mediaType={media.media_type}
-                    onClick={() => {}}
+                    onClick={() => { }}
                   />
                 ))}
               </div>
