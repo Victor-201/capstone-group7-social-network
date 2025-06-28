@@ -1,7 +1,7 @@
 // api/messageApi.js
 import { API_BASE_URL } from "../config/apiConfig";
 
-const BASE_URL = `${API_BASE_URL}/message`;
+const BASE_URL = `${API_BASE_URL}/user`;
 
 const fetchApi = async (url, options) => {
   const res = await fetch(url, options);
@@ -12,18 +12,18 @@ const fetchApi = async (url, options) => {
   return res.json();
 };
 
-export const sendMessage = async (token, messageData) =>
-  fetchApi(`${BASE_URL}/send`, {
+export const sendMessage = async (token, { chat_id, content }) =>
+  fetchApi(`${BASE_URL}/chats/${chat_id}/messages`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(messageData),
+    body: JSON.stringify({ chat_id, content }),
   });
 
-export const getMessagesByChatId = async (token, chatId, page = 1, limit = 20) =>
-  fetchApi(`${BASE_URL}/chat/${chatId}?page=${page}&limit=${limit}`, {
+export const getMessagesByChatId = async (token, chat_id) =>
+  fetchApi(`${BASE_URL}/chats/${chat_id}/messages`, {
     method: "GET",
     headers: {
       Authorization: `Bearer ${token}`,
@@ -50,14 +50,13 @@ export const deleteMessage = async (token, messageId) =>
     },
   });
 
-export const markMessagesAsRead = async (token, chatId) =>
-  fetchApi(`${BASE_URL}/mark-read`, {
+export const markMessagesAsRead = async (token, chat_id) =>
+  fetchApi(`${BASE_URL}/chats/${chat_id}/read`, {
     method: "PUT",
     headers: {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ chatId }),
   });
 
 export const countUnreadMessages = async (token, chatId) =>

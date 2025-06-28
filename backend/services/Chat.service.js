@@ -5,6 +5,9 @@ const { Chat, ChatParticipant, UserAccount, UserInfo, Message } = models;
 
 export default {
   async createPrivateChat(userId, otherUserId) {
+    if (!otherUserId) {
+      throw new Error('Thiếu userId hoặc otherUserId để tạo chat', userId, otherUserId);
+    }
     if (userId.toString() === otherUserId.toString()) {
       return {
         error: { code: 400, message: 'You cannot create a chat with yourself.' }
@@ -25,7 +28,6 @@ export default {
           attributes: []
         }]
       });
-
       if (existingChat.length > 0) {
         return { result: { message: "Chat already exists", chatId: existingChat.id } };
       }

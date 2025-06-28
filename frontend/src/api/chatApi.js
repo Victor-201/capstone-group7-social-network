@@ -20,16 +20,16 @@ export const getChats = async (token) =>
       "Content-Type": "application/json",
     },
   });
-
-export const createChat = async (token, participants) =>
-  fetchApi(`${BASE_URL}/create`, {
+export const createChat = async (token, friend_id) =>
+  fetchApi(`${BASE_URL}/chats`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ participants }),
+    body: JSON.stringify({ id: friend_id }), 
   });
+
 
 export const getChatById = async (token, chatId) =>
   fetchApi(`${BASE_URL}/${chatId}`, {

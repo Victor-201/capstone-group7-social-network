@@ -1,5 +1,4 @@
 import models from "../models/index.js";
-import sequelize from "../configs/database.config.js";
 import { Op } from "sequelize";
 
 export default {
@@ -14,7 +13,7 @@ export default {
                     {
                         model: models.UserInfo,
                         as: 'Sender',
-                        attributes: ['id', 'user_name', 'avatar'],
+                        attributes: ['id', 'full_name', 'avatar'],
                     },
                 ],
                 order: [['sent_at', 'ASC']],
@@ -67,7 +66,7 @@ export default {
                     where: {
                         chat_id,
                         is_read: false,
-                        sender_id: { [models.sequelize.Op.ne]: user_id },
+                        sender_id: { [Op.ne]: user_id },
                     },
                 }
             );

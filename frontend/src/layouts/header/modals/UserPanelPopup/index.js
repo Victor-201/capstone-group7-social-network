@@ -31,7 +31,7 @@ const UserPanelPopup = ({ type, user, onClose, reloadFns, notiData }) => {
     };
 
     const handleCreateChat = async () => {
-        setIsOpenCreateChat(true);
+        setIsOpenCreateChat(!isOpenCreateChat);
     };
 
     return (
@@ -45,19 +45,19 @@ const UserPanelPopup = ({ type, user, onClose, reloadFns, notiData }) => {
                         {type === 'mess' && <h3 className="popup__section-title">Tin nhắn</h3>}
                         <div className="popup__section-actions">
                             {type === 'mess' && (
-                                <button className="message-create" onClick={handleCreateChat}>
+                                <button className="popup__section-action" onClick={handleCreateChat}>
                                     <IoCreate />
                                 </button>
                             )}
                             <button
                                 type="button"
-                                className="popup__section-more"
+                                className="popup__section-action"
                                 onClick={() => setIsOpenMoreAction(prev => !prev)}
                                 ref={isOpenMoreActionRef}
                             >
                                 <BsThreeDots />
                                 {isOpenMoreAction && (
-                                    <div className="popup__section-more--actions">
+                                    <div className="popup__section-action--more">
                                         {type === 'noti' && (
                                             <>
                                                 <button className="notification-action" onClick={handleMarkAllAsRead}>
@@ -86,6 +86,7 @@ const UserPanelPopup = ({ type, user, onClose, reloadFns, notiData }) => {
                         <MessageSection
                             onClose={onClose}
                             isOpenCreateChat={isOpenCreateChat}
+                            setIsOpenCreateChat={setIsOpenCreateChat}
                         />
                     )}
 
