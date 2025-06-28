@@ -55,10 +55,7 @@ export default {
           is_group: false,
           '$Participants.user_id$': userId,
         },
-        where: {
-          is_group: false,
-          '$Participants.user_id$': userId,
-        },
+       
         include: [
           {
             model: ChatParticipant,
@@ -66,20 +63,6 @@ export default {
             required: true,
             required: true,
             attributes: ['user_id'],
-            include: [
-              {
-                model: UserInfo,
-                as: 'User',
-                attributes: ['id', 'full_name', 'avatar'],
-                include: [
-                  {
-                    model: UserAccount,
-                    as: 'userAccount',
-                    attributes: ['user_name']
-                  }
-                ]
-              }
-            ]
             include: [
               {
                 model: UserInfo,
@@ -105,28 +88,7 @@ export default {
         ],
         order: [['created_at', 'DESC']],
         subQuery: false 
-        order: [['created_at', 'DESC']],
-        subQuery: false
       });
-
-      const result = await Promise.all(chats.map(async (chat) => {
-        const otherParticipant = await ChatParticipant.findOne({
-          where: {
-            chat_id: chat.id,
-            user_id: { [Op.ne]: userId }
-          },
-          include: [{
-            model: UserInfo,
-            as: 'User',
-            attributes: ['id', 'full_name', 'avatar'],
-            include: [{
-              model: UserAccount,
-              as: 'userAccount',
-              attributes: ['user_name']
-            }]
-          }]
-        });
-
 
       const result = await Promise.all(chats.map(async (chat) => {
         const otherParticipant = await ChatParticipant.findOne({
@@ -150,20 +112,12 @@ export default {
           chat_id: chat.id,
           latest_message: chat.Messages?.[0] || null,
           other_user: otherParticipant?.User || null
-          other_user: otherParticipant?.User || null
         };
-      }));
       }));
       return { result };
     } catch (error) {
       console.error('Get private chats error:', error);
-      console.error('Get private chats error:', error);
       return {
-        error: {
-          code: 500,
-          message: 'Error fetching private chats',
-          detail: error.message
-        }
         error: {
           code: 500,
           message: 'Error fetching private chats',
