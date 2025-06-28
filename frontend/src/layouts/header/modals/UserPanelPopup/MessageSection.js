@@ -3,30 +3,22 @@ import AvatarUser from '../../../../components/avatarUser';
 import Loader from '../../../../components/loader';
 import { useChats, useChatActions } from '../../../../hooks/chat';
 import { useFriends } from '../../../../hooks/friends';
-import ChatBox from '../../../../components/chatBox';
 import ChatList from '../../../../components/chatList';
 
-const MessageSection = ({ onClose, isOpenCreateChat, setIsOpenCreateChat }) => {
-    const [other_userId, setOtherUserId] = useState(null);
-    const [isOpenChatRoom, setIsOpenChatRoom] = useState(false);
-    const [chatId, setChatId] = useState(null);
+const MessageSection = ({ onClose, isOpenCreateChat, setIsOpenCreateChat, onOpenChat }) => {
     const { chats, loading: loadingChats, error: errorChats, refetch } = useChats();
     const { friends, loading: loadingFriends, error: errorFriends } = useFriends();
 
  const handleCreateChat = async (friend_id) => {
-    setOtherUserId(friend_id);
     setIsOpenCreateChat(false);
-    setIsOpenChatRoom(true);
+    onOpenChat(null, friend_id);
+    onClose();
 };
 
-    const handleSelectChat = (chatId) => {
-        setChatId(chatId);
-    };
-
-    const handleCloseChat = () => {
-        setChatId(null);
-        setIsOpenChatRoom(false);
-    };
+    const handleSelectChat = (chatId, otherUserId) => {
+        onOpenChat(chatId, otherUserId);
+        onClose();
+    }
 
     return (
         <section className="popup__section popup__section--message">
@@ -56,8 +48,6 @@ const MessageSection = ({ onClose, isOpenCreateChat, setIsOpenCreateChat }) => {
                         </ul>
                     )}
                 </div>
-            ) : isOpenChatRoom || chatId ? (
-                <ChatBox chatId={chatId} friend_id ={other_userId} onClose={handleCloseChat} />
             ) : loadingChats ? (
                 <div className="popup__loader">
                     <Loader />
@@ -69,7 +59,7 @@ const MessageSection = ({ onClose, isOpenCreateChat, setIsOpenCreateChat }) => {
             ) : (
                 <ul className="popup__message-list">
                     {chats.map(chat => (
-                        <ChatList key={chat.chat_id} chat={chat} handleSelectChat={handleSelectChat} setOtherUserId={setOtherUserId} />
+                        <ChatList key={chat.chat_id} chat={chat} handleSelectChat={handleSelectChat}/>
                     ))}
                 </ul>
             )}

@@ -16,7 +16,8 @@ import { useSearch } from '../../hooks/search';
 import Loader from '../../components/loader';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNotifications } from '../../hooks/notifications';
-
+import { useChatSocket, useChatActions } from '../../hooks/chat';
+import ChatBox from '../../components/chatBox';
 
 const Header = () => {
     const { auth } = useAuth();
@@ -28,6 +29,8 @@ const Header = () => {
     const [menus, setMenus] = useState([]);
     const { userInfo, loading, error } = useUserInfo();
     const { loading: loadingSearch, error: errorSearch, results: searchResults, search } = useSearch();
+    const [chatId, setChatId] = useState(null);
+    const [otherUserId, setOtherUserId] = useState(null);
     const {
         notifications,
         unreadCount,
@@ -37,6 +40,12 @@ const Header = () => {
         loading: loadingNotifications,
         error: errorNotifications
     } = useNotifications();
+    const { messages, unreadCount: unreadCountChat, sendMessage, markAsRead, reloadChat } = useChatSocket(chatId);
+
+    useEffect(() => {
+        if (!chatId) return;
+        reloadChat();
+    }, [chatId]);
 
     // Set menu items based on role
     useEffect(() => {
@@ -66,126 +75,141 @@ const Header = () => {
     const handleSearch = (query) => {
         search(query, "users");
     };
-
+    const handleOpenChat = (chatId, userId) => {
+        setChatId(chatId);
+        setOtherUserId(userId);
+    };
+    const handleCloseChat = () => {
+        setChatId(null);
+        setOtherUserId(null);
+    };
 
     return (
-        <header className="header">
-            <div className="header__container">
-                <div className="header__left">
-                    <Link to={ROUTERS.USER.HOME} className="header__logo">
-                        <img src={Logo} alt="Nova Logo" className="header__logo-img" />
-                    </Link>
-                    <div className={`header__search ${isFocusedSearch ? "header__search--focused" : ""}`} ref={searchRef}>
-                        <form className='header__search-form'
-                            role="search"
-                            onClick={() => setIsFocusedSearch(true)}
-                        >
-                            <FaSearch className="header__search-icon" />
-                            <input
-                                type="text"
-                                className="header__search-input"
-                                onChange={(e) => handleSearch(e.target.value)}
-                                placeholder="Tìm kiếm trên Nova"
-                            />
-                        </form>
-                        {isFocusedSearch && (
-                            <>
-                                <button className="header__search-close" onClick={() => setIsFocusedSearch(false)}>
-                                    <IoArrowBack />
-                                </button>
-                                {isFocusedSearch && (
-                                    <ul className="header__search-suggestions">
-                                        {searchResults.length > 0 && searchResults.map((user) => (
-                                            <li
-                                                key={user.id}
-                                                className="header__search-item"
-                                                onClick={() => navigate(ROUTERS.USER.PROFILE.replace(':user_name', user.userAccount.user_name))}
-                                            >
-                                                <div className="search-item__info">
-                                                    <h3>{user.full_name}</h3>
-                                                    {user.isFriend ? <span className="search-item__is-friend">Bạn bè</span> : null}
-                                                    {user.mutualFriendsCount > 0 ? <span>{user.mutualFriendsCount} bạn chung</span> : null}
-                                                </div>
-                                                <div className="search-item__avatar">
-                                                    <AvatarUser user={user} />
-                                                </div>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                )}
-                            </>
-                        )}
-                    </div>
-                </div>
-
-                <nav className="header__nav" role="navigation">
-                    <ul className="header__menu">
-                        {menus.map((menu, index) => (
-                            <li key={index} className="header__menu-item">
-                                <NavLink
-                                    to={menu.path}
-                                    className={({ isActive }) =>
-                                        `header__nav-link${isActive ? ' header__nav-link--active' : ''}`
-                                    }
-                                >
-                                    {({ isActive }) => (
-                                        <>
-                                            <span className="header__nav-icon">
-                                                {isActive ? menu.iconActive : menu.icon}
-                                            </span>
-                                            <span className="header__nav-text">{menu.name}</span>
-                                        </>
+        <>
+            <header className="header">
+                <div className="header__container">
+                    <div className="header__left">
+                        <Link to={ROUTERS.USER.HOME} className="header__logo">
+                            <img src={Logo} alt="Nova Logo" className="header__logo-img" />
+                        </Link>
+                        <div className={`header__search ${isFocusedSearch ? "header__search--focused" : ""}`} ref={searchRef}>
+                            <form className='header__search-form'
+                                role="search"
+                                onClick={() => setIsFocusedSearch(true)}
+                            >
+                                <FaSearch className="header__search-icon" />
+                                <input
+                                    type="text"
+                                    className="header__search-input"
+                                    onChange={(e) => handleSearch(e.target.value)}
+                                    placeholder="Tìm kiếm trên Nova"
+                                />
+                            </form>
+                            {isFocusedSearch && (
+                                <>
+                                    <button className="header__search-close" onClick={() => setIsFocusedSearch(false)}>
+                                        <IoArrowBack />
+                                    </button>
+                                    {isFocusedSearch && (
+                                        <ul className="header__search-suggestions">
+                                            {searchResults.length > 0 && searchResults.map((user) => (
+                                                <li
+                                                    key={user.id}
+                                                    className="header__search-item"
+                                                    onClick={() => navigate(ROUTERS.USER.PROFILE.replace(':user_name', user.userAccount.user_name))}
+                                                >
+                                                    <div className="search-item__info">
+                                                        <h3>{user.full_name}</h3>
+                                                        {user.isFriend ? <span className="search-item__is-friend">Bạn bè</span> : null}
+                                                        {user.mutualFriendsCount > 0 ? <span>{user.mutualFriendsCount} bạn chung</span> : null}
+                                                    </div>
+                                                    <div className="search-item__avatar">
+                                                        <AvatarUser user={user} />
+                                                    </div>
+                                                </li>
+                                            ))}
+                                        </ul>
                                     )}
-                                </NavLink>
-                            </li>
-                        ))}
-                    </ul>
-                </nav>
+                                </>
+                            )}
+                        </div>
+                    </div>
 
-                <div className="header__right">
-                    <div className="header__icon-group" ref={popupUserPanelRef}>
-                        <div className="header__icon" onClick={() => setActiveUsePanelPopup('mess')}>
-                            <TbMessageCircleFilled />
-                            <span className="header__icon-badge">1</span>
-                        </div>
-                        <div className="header__icon" onClick={() => setActiveUsePanelPopup('noti')}>
-                            <IoNotifications />
-                            {unreadCount > 0 && <span className="header__icon-badge">{unreadCount > 99 ? '99+' : unreadCount}</span>}
-                        </div>
-                        <div
-                            className="header__icon"
-                            onClick={() => setActiveUsePanelPopup(activeUsePanelPopup === 'user' ? null : 'user')}
-                        >
-                            <div className="header__avatar">
-                                {loading ? (
-                                    <Loader />
-                                ) : (
-                                    <AvatarUser user={userInfo} />
-                                )}
+                    <nav className="header__nav" role="navigation">
+                        <ul className="header__menu">
+                            {menus.map((menu, index) => (
+                                <li key={index} className="header__menu-item">
+                                    <NavLink
+                                        to={menu.path}
+                                        className={({ isActive }) =>
+                                            `header__nav-link${isActive ? ' header__nav-link--active' : ''}`
+                                        }
+                                    >
+                                        {({ isActive }) => (
+                                            <>
+                                                <span className="header__nav-icon">
+                                                    {isActive ? menu.iconActive : menu.icon}
+                                                </span>
+                                                <span className="header__nav-text">{menu.name}</span>
+                                            </>
+                                        )}
+                                    </NavLink>
+                                </li>
+                            ))}
+                        </ul>
+                    </nav>
+
+                    <div className="header__right">
+                        <div className="header__icon-group" ref={popupUserPanelRef}>
+                            <div className="header__icon" onClick={() => setActiveUsePanelPopup('mess')}>
+                                <TbMessageCircleFilled />
                             </div>
-                            <span className="header__icon-badge header__avatar-badge">
-                                {activeUsePanelPopup === 'user' ? <FaCaretUp /> : <FaCaretDown />}
-                            </span>
+                            <div className="header__icon" onClick={() => setActiveUsePanelPopup('noti')}>
+                                <IoNotifications />
+                                {unreadCount > 0 && <span className="header__icon-badge">{unreadCount > 99 ? '99+' : unreadCount}</span>}
+                            </div>
+                            <div
+                                className="header__icon"
+                                onClick={() => setActiveUsePanelPopup(activeUsePanelPopup === 'user' ? null : 'user')}
+                            >
+                                <div className="header__avatar">
+                                    {loading ? (
+                                        <Loader />
+                                    ) : (
+                                        <AvatarUser user={userInfo} />
+                                    )}
+                                </div>
+                                <span className="header__icon-badge header__avatar-badge">
+                                    {activeUsePanelPopup === 'user' ? <FaCaretUp /> : <FaCaretDown />}
+                                </span>
+                            </div>
+                            {activeUsePanelPopup && (
+                                <UserPanelPopup
+                                    type={activeUsePanelPopup}
+                                    user={userInfo}
+                                    onClose={() => setActiveUsePanelPopup(null)}
+                                    reloadFns={{
+                                        notifications: reloadNotifications,
+                                    }}
+                                    notiData={{
+                                        notifications,
+                                        loadingNotifications,
+                                        errorNotifications,
+                                    }}
+                                    onOpenChat={handleOpenChat}
+                                />
+                            )}
                         </div>
-                        {activeUsePanelPopup && (
-                            <UserPanelPopup
-                                type={activeUsePanelPopup}
-                                user={userInfo}
-                                onClose={() => setActiveUsePanelPopup(null)}
-                                reloadFns={{
-                                    notifications: reloadNotifications,
-                                }}
-                                notiData={{
-                                    notifications,
-                                    loadingNotifications,
-                                    errorNotifications,
-                                }}
-                            />
-                        )}
                     </div>
                 </div>
-            </div>
-        </header>
+            </header>
+
+            {(chatId || otherUserId) && (
+                <ChatBox chatId={chatId} friend_id={otherUserId} onClose={handleCloseChat} />
+            )}
+
+        </>
+
     );
 
 };

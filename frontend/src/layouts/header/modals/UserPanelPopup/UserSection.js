@@ -7,20 +7,20 @@ import { ROUTERS } from '../../../../utils/router';
 import { useAuth } from '../../../../contexts/AuthContext';
 
 const UserSection = ({ user, onClose }) => {
-    const {logout} = useAuth();
+    const { logout } = useAuth();
     const navigator = useNavigate();
 
     const menuItems = [
-        { icon: <FaCog />, label: 'Cài đặt', onClick: () => { navigator(ROUTERS.USER.SETTINGS)} },
-        { icon: <FaMoon />, label: 'Chế độ màn hình', onClick: () => {} },
-        { icon: <FaCommentDots />, label: 'Đóng góp ý kiến', onClick: () => {} },
+        { icon: <FaCog />, label: 'Cài đặt', onClick: () => { navigator(ROUTERS.USER.SETTINGS) } },
+        { icon: <FaMoon />, label: 'Chế độ màn hình', onClick: () => { } },
+        { icon: <FaCommentDots />, label: 'Đóng góp ý kiến', onClick: () => { } },
         { icon: <FaSignOutAlt />, label: 'Đăng xuất', onClick: () => { logout(); onClose(); navigator(ROUTERS.USER.HOME) } },
     ];
 
     return (
         <section className="popup__section popup__section--user">
             <header className="popup__user-header">
-                <Link  to={ROUTERS.USER.PROFILE.replace(':user_name', user.userAccount.user_name)} className="popup__user-info" onClick={onClose}>
+                <Link to={ROUTERS.USER.PROFILE.replace(':user_name', user.userAccount.user_name)} className="popup__user-info" onClick={onClose}>
                     <div className="popup__avatar">
                         <AvatarUser user={user} />
                     </div>
@@ -40,8 +40,8 @@ const UserSection = ({ user, onClose }) => {
                 ))}
             </ul>
 
-            <footer className="popup__footer">
-                Điều khoản · Meta © 2025
+            <footer className="popup__footer" >
+                <Link to={ROUTERS.PUBLIC.TERMS_OF_SERVICE} className="popup__footer-link">Điều khoản · Meta © 2025</Link>
             </footer>
         </section>
     );

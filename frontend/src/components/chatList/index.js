@@ -3,16 +3,13 @@ import { useAuth } from '../../contexts/AuthContext';
 import AvatarUser from '../avatarUser';
 import './style.scss';
 
-const ChatList = ({ chat, handleSelectChat, setOtherUserId }) => {
+const ChatList = ({ chat, handleSelectChat }) => {
   const { auth } = useAuth();
 
   return (
    <li
   className="chat__friend-item"
-  onClick={() => {
-    handleSelectChat(chat.chat_id);
-    setOtherUserId(chat.other_user.id);
-  }}
+  onClick={() => handleSelectChat(chat.chat_id, chat.other_user.id)}
 >
 
       <div className="chat__friend-avatar">

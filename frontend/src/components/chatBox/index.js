@@ -9,13 +9,19 @@ import { IoClose } from 'react-icons/io5'; // dùng react-icons cho icon x
 
 const ChatBox = ({ chatId = null, friend_id, onClose }) => {
   const { userInfo: friend, loading: loadingFriends } = useUserInfo(friend_id);
-  const { createNewChat, loading: loadingCreate, error: errorCreate } = useChatActions();
+  const { createNewChat, loading: loadingCreate } = useChatActions();
   const [input, setInput] = useState('');
   const [sending, setSending] = useState(false);
   const [tempChatId, setTempChatId] = useState(chatId);
   const [pendingMessage, setPendingMessage] = useState(null);
-  const { messages, sendMessage, markAsRead } = useChatSocket(tempChatId);
+  const { messages, unreadCount,  sendMessage, markAsRead, reloadChat} = useChatSocket(tempChatId);
   const messagesEndRef = useRef(null);
+
+  useEffect(() => {
+    if (chatId) {
+      setTempChatId(chatId);
+    }
+  }, [chatId]);
 
   useEffect(() => {
     if (tempChatId) {
@@ -67,15 +73,15 @@ const ChatBox = ({ chatId = null, friend_id, onClose }) => {
   return (
     <div className="chat-box">
       <div className="chat-box__header">
-        {loadingFriends ? 'Loading...' : 
-        <div className="chat-box__friend-info">
-          <div className="chat-box__avatar">
-            <AvatarUser user={friend}/>
+        {loadingFriends ? 'Loading...' :
+          <div className="chat-box__friend-info">
+            <div className="chat-box__avatar">
+              <AvatarUser user={friend} />
+            </div>
+            <div className="chat-box__name">{friend.full_name}</div>
           </div>
-          <div className="chat-box__name">{friend.full_name}</div>
-        </div>
         }
-        
+
         <button className="chat-box__close" onClick={onClose} title="Đóng">
           <IoClose size={22} />
         </button>
@@ -86,7 +92,7 @@ const ChatBox = ({ chatId = null, friend_id, onClose }) => {
           <div className="chat-box__empty">Không có tin nhắn</div>
         ) : (
           messages.map((msg, idx) => (
-            <ChatMessageItem key={msg.id || idx} message={msg}/>
+            <ChatMessageItem key={msg.id || idx} message={msg} />
           ))
         )}
         <div ref={messagesEndRef} />
