@@ -13,7 +13,7 @@
   transition: all 0.2s ease;
   position: relative;
   width: 100%;
-  max-width: 240px;
+  max-width: 220px;
   margin: 0 auto;
 
   &:hover {
@@ -42,21 +42,27 @@
   }
 
   .friend-info {
-    padding: 10px 14px 6px 14px;
+    padding: 12px 12px 6px 12px;
     text-align: left;
     flex: 1;
+    min-height: 70px;
 
     .friend-name {
       margin-bottom: 4px;
 
       h3 {
         margin: 0;
-        font-size: 16px;
+        font-size: 15px;
         font-weight: 600;
         color: #1c1e21;
         line-height: 1.3;
         cursor: pointer;
         transition: color 0.2s ease;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
 
         &:hover {
           color: #1877f2;
@@ -70,6 +76,9 @@
         color: #65676b;
         font-weight: 400;
         margin-top: 2px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
       }
     }
 
@@ -99,21 +108,21 @@
         }
 
         .mutual-count {
-          font-size: 13px; /* Giảm từ 14px xuống 13px */
+          font-size: 13px;
           color: #65676b;
           font-weight: 400;
         }
       }
 
       .mutual-count.no-mutual {
-        font-size: 13px; /* Giảm từ 14px xuống 13px */
+        font-size: 13px;
         color: #8a8d91;
         font-weight: 400;
         display: block;
       }
 
       .request-time {
-        font-size: 12px; /* Giảm từ 13px xuống 12px */
+        font-size: 12px;
         color: #8a8d91;
         font-weight: 400;
         margin-top: 2px;
@@ -123,7 +132,7 @@
   }
 
   .friend-actions {
-    padding: 0 14px 14px 14px;
+    padding: 0 12px 12px 12px;
 
     .action-buttons {
       display: flex;
@@ -136,7 +145,7 @@
         align-items: center;
         justify-content: center;
         gap: 6px;
-        padding: 8px 14px;
+        padding: 8px 12px;
         border: none;
         border-radius: 6px;
         font-size: 14px;
@@ -145,6 +154,7 @@
         transition: all 0.2s ease;
         white-space: nowrap;
         width: 100%;
+        height: 36px;
 
         .friend-card-icon {
           font-size: 15px;
@@ -273,12 +283,12 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            padding: 12px 14px; /* Giảm padding từ 14px 16px */
+            padding: 12px 14px;
             background: transparent;
             border: none;
             width: 100%;
             text-align: left;
-            font-size: 14px; /* Giảm từ 16px xuống 14px */
+            font-size: 14px;
             font-weight: 400;
             color: #1c1e21;
             cursor: pointer;
@@ -294,7 +304,7 @@
             }
 
             .friend-card-icon {
-              font-size: 15px; /* Giảm từ 17px xuống 15px */
+              font-size: 15px;
               color: #65676b;
               transition: color 0.2s ease;
             }
@@ -320,8 +330,8 @@
           flex-shrink: 0;
 
           .more-button {
-            width: 40px;
-            height: 40px;
+            width: 36px;
+            height: 36px;
             padding: 0;
             border-radius: 6px;
           }
@@ -336,15 +346,41 @@
     }
   }
 
-  // Responsive design
-  @media (max-width: 768px) {
-    max-width: 140px;
+  // Responsive design - improved breakpoints
+  @media (min-width: 1200px) {
+    max-width: 220px;
+  }
+
+  @media (min-width: 992px) and (max-width: 1199px) {
+    max-width: 200px;
+  }
+
+  @media (min-width: 768px) and (max-width: 991px) {
+    max-width: 180px;
 
     .friend-info {
-      padding: 8px 10px 4px 10px;
+      padding: 10px 10px 5px 10px;
 
       .friend-name h3 {
         font-size: 14px;
+      }
+    }
+
+    .friend-actions {
+      padding: 0 10px 10px 10px;
+    }
+  }
+
+  @media (max-width: 767px) {
+    max-width: 160px;
+
+    .friend-info {
+      padding: 8px 10px 4px 10px;
+      min-height: 60px;
+
+      .friend-name h3 {
+        font-size: 14px;
+        -webkit-line-clamp: 1;
       }
 
       .mutual-info .mutual-count {
@@ -356,17 +392,19 @@
       padding: 0 10px 10px 10px;
 
       .action-buttons .action-button {
-        padding: 7px 12px;
+        padding: 6px 10px;
         font-size: 13px;
+        height: 32px;
       }
     }
   }
 
   @media (max-width: 576px) {
-    max-width: 120px;
+    max-width: 140px;
 
     .friend-info {
       padding: 6px 8px 4px 8px;
+      min-height: 50px;
 
       .friend-name h3 {
         font-size: 13px;
@@ -405,8 +443,9 @@
 
       .action-buttons {
         .action-button {
-          padding: 6px 10px;
+          padding: 5px 8px;
           font-size: 12px;
+          height: 30px;
 
           .friend-card-icon {
             font-size: 13px;
@@ -415,16 +454,14 @@
 
         &.suggestion-actions {
           .more-options .more-button {
-            width: 28px;
-            height: 28px;
+            width: 30px;
+            height: 30px;
           }
         }
       }
     }
   }
 }
-
-// ...existing code...
 
 @keyframes spin {
   from {
