@@ -55,7 +55,7 @@ const AddFriendCard = ({
   return (
     <div className={`add-friend-card ${type === 'compact' ? 'compact' : 'horizontal'}`}>
       <div className="friend-avatar" onClick={handleProfileClick} style={{ cursor: 'pointer' }}>
-        <AvatarUser user={user} size={type === 'compact' ? 'large' : 'medium'} />
+        <AvatarUser user={user} size="medium" />
       </div>
       
       <div className="friend-info" onClick={handleProfileClick} style={{ cursor: 'pointer' }}>

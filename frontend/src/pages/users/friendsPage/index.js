@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { FaSpinner, FaExclamationTriangle, FaSearch, FaFilter, FaEllipsisH, FaBars, FaTimes } from 'react-icons/fa';
+import { FaSpinner, FaExclamationTriangle, FaSearch, FaFilter, FaBars, FaTimes } from 'react-icons/fa';
 import FriendCard from '../../../components/friendCard';
 import FriendSuggestions from '../../../components/friendSuggestions';
 import Sidebar from './modals/Sidebar/index';
@@ -82,7 +82,7 @@ const FriendsPage = () => {
   const [activeTab, setActiveTab] = useState(() => {
     // Check URL params for initial tab
     const tabParam = searchParams.get('tab');
-    return tabParam && ['friends', 'suggestions', 'requests', 'followers', 'following', 'recent', 'birthdays', 'custom'].includes(tabParam) 
+    return tabParam && ['friends', 'suggestions', 'requests', 'followers', 'following'].includes(tabParam) 
       ? tabParam 
       : 'friends';
   });
@@ -90,7 +90,7 @@ const FriendsPage = () => {
   // Update tab when URL changes
   useEffect(() => {
     const tabParam = searchParams.get('tab');
-    if (tabParam && ['friends', 'suggestions', 'requests', 'followers', 'following', 'recent', 'birthdays', 'custom'].includes(tabParam)) {
+    if (tabParam && ['friends', 'suggestions', 'requests', 'followers', 'following'].includes(tabParam)) {
       setActiveTab(tabParam);
     }
   }, [searchParams]);
@@ -183,11 +183,6 @@ const FriendsPage = () => {
         case 'following':
           await refetchFollow();
           setShouldFetchMutual(true);
-          break;
-        case 'recent':
-        case 'birthdays':
-        case 'custom':
-          // Các tab này không cần fetch dữ liệu đặc biệt
           break;
         default:
           break;
@@ -673,11 +668,6 @@ const FriendsPage = () => {
                     <div className="friends-list">
                       <h2>
                         Danh sách bạn bè ({filteredFriends.length})
-                        <div className="section-actions">
-                          <button className="action-btn">
-                            <ThemedIcon icon={FaEllipsisH} />
-                          </button>
-                        </div>
                       </h2>
                       
                       {!filteredFriends.length && !recentlyUnfriended.size ? (
@@ -733,11 +723,6 @@ const FriendsPage = () => {
                     <div className="suggestions-section">
                       <h2>
                         Gợi ý kết bạn
-                        <div className="section-actions">
-                          <button className="action-btn">
-                            <ThemedIcon icon={FaEllipsisH} />
-                          </button>
-                        </div>
                       </h2>
                       
                       {/* Show recently unfriended users first */}
@@ -780,11 +765,6 @@ const FriendsPage = () => {
                     <div className="requests-list">
                       <h2>
                         Lời mời kết bạn ({filteredRequests.length})
-                        <div className="section-actions">
-                          <button className="action-btn">
-                            <ThemedIcon icon={FaEllipsisH} />
-                          </button>
-                        </div>
                       </h2>
                       {!filteredRequests.length ? (
                         <div className="empty-state">
@@ -827,11 +807,7 @@ const FriendsPage = () => {
                   {activeTab === 'followers' && (
                     <div className="followers-list">
                       <h2>Người theo dõi ({filteredFollowers.length})
-                        <div className="section-actions">
-                          <button className="action-btn">
-                            <ThemedIcon icon={FaEllipsisH} />
-                          </button>
-                        </div></h2>
+                      </h2>
                       {!filteredFollowers.length ? (
                         <div className="empty-state">
                           <p>{debouncedSearchQuery ? 'Không tìm thấy người theo dõi nào phù hợp.' : 'Chưa có ai theo dõi bạn.'}</p>
@@ -868,11 +844,7 @@ const FriendsPage = () => {
                   {activeTab === 'following' && (
                     <div className="following-list">
                       <h2>Đang theo dõi ({filteredFollowing.length})
-                        <div className="section-actions">
-                          <button className="action-btn">
-                            <ThemedIcon icon={FaEllipsisH} />
-                          </button>
-                        </div></h2>
+                      </h2>
                       {!filteredFollowing.length ? (
                         <div className="empty-state">
                           <p>{debouncedSearchQuery ? 'Không tìm thấy ai bạn đang theo dõi phù hợp.' : 'Bạn chưa theo dõi ai.'}</p>
@@ -900,54 +872,6 @@ const FriendsPage = () => {
                           ))}
                         </div>
                       )}
-                    </div>
-                  )}
-
-                  {activeTab === 'recent' && (
-                    <div className="recent-list">
-                      <h2>
-                        Bạn bè gần đây
-                        <div className="section-actions">
-                          <button className="action-btn">
-                            <ThemedIcon icon={FaEllipsisH} />
-                          </button>
-                        </div>
-                      </h2>
-                      <div className="empty-state">
-                        <p>Chưa có hoạt động gần đây với bạn bè.</p>
-                      </div>
-                    </div>
-                  )}
-
-                  {activeTab === 'birthdays' && (
-                    <div className="birthdays-list">
-                      <h2>
-                        Sinh nhật bạn bè
-                        <div className="section-actions">
-                          <button className="action-btn">
-                            <ThemedIcon icon={FaEllipsisH} />
-                          </button>
-                        </div>
-                      </h2>
-                      <div className="empty-state">
-                        <p>Không có sinh nhật bạn bè trong thời gian tới.</p>
-                      </div>
-                    </div>
-                  )}
-
-                  {activeTab === 'custom' && (
-                    <div className="custom-list">
-                      <h2>
-                        Danh sách tùy chỉnh
-                        <div className="section-actions">
-                          <button className="action-btn">
-                            <ThemedIcon icon={FaEllipsisH} />
-                          </button>
-                        </div>
-                      </h2>
-                      <div className="empty-state">
-                        <p>Bạn chưa tạo danh sách tùy chỉnh nào.</p>
-                      </div>
                     </div>
                   )}
                 </>
