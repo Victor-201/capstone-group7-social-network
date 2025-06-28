@@ -28,8 +28,6 @@ export default {
           attributes: []
         }]
       });
-      console.log('existingChat', existingChat);
-
       if (existingChat.length > 0) {
         return { result: { message: "Chat already exists", chatId: existingChat.id } };
       }

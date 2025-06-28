@@ -95,7 +95,7 @@ export default {
     const mutualIds = [...aSet].filter(id => bSet.has(id));
 
     if (mutualIds.length === 0) {
-      return { error: { code: 404, message: "No mutual friends found" } };
+      return { error: { code: 200, message: "No mutual friends found" } };
     }
 
     // Lấy thông tin chi tiết các bạn chung
