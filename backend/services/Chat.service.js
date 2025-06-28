@@ -29,7 +29,7 @@ export default {
         }]
       });
       if (existingChat.length > 0) {
-        return { result: { message: "Chat already exists", chatId: existingChat.id } };
+        return { result: { message: 'Private chat already exists', chat_id: existingChat[0].chat_id } };
       }
 
       const chat = await Chat.create({ is_group: false });
