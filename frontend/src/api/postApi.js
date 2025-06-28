@@ -20,6 +20,22 @@ export const createPost = async (token, formData) => {
     return await response.json();
 };
 
+export const updatePost = async (token, post_id, formData) => {
+    const response = await fetch(`${BASE_URL}/posts/${post_id}`, {
+        method: 'PUT',
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+        body: formData, // multipart/form-data, KHÔNG set Content-Type
+    });
+
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || `HTTP ${response.status}`);
+    }
+
+    return await response.json();
+};
 
 /**
  * Lấy bài viết theo userId (nếu có), hoặc của chính người dùng
