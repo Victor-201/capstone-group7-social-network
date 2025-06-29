@@ -9,6 +9,7 @@ import AuthPage from './pages/users/authPage';
 import MasterLayout from './layouts/masterLayout';
 import PrivateRoute from './components/privateRoute';
 import SettingsPage from './pages/users/settingsPage';
+import AdminDashboard from './pages/admin';
 import { ROUTERS } from './utils/router';
 
 const renderUserRouter = () => {
@@ -45,6 +46,14 @@ const renderUserRouter = () => {
     },
   ];
 
+  const adminRouters = [
+    {
+      path: ROUTERS.ADMIN,
+      Component: <AdminDashboard />,
+      roles: ['admin'],
+    },
+  ];
+
   const publicRouters = [
     {
       path: ROUTERS.PUBLIC.LOGIN,
@@ -77,6 +86,18 @@ const renderUserRouter = () => {
           element={
             <PrivateRoute roles={item.roles}>
               <MasterLayout>{item.Component}</MasterLayout>
+            </PrivateRoute>
+          }
+        />
+      ))}
+
+      {adminRouters.map((item, key) => (
+        <Route
+          key={key}
+          path={item.path}
+          element={
+            <PrivateRoute roles={item.roles}>
+              {item.Component}
             </PrivateRoute>
           }
         />
