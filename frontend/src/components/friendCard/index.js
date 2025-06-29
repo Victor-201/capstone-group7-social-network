@@ -3,6 +3,7 @@ import { FaSpinner, FaEllipsisH, FaUserMinus, FaUserPlus, FaEyeSlash, FaFlag, Fa
 import { useNavigate } from 'react-router-dom';
 import AvatarUser from '../avatarUser';
 import MutualFriendsDisplay from '../mutualFriendsDisplay';
+import {ROUTERS} from '../../utils/router';
 import "./style.scss";
 
 // Themed icon component for FriendCard
@@ -55,7 +56,7 @@ const FriendCard = ({
   const handleProfileClick = () => {
     const username = getUserNameForNavigation(user);
     if (username) {
-      navigate(`/${username}`);
+      navigate(ROUTERS.USER.PROFILE.replace(':user_name', username));
     } else {
       console.warn('FriendCard: No username found for navigation', user);
     }

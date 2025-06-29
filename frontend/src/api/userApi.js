@@ -20,6 +20,39 @@ export const getUserInfo = async (token) => {
 
     return await response.json();
 };
+export const getUserById = async (token, userId) => {
+    const response = await fetch(`${BASE_URL}/info/${userId}`, {
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+        },
+    });
+    
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || `HTTP ${response.status}`);
+    }
+
+    return await response.json();
+};
+
+export const getUserByUserName = async (token, userName) => {
+    const response = await fetch(`${BASE_URL}/info/username/${userName}`, {
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+        },
+    });
+    
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || `HTTP ${response.status}`);
+    }
+
+    return await response.json();
+};
 // Cập nhật thông tin profile (nội dung: job, education, ...)
 export const updateUserProfile = async (token, profileData) => {
     const response = await fetch(`${BASE_URL}/profile`, {
@@ -50,25 +83,6 @@ export const updateProfileVisibility = async (token, visibilityList) => {
         body: JSON.stringify({ visibilities: visibilityList }),
     });
 
-    if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || `HTTP ${response.status}`);
-    }
-
-    return await response.json();
-};
-
-
-// Lấy thông tin user theo ID
-export const getUserById = async (token, userId) => {
-    const response = await fetch(`${BASE_URL}/info/${userId}`, {
-        method: 'GET',
-        headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-        },
-    });
-    
     if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || `HTTP ${response.status}`);
@@ -131,11 +145,4 @@ export const uploadAvatar = async (token, formData) => {
     }
 
     return await response.json();
-};
-export const getUserInfoByUsername = async (username) => {
-  const res = await fetch(`${API_BASE_URL}/user/profile/${username}`);
-  if (!res.ok) {
-    throw new Error("Không tìm thấy người dùng");
-  }
-  return res.json();
 };

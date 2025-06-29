@@ -197,25 +197,21 @@ export default {
       return { error: { code: 500, message: error.message } };
     }
   },
-  async getUserByUserName (user_name){
-    if(!user_name){
-      return {error: {code: 400, message: "user_name is required"}};
+  async getUserByUserName(user_name) {
+    if (!user_name) {
+      return { error: { code: 400, message: "user_name is required" } };
     }
-    try{
-      const user = await UserAccount.findOne({
-        where: {user_name},
-        include: [{
-          model: UserInfo,
-          attributes: [
-          "id",
-          "full_name",
-          "avatar",
-          "cover",
-          "isOnline",
-          "birth_date",
-          "gender",
-          "bio",],
-          include: [{
+
+    try {
+      const user = await UserInfo.findOne({
+        include: [
+          {
+            model: UserAccount,
+            as: "userAccount",
+            where: { user_name },
+            attributes: ["email", "phone_number", "user_name", "created_at"],
+          },
+          {
             model: ProfileDetail,
             as: "ProfileDetails",
             include: [
@@ -226,16 +222,29 @@ export default {
                 required: false,
               },
             ],
-          }]
-        }],
-        attributes: ["email", "phone_number", "user_name", "created_at"]
-      })
-      if(!user){
-        return {error: {code: 404, message: "User not found"}};
+          },
+        ],
+        attributes: [
+          "id",
+          "full_name",
+          "avatar",
+          "cover",
+          "isOnline",
+          "birth_date",
+          "gender",
+          "bio",
+        ],
+      });
+
+      if (!user) {
+        return { error: { code: 404, message: "User not found" } };
       }
-      return {result: user};
-    } catch (error) {
-      return { error: { code: 500, message: error.message}};
+
+      return { result: user };
+    } catch (err) {
+      return {
+        error: { code: 500, message: "Server error", detail: err.message },
+      };
     }
   }
 };

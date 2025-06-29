@@ -1,0 +1,21 @@
+@import '../../styles/pages/theme';
+
+@keyframes pulseFade {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.media-error {
+  width: 100%;
+  height: 100%;
+  background-color: rgba(get-theme-color("tertiary-color"), 0.4);
+  border-radius: 8px;
+  animation: pulseFade 1.5s infinite ease-in-out;
+}

@@ -8,7 +8,7 @@ import {
 } from "react-icons/fi";
 import { BsCameraFill } from "react-icons/bs";
 import { useParams } from "react-router-dom";
-
+import Loader from "../../../components/loader";
 import AvatarUser from "../../../components/avatarUser";
 import MediaCard from "../../../components/mediaCard";
 import CreatePost from "../../../components/createPost";
@@ -19,6 +19,7 @@ import { useFriends } from "../../../hooks/friends/useFriends";
 import { useUserInfo } from "../../../hooks/user";
 import { useAuth } from "../../../contexts/AuthContext";
 import { useBatchMutualFriends } from "../../../hooks/friends/useMutualFriends";
+import MediaUser from "../../../components/mediaCard";
 
 import PostsTab from "./modals/PostsTab";
 import AboutTab from "./modals/AboutTab";
@@ -33,11 +34,10 @@ const PersonalPage = () => {
   const { user_name } = useParams();
 
   const isOwner = auth.user_name === user_name;
-  const { userInfo, isLoading } = useUserInfo(isOwner ? undefined : user_name);
+  const { userInfo, loading: userInfoLoading, error: userInfoError } = useUserInfo( undefined, isOwner ? undefined : user_name);
   const coverInputRef = useRef(null);
   const avatarInputRef = useRef(null);
-
-  const coverImageUrl = useCloudinaryFile(userInfo?.cover, "image");
+  const [showCover, setShowCover] = useState(true);
   const { isUploading, error, handleChangeUserImage } = ChageUserImage();
   const { images, loading: loadingImages } = useUserImages(userInfo?.id);
   const {
@@ -163,8 +163,13 @@ const PersonalPage = () => {
     }
   }, [activeTab, images, loadingImages, friends, loadingFriends, friendsError, mutualCounts, loadingMutual, mutualError, userInfo, isOwner]);
 
-  if (!userInfo || isLoading) {
-    return <p className="loading-screen">⏳ Đang tải trang cá nhân...</p>;
+  if (!userInfo || userInfoLoading) {
+    console.log("userInfo:", userInfo, "isLoading:", userInfoLoading);
+    return <div className="personal-page__loading"> <Loader /></div>
+  }
+
+  if (userInfoError) {
+    return <div className="personal-page__error">{userInfoError}</div>;
   }
 
   return (
@@ -172,20 +177,10 @@ const PersonalPage = () => {
       <article className="personal-page">
         <main className="main">
           <section className="profile">
-            <div className="viewer-mode-banner">
-              <p className="viewer-mode-text">
-                {isOwner
-                  ? "🧑 Đây là trang cá nhân của bạn"
-                  : "👀 Bạn đang xem trang cá nhân của người khác"}
-              </p>
-            </div>
-
             <div className="profile__cover-container">
-              <img
-                src={coverImageUrl}
-                alt="Cover"
-                className="profile__cover"
-              />
+              {userInfo.cover && (
+                < MediaUser media_id={userInfo.cover} media_type="image" className="profile__cover-image" />
+              )}
               {isOwner && (
                 <>
                   <div

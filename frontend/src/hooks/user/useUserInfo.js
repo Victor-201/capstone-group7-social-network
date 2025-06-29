@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { getUserInfo, getUserById } from '../../api/userApi';
+import { getUserInfo, getUserById, getUserByUserName } from '../../api/userApi';
 
-export const useUserInfo = (userId = null) => {
+export const useUserInfo = (userId = null, userName = null) => {
     const [userInfo, setUserInfo] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -22,7 +22,10 @@ export const useUserInfo = (userId = null) => {
                 
                 if (userId) {
                     data = await getUserById(token, userId);
-                } else {
+                } else if (userName) {
+                    data = await getUserByUserName(token, userName);
+                }
+                 else {
                     data = await getUserInfo(token);
                 }
                 
@@ -36,7 +39,7 @@ export const useUserInfo = (userId = null) => {
         };
 
         fetchUserInfo();
-    }, [userId]);
+    }, [userId, userName]);
 
     return { userInfo, loading, error };
 };
