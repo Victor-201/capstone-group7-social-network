@@ -8,7 +8,7 @@ import useClickOutside from '../../../../hooks/useClickOutside';
 import { useMarkAllAsRead, useDeleteAllReadNotifications } from '../../../../hooks/notifications';
 import './style.scss';
 
-const UserPanelPopup = ({ type, user, onClose, reloadFns, notiData }) => {
+const UserPanelPopup = ({ type, user, onClose, reloadFns, notiData, onOpenChat }) => {
     const [isOpenMoreAction, setIsOpenMoreAction] = useState(false);
     const isOpenMoreActionRef = useRef(null);
     const [isOpenCreateChat, setIsOpenCreateChat] = useState(false);
@@ -87,6 +87,7 @@ const UserPanelPopup = ({ type, user, onClose, reloadFns, notiData }) => {
                             onClose={onClose}
                             isOpenCreateChat={isOpenCreateChat}
                             setIsOpenCreateChat={setIsOpenCreateChat}
+                            onOpenChat={onOpenChat}
                         />
                     )}
 

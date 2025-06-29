@@ -29,19 +29,48 @@ export default {
     async sendMessage(chatId, senderId, content) {
         try {
             if (!chatId || !senderId || !content) {
-                return { error: { code: 400, message: 'Chat ID, sender ID, and content are required' } };
+                return {
+                    error: {
+                        code: 400,
+                        message: 'Chat ID, sender ID, and content are required'
+                    }
+                };
             }
+
             const message = await models.Message.create({
                 chat_id: chatId,
                 sender_id: senderId,
                 content,
             });
+
             if (!message) {
-                return { error: { code: 500, message: 'Failed to send message' } };
+                return {
+                    error: {
+                        code: 500,
+                        message: 'Failed to send message'
+                    }
+                };
             }
-            return { result: message };
+
+            // Fetch lại message kèm thông tin người gửi
+            const fullMessage = await models.Message.findByPk(message.id, {
+                include: [{
+                    model: models.UserInfo,
+                    as: 'Sender',
+                    attributes: ['id', 'full_name', 'avatar'],
+                }]
+            });
+
+            return { result: fullMessage };
+
         } catch (error) {
-            return { error: { code: 500, message: 'Error sending message', detail: error.message } };
+            return {
+                error: {
+                    code: 500,
+                    message: 'Error sending message',
+                    detail: error.message
+                }
+            };
         }
     },
     async markAllMessagesAsRead(chat_id, user_id) {

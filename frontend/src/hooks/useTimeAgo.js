@@ -5,33 +5,44 @@ const getTimeAgo = (dateString) => {
     const date = new Date(dateString);
     const diffInSeconds = Math.floor((now - date) / 1000);
 
-    if (diffInSeconds < 60) {
-        return `${diffInSeconds} giây trước`;
-    }
-
     const diffInMinutes = Math.floor(diffInSeconds / 60);
     if (diffInMinutes < 60) {
-        return `${diffInMinutes} phút trước`;
+        return `${diffInMinutes} phút`;
     }
 
     const diffInHours = Math.floor(diffInMinutes / 60);
     if (diffInHours < 24) {
-        return `${diffInHours} giờ trước`;
+        return `${diffInHours} giờ`;
     }
 
     const diffInDays = Math.floor(diffInHours / 24);
+    if (diffInDays < 7) {
+        return `${diffInDays} ngày`;
+    }
+
+    const diffInWeeks = Math.floor(diffInDays / 7);
     if (diffInDays < 30) {
-        return `${diffInDays} ngày trước`;
+        return `${diffInWeeks} tuần`;
     }
 
     const diffInMonths = Math.floor(diffInDays / 30);
-    if (diffInMonths < 12) {
-        return `${diffInMonths} tháng trước`;
+    const diffInYears = Math.floor(diffInMonths / 12);
+
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear();
+
+    if (diffInMonths >= 24 || diffInYears >= 1) {
+        return `${day} tháng ${month}, ${year}`;
     }
 
-    const diffInYears = Math.floor(diffInMonths / 12);
-    return `${diffInYears} năm trước`;
+    if (diffInMonths >= 2) {
+        return `${day} tháng ${month}`;
+    }
+
+    return `${diffInMonths} tháng`;
 };
+
 
 const useTimeAgo = (dateString, refreshInterval = 60000) => {
     const [timeAgo, setTimeAgo] = useState(() => getTimeAgo(dateString));

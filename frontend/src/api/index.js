@@ -11,3 +11,4 @@ export * from './searchApi';
 export * from './chatApi';
 export * from './messageApi';
 export * from './notificationApi';
+export * from './adminApi';

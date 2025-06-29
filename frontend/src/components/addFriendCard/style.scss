@@ -297,7 +297,7 @@
   border-radius: 8px;
   border: 1px solid #dddfe2;
   transition: all 0.2s ease;
-  width: 200px; // Fixed width for horizontal scroll
+  width: 220px; // Match FriendCard size
   overflow: hidden;
 
   &:hover {
@@ -340,13 +340,14 @@
   }
 
   .friend-info {
-    padding: 12px 12px 8px 12px;
+    padding: 12px 12px 8px 12px; // Match FriendCard padding
     text-align: center;
+    min-height: 70px; // Ensure consistent height
 
     .friend-name {
       h3 {
         margin: 0 0 6px 0;
-        font-size: 16px;
+        font-size: 15px; // Match FriendCard font size
         font-weight: 600;
         color: #1c1e21;
         line-height: 1.3;
@@ -371,7 +372,7 @@
   }
 
   .friend-actions {
-    padding: 0 12px 12px 12px;
+    padding: 0 12px 12px 12px; // Match FriendCard padding
 
     .action-buttons {
       display: flex;
@@ -391,6 +392,7 @@
         cursor: pointer;
         transition: all 0.2s ease;
         width: 100%;
+        height: 36px; // Fixed height for consistency
 
         .add-friend-card-icon {
           font-size: 14px;
@@ -433,15 +435,62 @@
     }
   }
 
-  // Responsive for horizontal scroll layout
-  @media (max-width: 768px) {
-    width: 180px;
+  // Responsive design - match FriendCard breakpoints
+  @media (min-width: 1200px) {
+    width: 220px;
+  }
 
+  @media (min-width: 992px) and (max-width: 1199px) {
+    width: 200px;
+    
     .friend-info {
       padding: 10px 10px 6px 10px;
+      min-height: 65px;
+      
+      .friend-name h3 {
+        font-size: 14px;
+      }
+    }
+    
+    .friend-actions {
+      padding: 0 10px 10px 10px;
+    }
+  }
+
+  @media (min-width: 768px) and (max-width: 991px) {
+    width: 180px;
+    
+    .friend-info {
+      padding: 10px 10px 6px 10px;
+      min-height: 60px;
+      
+      .friend-name h3 {
+        font-size: 14px;
+      }
+      
+      .mutual-info .mutual-count {
+        font-size: 12px;
+      }
+    }
+    
+    .friend-actions {
+      padding: 0 10px 10px 10px;
+      
+      .action-buttons .action-button {
+        height: 34px;
+      }
+    }
+  }
+
+  @media (max-width: 767px) {
+    width: 160px;
+
+    .friend-info {
+      padding: 8px 10px 4px 10px;
+      min-height: 55px;
 
       .friend-name h3 {
-        font-size: 15px;
+        font-size: 14px;
       }
 
       .mutual-info .mutual-count {
@@ -453,20 +502,22 @@
       padding: 0 10px 10px 10px;
       
       .action-buttons .action-button {
-        padding: 7px 10px;
+        padding: 6px 10px;
         font-size: 13px;
+        height: 32px;
       }
     }
   }
 
-  @media (max-width: 480px) {
-    width: 160px;
+  @media (max-width: 576px) {
+    width: 140px;
 
     .friend-info {
-      padding: 8px 8px 6px 8px;
+      padding: 6px 8px 4px 8px;
+      min-height: 50px;
 
       .friend-name h3 {
-        font-size: 14px;
+        font-size: 13px;
       }
 
       .mutual-info .mutual-count {
@@ -478,8 +529,9 @@
       padding: 0 8px 8px 8px;
       
       .action-buttons .action-button {
-        padding: 6px 8px;
+        padding: 5px 8px;
         font-size: 12px;
+        height: 30px;
       }
     }
   }

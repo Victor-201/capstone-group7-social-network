@@ -13,7 +13,7 @@
   transition: all 0.2s ease;
   position: relative;
   width: 100%;
-  max-width: 200px; // Smaller for request cards
+  max-width: 220px; // Match FriendCard size
   margin: 0 auto;
 
   &:hover {
@@ -54,19 +54,25 @@
   }
 
   .user-info {
-    padding: 12px 16px 8px 16px;
+    padding: 12px 12px 8px 12px; // Match FriendCard padding
     text-align: left;
     flex: 1;
+    min-height: 70px; // Ensure consistent height
 
     .user-name {
       h3 {
         margin: 0 0 6px 0;
-        font-size: 16px;
+        font-size: 15px; // Match FriendCard font size
         font-weight: 600;
         color: #1c1e21;
         line-height: 1.3;
         cursor: pointer;
         transition: color 0.2s ease;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
 
         &:hover {
           color: #1877f2;
@@ -96,78 +102,108 @@
   }
 
   .user-actions {
-    padding: 0 16px 16px 16px;
+    padding: 0 12px 12px 12px; // Match FriendCard padding
 
-    .action-button {
+    .action-buttons {
       display: flex;
-      align-items: center;
-      justify-content: center;
+      flex-direction: column;
       gap: 6px;
-      padding: 8px 16px;
-      border: none;
-      border-radius: 6px;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s ease;
       width: 100%;
-      margin-bottom: 8px;
 
-      &:last-child {
-        margin-bottom: 0;
-      }
-
-      .user-card-icon {
+      .action-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 8px 12px; // Match FriendCard padding
+        border: none;
+        border-radius: 6px;
         font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        white-space: nowrap;
+        width: 100%;
+        height: 36px; // Fixed height for consistency
 
-        &.spinner {
-          animation: spin 1s linear infinite;
-        }
-      }
+        .user-card-icon {
+          font-size: 15px;
 
-      &.primary-button {
-        background: #1877f2;
-        color: white;
-
-        &:hover:not(:disabled) {
-          background: #166fe5;
-          transform: translateY(-1px);
-          box-shadow: 0 2px 8px rgba(24, 119, 242, 0.3);
-        }
-
-        &:disabled {
-          opacity: 0.6;
-          cursor: not-allowed;
-        }
-      }
-
-      &.secondary-button {
-        background: #e4e6ea;
-        color: #1c1e21;
-
-        &:hover:not(:disabled) {
-          background: #d8dadf;
-          transform: translateY(-1px);
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+          &.spinner {
+            animation: spin 1s linear infinite;
+          }
         }
 
-        &:disabled {
-          opacity: 0.6;
-          cursor: not-allowed;
+        &.primary-button {
+          background: #1877f2;
+          color: white;
+
+          &:hover:not(:disabled) {
+            background: #166fe5;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(24, 119, 242, 0.3);
+          }
+
+          &:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+          }
+        }
+
+        &.secondary-button {
+          background: #e4e6ea;
+          color: #1c1e21;
+
+          &:hover:not(:disabled) {
+            background: #d8dadf;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+          }
+
+          &:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+          }
         }
       }
     }
   }
 
-  // Responsive design for compact cards
-  @media (max-width: 768px) {
-    max-width: 160px;
+  // Responsive design - match FriendCard breakpoints
+  @media (min-width: 1200px) {
+    max-width: 220px; // Standard size for large screens
+  }
+
+  @media (min-width: 992px) and (max-width: 1199px) {
+    max-width: 200px; // Slightly smaller for medium-large screens
+  }
+
+  @media (min-width: 768px) and (max-width: 991px) {
+    max-width: 180px; // Smaller for medium screens
 
     .user-info {
-      padding: 10px 12px 6px 12px;
+      padding: 10px 10px 6px 10px;
 
       .user-name h3 {
         font-size: 14px;
+      }
+    }
+
+    .user-actions {
+      padding: 0 10px 10px 10px;
+    }
+  }
+
+  @media (max-width: 767px) {
+    max-width: 160px; // Smaller for small screens
+
+    .user-info {
+      padding: 8px 10px 4px 10px;
+      min-height: 60px;
+
+      .user-name h3 {
+        font-size: 14px;
+        -webkit-line-clamp: 1; // Show only one line on small screens
       }
 
       .mutual-info .mutual-count {
@@ -176,32 +212,43 @@
     }
 
     .user-actions {
-      padding: 0 12px 12px 12px;
+      padding: 0 10px 10px 10px;
 
-      .action-button {
-        padding: 7px 14px;
+      .action-buttons .action-button {
+        padding: 6px 10px;
         font-size: 13px;
+        height: 32px; // Smaller height for small screens
       }
     }
   }
 
   @media (max-width: 576px) {
-    max-width: 140px;
+    max-width: 140px; // Even smaller for extra small screens
 
     .user-info {
-      padding: 8px;
+      padding: 6px 8px 4px 8px;
+      min-height: 50px;
 
       .user-name h3 {
-        font-size: 14px;
+        font-size: 13px;
+      }
+
+      .mutual-info .mutual-friends .mutual-count {
+        font-size: 11px;
       }
     }
 
     .user-actions {
       padding: 0 8px 8px 8px;
 
-      .action-button {
-        padding: 6px 12px;
+      .action-buttons .action-button {
+        padding: 5px 8px;
         font-size: 12px;
+        height: 30px; // Smaller height for extra small screens
+
+        .user-card-icon {
+          font-size: 13px;
+        }
       }
     }
   }

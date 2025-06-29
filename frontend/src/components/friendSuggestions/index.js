@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect } from 'react';
 import { FaSpinner, FaUserPlus } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import AddFriendCard from '../addFriendCard';
@@ -16,8 +16,13 @@ const SuggestionsIcon = ({ icon: Icon, className }) => {
 
 const FriendSuggestions = ({ limit = 6 }) => {
   const navigate = useNavigate();
-  const { suggestions, loading, error, refetch } = useFriendSuggestions();
+  const { suggestions, loading, error, refetch } = useFriendSuggestions(false);
   const { sendRequest, loading: actionLoading } = useFriendActions();
+
+  // Fetch suggestions khi component mount
+  useEffect(() => {
+    refetch();
+  }, [refetch]);
 
   const suggestionIds = useMemo(() => {
     return Array.isArray(suggestions) ? suggestions.map(user => user.id).filter(Boolean) : [];
@@ -26,8 +31,16 @@ const FriendSuggestions = ({ limit = 6 }) => {
   const {
     mutualCounts,
     loading: mutualLoading,
-    error: mutualError
-  } = useBatchMutualFriends(suggestionIds);
+    error: mutualError,
+    refetch: refetchMutual
+  } = useBatchMutualFriends(suggestionIds, false);
+
+  // Fetch mutual friends khi có suggestions
+  useEffect(() => {
+    if (suggestionIds.length > 0) {
+      refetchMutual();
+    }
+  }, [suggestionIds, refetchMutual]);
 
   const handleSendRequest = async (userId) => {
     try {

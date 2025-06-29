@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { getMutualFriends } from '../../api/friendApi';
 
-export const useMutualFriends = (userId) => {
+export const useMutualFriends = (userId, autoFetch = false) => {
     const [mutualFriends, setMutualFriends] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -30,9 +30,12 @@ export const useMutualFriends = (userId) => {
         }
     }, [userId]);
 
+    // Chỉ fetch tự động nếu autoFetch = true
     useEffect(() => {
-        fetchMutualFriends();
-    }, [fetchMutualFriends]);
+        if (autoFetch) {
+            fetchMutualFriends();
+        }
+    }, [autoFetch, fetchMutualFriends]);
 
     return { 
         mutualFriends, 
@@ -43,7 +46,7 @@ export const useMutualFriends = (userId) => {
 };
 
 // Hook để batch fetch mutual friends với chi tiết
-export const useBatchMutualFriendsDetailed = (friendIds = []) => {
+export const useBatchMutualFriendsDetailed = (friendIds = [], autoFetch = false) => {
   const [mutualFriendsData, setMutualFriendsData] = useState({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -53,8 +56,6 @@ export const useBatchMutualFriendsDetailed = (friendIds = []) => {
       setMutualFriendsData({});
       return;
     }
-
-    console.log('useBatchMutualFriendsDetailed: Starting fetch for IDs:', friendIds);
 
     const token = localStorage.getItem('token');
     if (!token) {
@@ -70,16 +71,13 @@ export const useBatchMutualFriendsDetailed = (friendIds = []) => {
       // Fetch tất cả mutual friends details song song
       const promises = friendIds.map(async (friendId) => {
         try {
-          console.log(`Fetching detailed mutual friends for user ${friendId}...`);
           const result = await getMutualFriends(token, friendId);
-          console.log(`Mutual friends result for ${friendId}:`, result);
           return {
             friendId,
             mutualFriends: result?.mutualFriends || [],
             count: result?.mutualFriends?.length || 0
           };
         } catch (err) {
-          console.log(`Failed to fetch mutual friends for ${friendId}:`, err);
           return { friendId, mutualFriends: [], count: 0 };
         }
       });
@@ -92,10 +90,8 @@ export const useBatchMutualFriendsDetailed = (friendIds = []) => {
         dataMap[friendId] = { mutualFriends, count };
       });
       
-      console.log('useBatchMutualFriendsDetailed: Final dataMap:', dataMap);
       setMutualFriendsData(dataMap);
     } catch (err) {
-      console.error('Failed to fetch batch detailed mutual friends:', err);
       setError(err);
       setMutualFriendsData({});
     } finally {
@@ -103,15 +99,18 @@ export const useBatchMutualFriendsDetailed = (friendIds = []) => {
     }
   }, [friendIds]);
 
+  // Chỉ fetch tự động nếu autoFetch = true
   useEffect(() => {
-    fetchAllMutualFriendsDetailed();
-  }, [fetchAllMutualFriendsDetailed]);
+    if (autoFetch) {
+      fetchAllMutualFriendsDetailed();
+    }
+  }, [autoFetch, fetchAllMutualFriendsDetailed]);
 
   return { mutualFriendsData, loading, error, refetch: fetchAllMutualFriendsDetailed };
 };
 
 // Hook để batch fetch mutual friends counts cho nhiều users
-export const useBatchMutualFriends = (friendIds = []) => {
+export const useBatchMutualFriends = (friendIds = [], autoFetch = false) => {
   const [mutualCounts, setMutualCounts] = useState({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -121,8 +120,6 @@ export const useBatchMutualFriends = (friendIds = []) => {
       setMutualCounts({});
       return;
     }
-
-    console.log('useBatchMutualFriends: Starting fetch for IDs:', friendIds);
 
     const token = localStorage.getItem('token');
     if (!token) {
@@ -138,10 +135,7 @@ export const useBatchMutualFriends = (friendIds = []) => {
       // Fetch tất cả mutual friends counts song song
       const promises = friendIds.map(async (friendId) => {
         try {
-          console.log(`Fetching mutual friends for user ${friendId}...`);
           const result = await getMutualFriends(token, friendId);
-          console.log(`Mutual friends result for ${friendId}:`, result);
-          
           // Handle both success and "no mutual friends" cases
           if (result.mutualFriends) {
             return {
@@ -153,7 +147,6 @@ export const useBatchMutualFriends = (friendIds = []) => {
             return { friendId, count: 0 };
           }
         } catch (err) {
-          console.log(`Failed to fetch mutual friends for ${friendId}:`, err);
           return { friendId, count: 0 };
         }
       });
@@ -166,10 +159,8 @@ export const useBatchMutualFriends = (friendIds = []) => {
         countsMap[friendId] = count;
       });
       
-      console.log('useBatchMutualFriends: Final counts map:', countsMap);
       setMutualCounts(countsMap);
     } catch (err) {
-      console.error('Failed to fetch batch mutual friends:', err);
       setError(err);
       setMutualCounts({});
     } finally {
@@ -177,9 +168,12 @@ export const useBatchMutualFriends = (friendIds = []) => {
     }
   }, [friendIds]);
 
+  // Chỉ fetch tự động nếu autoFetch = true
   useEffect(() => {
-    fetchAllMutualCounts();
-  }, [fetchAllMutualCounts]);
+    if (autoFetch) {
+      fetchAllMutualCounts();
+    }
+  }, [autoFetch, fetchAllMutualCounts]);
 
   return { mutualCounts, loading, error, refetch: fetchAllMutualCounts };
 };

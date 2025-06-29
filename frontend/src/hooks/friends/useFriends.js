@@ -4,9 +4,9 @@ import {
     getFriendshipStatus
 } from '../../api/friendApi';
 
-export const useFriends = (userId = null) => {
+export const useFriends = (userId = null, autoFetch = false) => {
     const [friends, setFriends] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(autoFetch);
     const [error, setError] = useState(null);
 
     const fetchFriends = useCallback(async () => {
@@ -45,9 +45,12 @@ export const useFriends = (userId = null) => {
         }
     }, [userId]);
 
+    // Chỉ fetch tự động nếu autoFetch = true
     useEffect(() => {
-        fetchFriends();
-    }, [fetchFriends]);
+        if (autoFetch) {
+            fetchFriends();
+        }
+    }, [autoFetch, fetchFriends]);
 
     return { friends, loading, error, refetch: fetchFriends };
 };

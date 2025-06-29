@@ -91,12 +91,17 @@ export const forgotPassword = async (email) => {
 
 // Reset mật khẩu
 export const resetPassword = async (token, newPassword) => {
+    if (!token || !newPassword) {
+        throw new Error("Token and new password are both required");
+    }
+    
     const response = await fetch(`${API_BASE_URL}/public/reset-password`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ token, newPassword }),
+        body: JSON.stringify({ newPassword }),
     });
     
     if (!response.ok) {
@@ -109,12 +114,16 @@ export const resetPassword = async (token, newPassword) => {
 
 // Xác minh OTP cho reset password
 export const verifyOtp = async (email, otpCode) => {
+    if (!email || !otpCode) {
+        throw new Error("Email and OTP code are both required");
+    }
+    
     const response = await fetch(`${API_BASE_URL}/public/verify-otp`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, otpCode }),
+        body: JSON.stringify({ email, otp_code: otpCode }),
     });
     
     if (!response.ok) {
