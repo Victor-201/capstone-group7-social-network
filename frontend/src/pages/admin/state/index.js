@@ -2,6 +2,15 @@ import React, { useState, useEffect } from "react";
 import { getSystemStats } from "../../../api/adminApi";
 import { useAuth } from "../../../contexts/AuthContext";
 import { Navigate } from "react-router-dom";
+import { 
+  FaSpinner, 
+  FaUsers, 
+  FaUserPlus, 
+  FaClipboard, 
+  FaFileUpload, 
+  FaComment, 
+  FaThumbsUp 
+} from "react-icons/fa";
 
 const StateAdmin = () => {
   const [stats, setStats] = useState(null);
@@ -45,9 +54,15 @@ const StateAdmin = () => {
     return <Navigate to="/login" replace />;
   }
   
-  if (loading) return <div>Đang tải dữ liệu...</div>;
-  if (error) return <div>Lỗi: {error}</div>;
-  if (!stats) return <div>Không có dữ liệu thống kê</div>;
+  if (loading) return (
+    <div className="admin-loading">
+      <FaSpinner className="spinner-icon" />
+      <span>Đang tải dữ liệu...</span>
+    </div>
+  );
+  
+  if (error) return <div className="admin-error">Lỗi: {error}</div>;
+  if (!stats) return <div className="admin-no-data">Không có dữ liệu thống kê</div>;
   
   // Lấy dữ liệu từ stats với xử lý fallback an toàn
   const {
@@ -77,32 +92,32 @@ const StateAdmin = () => {
       
       <div className="stats-grid">
         <div className="stat-card">
-          <h3>Tổng người dùng</h3>
+          <h3><FaUsers className="stat-icon" /> Tổng người dùng</h3>
           <div className="stat-value">{total_users}</div>
         </div>
         
         <div className="stat-card">
-          <h3>Người dùng mới (hôm nay)</h3>
+          <h3><FaUserPlus className="stat-icon" /> Người dùng mới (hôm nay)</h3>
           <div className="stat-value">{new_users_today}</div>
         </div>
         
         <div className="stat-card">
-          <h3>Tổng bài đăng</h3>
+          <h3><FaClipboard className="stat-icon" /> Tổng bài đăng</h3>
           <div className="stat-value">{total_posts}</div>
         </div>
         
         <div className="stat-card">
-          <h3>Bài đăng mới (hôm nay)</h3>
+          <h3><FaFileUpload className="stat-icon" /> Bài đăng mới (hôm nay)</h3>
           <div className="stat-value">{new_posts_today}</div>
         </div>
         
         <div className="stat-card">
-          <h3>Tổng bình luận (hôm nay)</h3>
+          <h3><FaComment className="stat-icon" /> Tổng bình luận (hôm nay)</h3>
           <div className="stat-value">{total_comments_today}</div>
         </div>
         
         <div className="stat-card">
-          <h3>Tổng lượt thích (hôm nay)</h3>
+          <h3><FaThumbsUp className="stat-icon" /> Tổng lượt thích (hôm nay)</h3>
           <div className="stat-value">{total_likes_today}</div>
         </div>
       </div>

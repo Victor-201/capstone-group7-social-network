@@ -1,15 +1,17 @@
+@import '../../styles/pages/theme';
+
 .admin-dashboard {
   padding-top: 90px;
-  background-color: #f9fafb;
+  background-color: get-theme-color("background-color-light");
   min-height: 100vh;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  color: #333;
+  font-family: $font-family-base;
+  color: get-theme-color("text-primary");
   box-sizing: border-box;
 
   .admin-title {
     font-size: 2rem;
-    font-weight: bold;
-    color: #2c3e50;
+    font-weight: $font-weight-bold;
+    color: get-theme-color("text-secondary");
     text-align: center;
     margin-bottom: 2rem;
   }
@@ -34,10 +36,10 @@
       padding: 1.4rem 1.2rem;
       border: none;
       border-radius: 16px;
-      background-color: #ecf0f1;
-      color: #2c3e50;
+      background-color: get-theme-color("primary-color");
+      color: get-theme-color("text-primary");
       font-size: 1.1rem;
-      font-weight: 600;
+      font-weight: $font-weight-semibold;
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -46,35 +48,76 @@
       transition: all 0.3s ease;
 
       .admin-card-icon {
-        font-size: 1.8rem;
+        font-size: 1.5rem;
+        color: get-theme-color("text-secondary");
       }
 
       &:hover {
-        background-color: #d0e6f7;
-        color: #1d3557;
+        background-color: get-theme-color("secondary-color");
+        color: get-theme-color("quaternary-color");
       }
 
       &.active {
-        background-color: #1abc9c;
-        color: #fff;
-        box-shadow: 0 4px 12px rgba(26, 188, 156, 0.3);
+        background-color: get-theme-color("quaternary-color");
+        color: get-theme-color("text-quaternary");
+        box-shadow: 0 4px 12px rgba(17, 87, 69, 0.3);
         transform: translateY(-1px);
+
+        .admin-card-icon {
+          color: get-theme-color("text-quaternary");
+        }
       }
     }
   }
 
   .admin-content {
     flex: 1;
-    background: #ffffff;
+    background: get-theme-color("primary-color");
     padding: 2rem;
     border-radius: 16px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
     min-height: 600px;
   }
+
+  .admin-loading {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
+    
+    .spinner-icon {
+      animation: spin 1s linear infinite;
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      color: get-theme-color("quaternary-color");
+    }
+    
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+  }
+  
+  .admin-error {
+    color: get-theme-color("red-color");
+    padding: 1rem;
+    border: 1px solid rgba(220, 53, 69, 0.3);
+    border-radius: 0.5rem;
+    background-color: rgba(220, 53, 69, 0.1);
+    margin: 1rem 0;
+  }
+  
+  .admin-no-data {
+    text-align: center;
+    padding: 2rem;
+    color: get-theme-color("text-secondary");
+    font-style: italic;
+  }
 }
 
 .admin-section {
-  background-color: white;
+  background-color: get-theme-color("primary-color");
   border-radius: 10px;
   padding: 20px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
@@ -82,7 +125,8 @@
   h2 {
     margin-bottom: 20px;
     font-size: 22px;
-    color: #333;
+    color: get-theme-color("text-secondary");
+    font-weight: $font-weight-bold;
   }
 }
 
@@ -97,12 +141,12 @@
     th, td {
       padding: 12px 15px;
       text-align: left;
-      border-bottom: 1px solid #eee;
+      border-bottom: 1px solid get-theme-color("secondary-color");
     }
     
     th {
-      background-color: #f5f5f5;
-      font-weight: 600;
+      background-color: get-theme-color("secondary-color");
+      font-weight: $font-weight-semibold;
     }
     
     .inactive-row {
@@ -114,16 +158,16 @@
       padding: 4px 8px;
       border-radius: 4px;
       font-size: 12px;
-      font-weight: 600;
+      font-weight: $font-weight-semibold;
       
       &.active {
         background-color: #e5f5e5;
-        color: #2e7d32;
+        color: get-theme-color("quaternary-color");
       }
       
       &.inactive {
         background-color: #ffebee;
-        color: #c62828;
+        color: get-theme-color("red-color");
       }
     }
     
@@ -137,7 +181,7 @@
       
       &.lock {
         background-color: #ffebee;
-        color: #c62828;
+        color: get-theme-color("red-color");
         
         &:hover {
           background-color: #ffcdd2;
@@ -146,7 +190,7 @@
       
       &.unlock {
         background-color: #e5f5e5;
-        color: #2e7d32;
+        color: get-theme-color("quaternary-color");
         
         &:hover {
           background-color: #c8e6c9;
@@ -156,7 +200,7 @@
     
     .delete-btn {
       background-color: #ffebee;
-      color: #c62828;
+      color: get-theme-color("red-color");
       
       &:hover {
         background-color: #ffcdd2;
@@ -179,7 +223,7 @@
   margin-bottom: 30px;
   
   .stat-card {
-    background-color: #f9f9f9;
+    background-color: get-theme-color("primary-color");
     border-radius: 8px;
     padding: 20px;
     text-align: center;
@@ -187,30 +231,40 @@
     
     h3 {
       font-size: 16px;
-      color: #666;
+      color: get-theme-color("text-secondary");
       margin-bottom: 10px;
+      font-weight: $font-weight-medium;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      
+      .stat-icon {
+        color: get-theme-color("quaternary-color");
+      }
     }
     
     .stat-value {
       font-size: 32px;
-      font-weight: 700;
-      color: #1877f2;
+      font-weight: $font-weight-bold;
+      color: get-theme-color("quaternary-color");
     }
   }
 }
 
 .stat-chart {
   margin-top: 40px;
-  background-color: #f9f9f9;
+  background-color: get-theme-color("primary-color");
   border-radius: 8px;
   padding: 20px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   
   h3 {
     font-size: 18px;
-    color: #333;
+    color: get-theme-color("text-secondary");
     margin-bottom: 20px;
     text-align: center;
+    font-weight: $font-weight-medium;
   }
   
   .growth-bar-chart {
@@ -230,13 +284,13 @@
       .growth-bar-label {
         margin-top: 10px;
         font-size: 12px;
-        color: #666;
+        color: get-theme-color("text-primary");
       }
       
       .growth-bar {
         width: 40px;
         min-height: 1px;
-        background-color: #1877f2;
+        background-color: get-theme-color("quaternary-color");
         border-radius: 4px 4px 0 0;
         display: flex;
         justify-content: center;
@@ -246,8 +300,8 @@
         .growth-bar-value {
           margin-top: -20px;
           font-size: 12px;
-          font-weight: 600;
-          color: #333;
+          font-weight: $font-weight-semibold;
+          color: get-theme-color("text-primary");
         }
       }
     }
@@ -267,13 +321,13 @@
       .activity-day-label {
         margin-top: 10px;
         font-size: 12px;
-        color: #666;
+        color: get-theme-color("text-primary");
       }
       
       .activity-indicator {
         width: 30px;
         min-height: 1px;
-        background-color: #4CAF50;
+        background-color: get-theme-color("tertiary-color");
         border-radius: 4px 4px 0 0;
         display: flex;
         justify-content: center;
@@ -282,10 +336,25 @@
         .activity-count {
           margin-top: -20px;
           font-size: 12px;
-          font-weight: 600;
-          color: #333;
+          font-weight: $font-weight-semibold;
+          color: get-theme-color("text-primary");
         }
       }
     }
+  }
+}
+
+// Button styles consistent with theme
+.status-toggle-btn, .delete-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-family: $font-family-base;
+  font-weight: $font-weight-medium;
+  
+  &:hover {
+    transform: translateY(-1px);
+    transition: all 0.2s ease;
   }
 }

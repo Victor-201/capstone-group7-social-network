@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { getAllPosts, deletePost } from "../../../api/adminApi";
 import { useAuth } from "../../../contexts/AuthContext";
 import { Navigate } from "react-router-dom";
+import { FaSpinner, FaTrashAlt } from "react-icons/fa";
 
 const PostsAdmin = () => {
   const [posts, setPosts] = useState([]);
@@ -79,8 +80,14 @@ const PostsAdmin = () => {
     return <Navigate to="/login" replace />;
   }
   
-  if (loading) return <div>Đang tải dữ liệu...</div>;
-  if (error) return <div>Lỗi: {error}</div>;
+  if (loading) return (
+    <div className="admin-loading">
+      <FaSpinner className="spinner-icon" />
+      <span>Đang tải dữ liệu...</span>
+    </div>
+  );
+  
+  if (error) return <div className="admin-error">Lỗi: {error}</div>;
   
   return (
     <div className="admin-section">
@@ -118,7 +125,7 @@ const PostsAdmin = () => {
                       className="delete-btn" 
                       onClick={() => handleDeletePost(post.id)}
                     >
-                      Xóa
+                      <FaTrashAlt /> Xóa
                     </button>
                   </td>
                 </tr>

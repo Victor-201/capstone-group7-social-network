@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { getAllUsers, changeUserStatus } from "../../../api/adminApi";
 import { useAuth } from "../../../contexts/AuthContext";
 import { Navigate } from "react-router-dom";
+import { FaLock, FaLockOpen, FaSpinner } from "react-icons/fa";
 
 const AccountsAdmin = () => {
   const [users, setUsers] = useState([]);
@@ -83,8 +84,14 @@ const AccountsAdmin = () => {
     return <Navigate to="/login" replace />;
   }
   
-  if (loading) return <div>Đang tải dữ liệu...</div>;
-  if (error) return <div>Lỗi: {error}</div>;
+  if (loading) return (
+    <div className="admin-loading">
+      <FaSpinner className="spinner-icon" />
+      <span>Đang tải dữ liệu...</span>
+    </div>
+  );
+  
+  if (error) return <div className="admin-error">Lỗi: {error}</div>;
   
   return (
     <div className="admin-section">
@@ -122,7 +129,7 @@ const AccountsAdmin = () => {
                       className={`status-toggle-btn ${user.status === 'active' ? 'lock' : 'unlock'}`}
                       onClick={() => handleStatusChange(user.id, user.status)}
                     >
-                      {user.status === 'active' ? 'Khóa' : 'Mở khóa'}
+                      {user.status === 'active' ? <><FaLock /> Khóa</> : <><FaLockOpen /> Mở khóa</>}
                     </button>
                   </td>
                 </tr>
