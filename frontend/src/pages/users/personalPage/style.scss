@@ -157,6 +157,95 @@
     }
   }
 
+  &__friend-action-inline {
+    margin-left: auto;
+
+    .btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      transition: background-color 0.2s ease;
+
+      svg {
+        font-size: 16px;
+      }
+
+      &.btn--primary {
+        background-color: #91bea0;
+        color: #fdfdfd;
+
+        &:hover {
+          background-color: #115745;
+        }
+      }
+
+      &.btn--secondary {
+        background-color: rgba(145, 190, 160, 0.2);
+        color: #051f24;
+
+        &:hover {
+          background-color: rgba(145, 190, 160, 0.3);
+        }
+      }
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+    }
+  }
+
+  &__friend-action {
+    margin-left: auto;
+    transform: translateY(-3px);
+
+    .btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      transition: background-color 0.2s ease;
+
+      svg {
+        font-size: 16px;
+      }
+
+      &.btn--primary {
+        background-color: #91bea0;
+        color: #fdfdfd;
+
+        &:hover {
+          background-color: #115745;
+        }
+      }
+
+      &.btn--secondary {
+        background-color: rgba(145, 190, 160, 0.2);
+        color: #051f24;
+
+        &:hover {
+          background-color: rgba(145, 190, 160, 0.3);
+        }
+      }
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+    }
+  }
+
   &__actions {
     display: flex;
     gap: 12px;
@@ -177,6 +266,26 @@
 
       svg {
         font-size: 18px;
+      }
+    }
+
+    // Single button styling for non-owner profiles
+    &--single {
+      justify-content: flex-end;
+      align-items: center;
+      margin-top: 0;
+      margin-bottom: 0;
+
+      .btn {
+        padding: 10px 20px;
+        font-size: 15px;
+        font-weight: 600;
+        min-width: 140px;
+        border-radius: 8px;
+
+        svg {
+          font-size: 18px;
+        }
       }
     }
 

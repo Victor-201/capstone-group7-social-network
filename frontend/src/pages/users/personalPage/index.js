@@ -344,6 +344,11 @@ const PersonalPage = () => {
                         </div>
                       ))}
                   </div>
+                  {!isOwner && (
+                    <div className="profile__friend-action-inline">
+                      {renderFriendActionButton()}
+                    </div>
+                  )}
                 </div>
 
                 {isOwner && (
@@ -365,21 +370,7 @@ const PersonalPage = () => {
                   </div>
                 )}
 
-                {!isOwner && (
-                  <div className="profile__actions">
-                    {renderFriendActionButton()}
-                    <button
-                      className="btn btn--secondary"
-                      onClick={() => alert('Tính năng nhắn tin đang được phát triển!')}
-                    >
-                      <FiEdit />
-                      Nhắn tin
-                    </button>
-                    <button className="btn btn--icon-only">
-                      <FiMoreHorizontal />
-                    </button>
-                  </div>
-                )}
+
               </div>
             </div>
 
