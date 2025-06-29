@@ -13,7 +13,6 @@ import './style.scss';
 
 const HomePage = () => {
   const { auth } = useAuth();
-  console.log("thanglimlon", auth);
   const { posts, loading: postsLoading, error: postsError } = useUserFeedPosts();
   const [message, setMessage] = useState('');
   const [removedSuggestions, setRemovedSuggestions] = useState(new Set());
