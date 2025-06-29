@@ -94,3 +94,12 @@ export const suggestFriends = async (req, res) => {
   if (error) return res.status(error.code).json(error);
   return res.status(200).json(result);
 }
+
+export const getFriendshipStatus = async (req, res) => {
+  const friend_id = req.params.friend_id;
+  const user_id = req.user.id;
+
+  const { error, result } = await friendService.getFriendshipStatus(user_id, friend_id);
+  if (error) return res.status(error.code).json(error);
+  return res.status(200).json(result);
+};

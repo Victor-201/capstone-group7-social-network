@@ -227,6 +227,60 @@ export default {
       return { error: { code: 500, message: "Server internal error" } };
     }
   },
+
+  async getFriendshipStatus(user_id, friend_id) {
+    if (!friend_id || user_id === friend_id) {
+      return { error: { code: 400, message: "Invalid user" } };
+    }
+
+    try {
+      // Kiểm tra xem đã là bạn bè chưa
+      const friendship = await Friend.findOne({
+        where: {
+          status: 'accepted',
+          [Op.or]: [
+            { user_id, friend_id },
+            { user_id: friend_id, friend_id: user_id }
+          ]
+        }
+      });
+
+      if (friendship) {
+        return { result: { status: 'friends' } };
+      }
+
+      // Kiểm tra xem có lời mời đang chờ không
+      const sentRequest = await Friend.findOne({
+        where: {
+          user_id,
+          friend_id,
+          status: 'pending'
+        }
+      });
+
+      if (sentRequest) {
+        return { result: { status: 'pending' } };
+      }
+
+      // Kiểm tra xem có nhận được lời mời không
+      const receivedRequest = await Friend.findOne({
+        where: {
+          user_id: friend_id,
+          friend_id: user_id,
+          status: 'pending'
+        }
+      });
+
+      if (receivedRequest) {
+        return { result: { status: 'received' } };
+      }
+
+      // Không có quan hệ gì
+      return { result: { status: 'none' } };
+    } catch (error) {
+      return { error: { code: 500, message: "Server internal error" } };
+    }
+  },
   async getFriendSuggestions(user_id) {
     if (!user_id) {
       return { error: { code: 400, message: "user_id is required" } };

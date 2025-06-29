@@ -1,12 +1,13 @@
-import {    sendFriendRequest, 
-            respondToFriendRequest, 
+import {    sendFriendRequest,
+            respondToFriendRequest,
             getMutualFriends,
             getFriendsList,
             deleteFriend,
             getSentRequests,
             getReceivedRequests,
-            suggestFriends
-        } 
+            suggestFriends,
+            getFriendshipStatus
+        }
 from "../controllers/Friend.controller.js";
 import { validateEnum } from "../middleware/validateEnum.middleware.js";
 import express from 'express';
@@ -20,5 +21,6 @@ router.get('/friends/sent-requests', getSentRequests);
 router.get('/friends/received-requests', getReceivedRequests);
 router.delete('/friends/:friend_id', deleteFriend);
 router.get('/friends/suggest', suggestFriends);
+router.get('/status/:friend_id', getFriendshipStatus);
 
 export default router;

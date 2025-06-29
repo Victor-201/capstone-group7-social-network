@@ -5,6 +5,10 @@ import {
   FiEdit,
   FiCheckCircle,
   FiMoreHorizontal,
+  FiUserPlus,
+  FiUserMinus,
+  FiClock,
+  FiUserCheck,
 } from "react-icons/fi";
 import { BsCameraFill } from "react-icons/bs";
 import { useParams } from "react-router-dom";
@@ -19,6 +23,8 @@ import { useFriends } from "../../../hooks/friends/useFriends";
 import { useUserInfo } from "../../../hooks/user";
 import { useAuth } from "../../../contexts/AuthContext";
 import { useBatchMutualFriends } from "../../../hooks/friends/useMutualFriends";
+import { useFriendshipStatus } from "../../../hooks/friends/useFriends";
+import { useFriendActions } from "../../../hooks/friends/useFriendActions";
 import MediaUser from "../../../components/mediaCard";
 
 import PostsTab from "./modals/PostsTab";
@@ -46,6 +52,10 @@ const PersonalPage = () => {
     error: friendsError,
     refetch: refetchFriends,
   } = useFriends(userInfo?.id);
+
+  // Friend status and actions for non-owner profiles
+  const { status: friendshipStatus, loading: statusLoading, refetch: refetchStatus } = useFriendshipStatus(!isOwner ? userInfo?.id : null);
+  const { sendRequest, unfriendUser, loading: actionLoading, error: actionError } = useFriendActions();
 
   // Lấy danh sách friendIds từ friends
   const friendIds = useMemo(() => friends.map(friend => friend.id), [friends]);
@@ -94,6 +104,84 @@ const PersonalPage = () => {
 
   const handleEditAction = (action) => {
     alert(`Tính năng ${action} đang được phát triển!`);
+  };
+
+  // Handle friend actions
+  const handleAddFriend = async () => {
+    try {
+      await sendRequest(userInfo.id);
+      refetchStatus();
+      alert('Đã gửi lời mời kết bạn!');
+    } catch (error) {
+      alert('Có lỗi xảy ra khi gửi lời mời kết bạn: ' + error.message);
+    }
+  };
+
+  const handleUnfriend = async () => {
+    if (window.confirm('Bạn có chắc chắn muốn hủy kết bạn?')) {
+      try {
+        await unfriendUser(userInfo.id);
+        refetchStatus();
+        refetchFriends();
+        alert('Đã hủy kết bạn!');
+      } catch (error) {
+        alert('Có lỗi xảy ra khi hủy kết bạn: ' + error.message);
+      }
+    }
+  };
+
+  // Render friend action button based on status
+  const renderFriendActionButton = () => {
+    if (isOwner || !userInfo) return null;
+
+    if (statusLoading) {
+      return (
+        <button className="btn btn--secondary" disabled>
+          <FiUserPlus />
+          Đang tải...
+        </button>
+      );
+    }
+
+    switch (friendshipStatus) {
+      case 'friends':
+        return (
+          <button
+            className="btn btn--secondary"
+            onClick={handleUnfriend}
+            disabled={actionLoading}
+          >
+            <FiUserMinus />
+            {actionLoading ? 'Đang xử lý...' : 'Hủy kết bạn'}
+          </button>
+        );
+      case 'pending':
+        return (
+          <button className="btn btn--secondary" disabled>
+            <FiClock />
+            Đã gửi lời mời
+          </button>
+        );
+      case 'received':
+        return (
+          <button className="btn btn--primary" onClick={() => alert('Tính năng chấp nhận lời mời đang được phát triển!')}>
+            <FiUserCheck />
+            Chấp nhận lời mời
+          </button>
+        );
+      case 'none':
+      default:
+        return (
+          <button
+            className="btn btn--primary"
+            onClick={handleAddFriend}
+            disabled={actionLoading}
+          >
+            <FiUserPlus />
+            {actionLoading ? 'Đang gửi...' : 'Thêm bạn bè'}
+          </button>
+        );
+    }
   };
 
   const renderTabContent = useMemo(() => {
@@ -270,6 +358,22 @@ const PersonalPage = () => {
                     >
                       <FiEdit />
                       Chỉnh sửa trang cá nhân
+                    </button>
+                    <button className="btn btn--icon-only">
+                      <FiMoreHorizontal />
+                    </button>
+                  </div>
+                )}
+
+                {!isOwner && (
+                  <div className="profile__actions">
+                    {renderFriendActionButton()}
+                    <button
+                      className="btn btn--secondary"
+                      onClick={() => alert('Tính năng nhắn tin đang được phát triển!')}
+                    >
+                      <FiEdit />
+                      Nhắn tin
                     </button>
                     <button className="btn btn--icon-only">
                       <FiMoreHorizontal />
