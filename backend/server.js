@@ -2,12 +2,13 @@ import express from 'express';
 import http from 'http';
 import cors from 'cors';
 import { Server } from 'socket.io';
-
+import helmet from 'helmet';
 import router from './routes/app.routes.js';
 import sequelize from './configs/database.config.js';
 import { PORT } from './configs/env.config.js';
 import { messageHandler, notificationHandler } from './socket.js';
 import { socketVerifyToken } from './middleware/authorization.middleware.js';
+import hpp from 'hpp';
 
 const app = express();
 const server = http.createServer(app);
@@ -17,7 +18,8 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true,
 }));
-
+app.use(hpp());
+app.use(helmet());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

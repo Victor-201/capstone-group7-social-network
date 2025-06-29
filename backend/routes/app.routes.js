@@ -1,5 +1,6 @@
 import express from 'express';
 import { verifyAdmin, verifyToken } from '../middleware/authorization.middleware.js';
+import authLimiter from '../middleware/limiter.middleware.js';
 import routerAuth from './Auth.routes.js';
 import routerUserInfo from './userInfo.routes.js';
 import routerUserMedia from './userMedia.routes.js';
@@ -18,7 +19,7 @@ const router = express.Router();
 
 
 // Đăng nhập / đăng ký không cần token
-router.use('/public', routerAuth);
+router.use('/public', authLimiter, routerAuth);
 
 // Admin
 router.use('/admin', verifyAdmin, routerAdmin);
